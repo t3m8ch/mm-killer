@@ -2,4 +2,10 @@ import { pgTable, integer, timestamp } from "drizzle-orm/pg-core";
 export const entries = pgTable("{{snakeCase name}}", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+{{#if updatedAt}}
+  updatedAt: timestamp("updated_at", { withTimezone: true }),
+{{/if}}
+{{#if updatedBy}}
+  updatedBy: integer("updated_by"),
+{{/if}}
 });

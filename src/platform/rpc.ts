@@ -1,6 +1,6 @@
 import { os } from "@orpc/server";
 import type { Database, Transaction } from "./db";
-export type Context = { db: Database | Transaction; now: () => Date };
+export type Context = { db: Database | Transaction; now: () => Date; userId?: number };
 export const transaction = os
   .$context<Context>()
   .middleware(({ context, next }) =>

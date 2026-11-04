@@ -8,13 +8,35 @@ const os = implement(contract).$context<Context>();
 const serialize = (row: typeof entries.$inferSelect) => ({
   ...row,
   createdAt: row.createdAt.toISOString(),
+{{#if updatedAt}}
+  updatedAt: row.updatedAt?.toISOString() ?? null,
+{{/if}}
 });
 export const api = {
   // plop:handlers
+{{#if audit}}
+  update: os.update.use(transaction).handler(async ({ input, context, errors }) => {
+{{#if updatedBy}}
+    if (context.userId === undefined) throw errors.UNAUTHORIZED();
+{{/if}}
+    const [entry] = await context.db.update(entries).set({
+      // Добавить предметные изменения; поля аудита задаются только сервером.
+{{#if updatedAt}}
+      updatedAt: context.now(),
+{{/if}}
+{{#if updatedBy}}
+      updatedBy: context.userId,
+{{/if}}
+    }).where(eq(entries.id, input.id)).returning();
+    if (!entry) throw errors.NOT_FOUND();
+    return serialize(entry);
+  }),
+{{else}}
   // Добавить предметные поля и реализацию обновления перед использованием.
   update: os.update.handler(({ errors }) => {
     throw errors.NOT_IMPLEMENTED();
   }),
+{{/if}}
   delete: os.delete.use(transaction).handler(async ({ input, context, errors }) => {
     const [entry] = await context.db.delete(entries).where(eq(entries.id, input.id)).returning();
     if (!entry) throw errors.NOT_FOUND();
