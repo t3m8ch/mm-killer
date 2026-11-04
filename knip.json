@@ -7,7 +7,9 @@
     "scripts/*.ts",
     "scripts/*.js",
     "src/app/client.ts",
-    "tests/helpers/database.ts"
+    "tests/helpers/database.ts",
+    "src/app/lifecycle.ts",
+    "src/app/server-entry.ts"
   ],
   "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,js}", "scripts/**/*.ts"],
   "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript", "@orpc/contract"],

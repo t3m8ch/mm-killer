@@ -6,7 +6,9 @@
     ".codex/**",
     "src/routeTree.gen.ts",
     "dist/**",
-    ".tools/**"
+    ".tools/**",
+    ".output/**",
+    ".nitro/**"
   ],
   "rules": {
     "typescript/switch-exhaustiveness-check": "error",

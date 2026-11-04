@@ -1,3 +1,10 @@
-import { connect } from "../platform";
+import { connect, databaseUrl } from "../platform";
 
-export const { db } = connect(process.env.DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm");
+declare global {
+  var mergeMindsDatabase: ReturnType<typeof connect> | undefined;
+}
+
+// Nitro и SSR собираются отдельно; оба используют один пул в процессе.
+const connection = (globalThis.mergeMindsDatabase ??= connect(databaseUrl()));
+
+export const { db, pool } = connection;

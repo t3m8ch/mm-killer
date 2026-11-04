@@ -2,7 +2,7 @@ import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 
 export function connect(url: string) {
-  const pool = new Pool({ connectionString: url });
+  const pool = new Pool({ connectionString: url, connectionTimeoutMillis: 5000 });
 
   pool.on("error", (error) => {
     console.error("Ошибка простаивающего соединения Postgres:", error.message);
