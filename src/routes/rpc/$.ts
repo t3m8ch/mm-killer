@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RPCHandler } from "@orpc/server/fetch";
-import { connect } from "../../platform";
+import { db } from "../../app/database";
 import { api } from "../../app/api";
-const { db } = connect(process.env.DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm");
 const handler = new RPCHandler(api);
 export const Route = createFileRoute("/rpc/$")({
   server: {
