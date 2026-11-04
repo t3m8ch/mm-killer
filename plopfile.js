@@ -1,5 +1,25 @@
 import { existsSync, readFileSync } from "node:fs";
-const valid = (name) => /^[a-z][a-z0-9-]*$/.test(name) || "Use kebab-case";
+const domainModules = new Set([
+  "courses",
+  "invitations",
+  "tasks",
+  "attempts",
+  "reviews",
+  "git",
+  "notifications",
+]);
+const keepDomainGraph = (answers) =>
+  domainModules.has(answers.name) ? "Сохранить согласованный граф предметного модуля" : false;
+function hasProperty(path, name) {
+  // Conservative preflight only. Existing files are changed solely at Plop markers.
+  const text = readFileSync(path, "utf8");
+  return (
+    new RegExp(String.raw`(?:^|[,{\n])\s*(?:${name}|["']${name}["'])\s*(?::|(?=[,}]))`).test(
+      text,
+    ) || new RegExp(String.raw`\bimport\s*\{[^}]*\bas\s+${name}\b`).test(text)
+  );
+}
+const valid = (name) => /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(name) || "Use kebab-case";
 export default function generators(plop) {
   plop.setActionType("validate-module", (answers) => {
     if (
@@ -39,6 +59,8 @@ export default function generators(plop) {
       for (const marker of markers)
         if (!text.includes(marker)) throw new Error(`Нет маркера ${marker} в ${file}`);
     }
+    const property = plop.getHelper("camelCase")(answers.name);
+    if (hasProperty("src/app/api.ts", property)) throw new Error("Имя модуля уже занято в API");
     return "Новый модуль проверен";
   });
   plop.setActionType("validate-procedure", (answers) => {
@@ -52,6 +74,11 @@ export default function generators(plop) {
     ]) {
       if (!readFileSync(`src/modules/${answers.module}/${file}`, "utf8").includes(marker))
         throw new Error(`Нет маркера ${marker}`);
+    }
+    const property = plop.getHelper("camelCase")(answers.name);
+    for (const file of ["contract.ts", "api.ts"]) {
+      if (hasProperty(`src/modules/${answers.module}/${file}`, property))
+        throw new Error("Имя процедуры уже занято");
     }
     return "Процедура проверена";
   });
@@ -91,6 +118,7 @@ export default function generators(plop) {
           type: "append",
           unique: false,
           path: "easement.yml",
+          skip: keepDomainGraph,
           pattern: "  # plop:components",
           template:
             "  {{name}}: { in: src/modules/{{name}}, public: [src/modules/{{name}}/index.ts] }",
@@ -99,6 +127,7 @@ export default function generators(plop) {
           type: "append",
           unique: false,
           path: "easement.yml",
+          skip: keepDomainGraph,
           pattern: "  # plop:rules",
           template: "  {{name}}: { may_depend_on: [platform] }",
         },
@@ -106,6 +135,7 @@ export default function generators(plop) {
           type: "append",
           unique: false,
           path: "easement.yml",
+          skip: keepDomainGraph,
           pattern: "      # plop:app-dependencies",
           template: "      - {{name}}",
         },
@@ -113,6 +143,7 @@ export default function generators(plop) {
           type: "append",
           unique: false,
           path: "easement.yml",
+          skip: keepDomainGraph,
           pattern: "      # plop:test-dependencies",
           template: "      - {{name}}",
         },
