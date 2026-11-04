@@ -9,7 +9,7 @@
     "src/app/client.ts",
     "tests/helpers/database.ts"
   ],
-  "project": ["src/**/*.{ts,tsx}", "tests/**/*.ts", "scripts/**/*.ts"],
+  "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,js}", "scripts/**/*.ts"],
   "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript", "@orpc/contract"],
   "ignoreBinaries": ["easement"]
 }

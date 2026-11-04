@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "test": "node scripts/test-generated.js",
+    "test": "node tests/tooling/test-generated.js",
     "lint": "oxlint",
     "typecheck": "oxlint --type-aware --type-check",
     "format": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore",
@@ -15,7 +15,7 @@
     "test:e2e": "playwright test",
     "boundaries": "easement check",
     "generate": "node scripts/generate.js",
-    "test:guards": "node scripts/verify-guards.js"
+    "test:guards": "node tests/tooling/verify-guards.js"
   },
   "dependencies": {
     "@mantine/core": "9.7.4",
