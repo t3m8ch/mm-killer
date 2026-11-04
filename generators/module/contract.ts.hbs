@@ -18,7 +18,7 @@ export const contract = {
 {{#if audit}}
     .errors({ NOT_FOUND: {}{{#if updatedBy}}, UNAUTHORIZED: {}{{/if}} }),
 {{else}}
-    .errors({ NOT_IMPLEMENTED: {} }),
+    .errors({ NOT_FOUND: {}, NOT_IMPLEMENTED: {} }),
 {{/if}}
   delete: oc
     .input(z.object({ id: z.number().int().positive() }))
