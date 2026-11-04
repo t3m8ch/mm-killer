@@ -5,15 +5,14 @@ import { api } from "./index";
 it("сохраняет запись через публичный API", () =>
   rollbackTest(async (context) => {
     const client = createRouterClient(api, { context });
-    const entry = await client.create({ text: "Сквозной пример" });
+    const entry = await client.create({});
     expect(await client.get({ id: entry.id })).toEqual({
       ...entry,
-      text: "Сквозной пример",
       createdAt: "2026-11-04T12:00:00.000Z",
     });
     expect(await client.list()).toContainEqual(entry);
-    expect(await client.update({ id: entry.id, text: "Изменено" })).toMatchObject({
-      text: "Изменено",
+    await expect(client.update({ id: entry.id })).rejects.toMatchObject({
+      code: "NOT_IMPLEMENTED",
     });
     expect(await client.delete({ id: entry.id })).toEqual({ deleted: true });
     await expect(client.get({ id: entry.id })).rejects.toMatchObject({ code: "NOT_FOUND" });

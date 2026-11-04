@@ -11,24 +11,19 @@ const serialize = (row: typeof entries.$inferSelect) => ({
 });
 export const api = {
   // plop:handlers
-  update: os.update.use(transaction).handler(async ({ input, context, errors }) => {
-    const [entry] = await context.db
-      .update(entries)
-      .set({ text: input.text })
-      .where(eq(entries.id, input.id))
-      .returning();
-    if (!entry) throw errors.NOT_FOUND();
-    return serialize(entry);
+  // Добавить предметные поля и реализацию обновления перед использованием.
+  update: os.update.handler(({ errors }) => {
+    throw errors.NOT_IMPLEMENTED();
   }),
   delete: os.delete.use(transaction).handler(async ({ input, context, errors }) => {
     const [entry] = await context.db.delete(entries).where(eq(entries.id, input.id)).returning();
     if (!entry) throw errors.NOT_FOUND();
     return { deleted: true };
   }),
-  create: os.create.use(transaction).handler(async ({ input, context }) => {
+  create: os.create.use(transaction).handler(async ({ context }) => {
     const [entry] = await context.db
       .insert(entries)
-      .values({ ...input, createdAt: context.now() })
+      .values({ createdAt: context.now() })
       .returning();
     return serialize(entry);
   }),
