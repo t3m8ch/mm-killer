@@ -70,7 +70,7 @@ export default function generators(plop) {
         "errors",
         "row",
         "pgTable",
-        "integer",
+        "bigint",
         "timestamp",
         "eq",
         "transaction",
