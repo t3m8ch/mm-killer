@@ -10,12 +10,49 @@
   ],
   "rules": {
     "typescript/switch-exhaustiveness-check": "error",
-    "project/module-boundaries": "error"
+    "project/module-boundaries": "error",
+    "curly": ["error", "all"],
+    "no-nested-ternary": "error",
+    "@stylistic/padding-line-between-statements": [
+      "error",
+      {
+        "blankLine": "always",
+        "prev": "import",
+        "next": "*"
+      },
+      {
+        "blankLine": "any",
+        "prev": "import",
+        "next": "import"
+      },
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": ["return", "throw"]
+      },
+      {
+        "blankLine": "always",
+        "prev": ["block-like", "function", "class"],
+        "next": "*"
+      },
+      {
+        "blankLine": "always",
+        "prev": ["const", "let", "var"],
+        "next": "*"
+      },
+      {
+        "blankLine": "any",
+        "prev": ["const", "let", "var"],
+        "next": ["const", "let", "var"]
+      }
+    ],
+    "project/max-unseparated-statements": "error"
   },
   "jsPlugins": [
     {
       "name": "project",
       "specifier": "./scripts/oxlint-plugin.js"
-    }
+    },
+    "@stylistic/eslint-plugin"
   ]
 }

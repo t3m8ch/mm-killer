@@ -3,8 +3,10 @@ import { eq } from "drizzle-orm";
 import { transaction, type Context } from "../../platform";
 import { contract } from "./contract";
 import { {{camelCase name}} } from "./schema";
+
 // plop:imports
 const os = implement(contract).$context<Context>();
+
 const serialize = (row: typeof {{camelCase name}}.$inferSelect) => ({
   ...row,
   createdAt: row.createdAt.toISOString(),
@@ -12,12 +14,16 @@ const serialize = (row: typeof {{camelCase name}}.$inferSelect) => ({
   updatedAt: row.updatedAt?.toISOString() ?? null,
 {{/if}}
 });
+
 export const api = {
   // plop:handlers
 {{#if audit}}
   update: os.update.use(transaction).handler(async ({ input, context, errors }) => {
 {{#if updatedBy}}
-    if (context.userId === undefined) throw errors.UNAUTHORIZED();
+    if (context.userId === undefined) {
+      throw errors.UNAUTHORIZED();
+    }
+
 {{/if}}
     const [entry] = await context.db.update({{camelCase name}}).set({
       // Добавить предметные изменения; поля аудита задаются только сервером.
@@ -28,7 +34,11 @@ export const api = {
       updatedBy: context.userId,
 {{/if}}
     }).where(eq({{camelCase name}}.id, input.id)).returning();
-    if (!entry) throw errors.NOT_FOUND();
+
+    if (!entry) {
+      throw errors.NOT_FOUND();
+    }
+
     return serialize(entry);
   }),
 {{else}}
@@ -39,7 +49,11 @@ export const api = {
 {{/if}}
   delete: os.delete.use(transaction).handler(async ({ input, context, errors }) => {
     const [entry] = await context.db.delete({{camelCase name}}).where(eq({{camelCase name}}.id, input.id)).returning();
-    if (!entry) throw errors.NOT_FOUND();
+
+    if (!entry) {
+      throw errors.NOT_FOUND();
+    }
+
     return { deleted: true };
   }),
   create: os.create.use(transaction).handler(async ({ context }) => {
@@ -47,6 +61,7 @@ export const api = {
       .insert({{camelCase name}})
       .values({ createdAt: context.now() })
       .returning();
+
     return serialize(entry);
   }),
   list: os.list.handler(async ({ context }) =>
@@ -54,7 +69,11 @@ export const api = {
   ),
   get: os.get.handler(async ({ input, context, errors }) => {
     const [entry] = await context.db.select().from({{camelCase name}}).where(eq({{camelCase name}}.id, input.id));
-    if (!entry) throw errors.NOT_FOUND();
+
+    if (!entry) {
+      throw errors.NOT_FOUND();
+    }
+
     return serialize(entry);
   }),
 };

@@ -2,9 +2,11 @@ import { mkdtempSync, cpSync, symlinkSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
+
 export function withFixture(run, options = {}) {
   const root = process.cwd();
   const directory = mkdtempSync(join(tmpdir(), "mm-fixture-"));
+
   try {
     for (const path of [
       "src",
@@ -20,8 +22,10 @@ export function withFixture(run, options = {}) {
       "easement.yml",
       ".oxlintrc.json",
       ".gitignore",
-    ])
+    ]) {
       cpSync(path, join(directory, path), { recursive: true });
+    }
+
     symlinkSync(join(root, "node_modules"), join(directory, "node_modules"), "dir");
     process.chdir(directory);
     const result = spawnSync(
@@ -35,7 +39,11 @@ export function withFixture(run, options = {}) {
       ],
       { stdio: "inherit" },
     );
-    if (result.status !== 0) throw new Error("Не удалось сгенерировать тестовый модуль");
+
+    if (result.status !== 0) {
+      throw new Error("Не удалось сгенерировать тестовый модуль");
+    }
+
     run();
   } finally {
     process.chdir(root);
