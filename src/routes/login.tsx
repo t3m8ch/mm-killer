@@ -14,6 +14,7 @@ function Login() {
 
   const { data: users } = useSuspenseQuery(rpc.auth.users.queryOptions());
   const login = useMutation({
+    throwOnError: true,
     mutationFn: (input: { userId: bigint }) => rpc.auth.login.call(input),
     onSuccess: () => {
       window.location.href = "/";
@@ -33,7 +34,6 @@ function Login() {
           {user.fullName}
         </Button>
       ))}
-      {login.isError && <Text role="alert">Не удалось войти</Text>}
     </Stack>
   );
 }

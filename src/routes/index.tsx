@@ -24,12 +24,14 @@ function Home() {
   const ready = useMounted();
   const { data: user } = useSuspenseQuery(rpc.auth.me.queryOptions());
   const logout = useMutation({
+    throwOnError: true,
     mutationFn: () => rpc.auth.logout.call(undefined),
     onSuccess: () => {
       window.location.href = "/login";
     },
   });
   const logoutAll = useMutation({
+    throwOnError: true,
     mutationFn: () => rpc.auth.logoutAll.call(undefined),
     onSuccess: () => {
       window.location.href = "/login";
@@ -47,7 +49,6 @@ function Home() {
       <Button disabled={!ready || logoutAll.isPending} onClick={() => logoutAll.mutate(undefined)}>
         Выйти со всех устройств
       </Button>
-      {(logout.isError || logoutAll.isError) && <Text role="alert">Не удалось выйти</Text>}
     </Stack>
   );
 }
