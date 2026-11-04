@@ -1,11 +1,11 @@
-import { describe, expect, it } from "vitest";
-import { databaseUrl } from "../../src/platform";
+import { describe, expect, it, vi } from "vitest";
+import { readConfig } from "../../src/platform";
 
 describe("конфигурация подключения к Postgres", () => {
   it.each(["postgres://user:password@host/database", "postgresql://host/database"])(
     "принимает URL из окружения: %s",
     (value) => {
-      expect(databaseUrl({ DATABASE_URL: value })).toBe(value);
+      expect(readConfig({ DATABASE_URL: value }).DATABASE_URL).toBe(value);
     },
   );
 
@@ -17,8 +17,19 @@ describe("конфигурация подключения к Postgres", () => {
     "postgresql:///database",
     "https://user:secret@host/database",
   ])("отклоняет отсутствующий или некорректный URL без раскрытия значения", (value) => {
-    expect(() => databaseUrl({ DATABASE_URL: value })).toThrow(
+    expect(() => readConfig({ DATABASE_URL: value })).toThrow(
       "Задать DATABASE_URL с корректным URL подключения к Postgres",
     );
+  });
+  it("блокирует чтение серверной переменной в браузере", () => {
+    vi.stubGlobal("window", {});
+
+    try {
+      const config = readConfig({ DATABASE_URL: "postgres://user:secret@host/database" });
+
+      expect(() => config.DATABASE_URL).toThrow("Серверная конфигурация недоступна в браузере");
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
