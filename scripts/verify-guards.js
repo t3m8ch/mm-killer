@@ -42,7 +42,7 @@ const probes = [
   {
     file: "src/app/guard-probe.ts",
     command: ["easement", "check"],
-    source: 'export { entries } from "../modules/fixture/schema";',
+    source: 'export { fixture } from "../modules/fixture/schema";',
     expected: "privacy",
   },
 ];

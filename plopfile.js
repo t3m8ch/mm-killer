@@ -60,6 +60,26 @@ export default function generators(plop) {
         if (!text.includes(marker)) throw new Error(`Нет маркера ${marker} в ${file}`);
     }
     const property = plop.getHelper("camelCase")(answers.name);
+    if (
+      [
+        "api",
+        "implement",
+        "entry",
+        "input",
+        "context",
+        "errors",
+        "row",
+        "pgTable",
+        "integer",
+        "timestamp",
+        "eq",
+        "transaction",
+        "contract",
+        "os",
+        "serialize",
+      ].includes(property)
+    )
+      throw new Error("Имя модуля конфликтует с именами в сгенерированном коде");
     if (hasProperty("src/app/api.ts", property)) throw new Error("Имя модуля уже занято в API");
     answers.audit = Boolean(answers.updatedAt || answers.updatedBy);
     return "Новый модуль проверен";
