@@ -1,14 +1,19 @@
-export function databaseUrl(environment: NodeJS.ProcessEnv = process.env) {
-  const value = environment.DATABASE_URL;
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
 
-  if (
-    !value ||
-    !URL.canParse(value) ||
-    !["postgres:", "postgresql:"].includes(new URL(value).protocol) ||
-    !new URL(value).hostname
-  ) {
-    throw new Error("Задать DATABASE_URL с корректным URL подключения к Postgres");
-  }
-
-  return value;
+export function readConfig(environment: NodeJS.ProcessEnv = process.env) {
+  return createEnv({
+    server: {
+      DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/, hostname: /.+/ }),
+    },
+    clientPrefix: "VITE_",
+    client: {},
+    runtimeEnvStrict: { DATABASE_URL: environment.DATABASE_URL },
+    onValidationError: () => {
+      throw new Error("Задать DATABASE_URL с корректным URL подключения к Postgres");
+    },
+    onInvalidAccess: () => {
+      throw new Error("Серверная конфигурация недоступна в браузере");
+    },
+  });
 }

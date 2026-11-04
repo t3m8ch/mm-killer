@@ -1,7 +1,7 @@
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { connect, databaseUrl } from "../src/platform/index.ts";
+import { connect, readConfig } from "../src/platform/index.ts";
 
-const { db, pool } = connect(databaseUrl());
+const { db, pool } = connect(readConfig().DATABASE_URL);
 
 try {
   await migrate(db, { migrationsFolder: "migrations" });
