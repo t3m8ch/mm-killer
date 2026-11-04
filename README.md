@@ -8,12 +8,15 @@
 
 Нужны Podman и [mise](https://mise.jdx.dev/getting-started.html).
 
+`compose.dev.yaml` поднимает только Postgres для локальной разработки.
+Само приложение запускается отдельно командой `pnpm dev`, как показано ниже.
+
 ```sh
 mise trust
 mise install
 mise exec -- pnpm install --frozen-lockfile
 mise exec -- hk install --mise
-mise exec -- podman compose up -d
+mise exec -- podman compose -f compose.dev.yaml up -d
 mise exec -- pnpm db:migrate
 mise exec -- pnpm dev
 ```
