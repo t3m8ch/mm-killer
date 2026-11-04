@@ -11,6 +11,6 @@ const getClient = createIsomorphicFn()
   .client((): RouterClient<typeof api> =>
     createORPCClient(new RPCLink({ url: () => `${window.location.origin}/rpc` })),
   );
-const client = getClient();
+const client: RouterClient<typeof api> = getClient();
 
 export const rpc = createTanstackQueryUtils(client);

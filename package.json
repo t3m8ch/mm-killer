@@ -11,6 +11,8 @@
     "format": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore",
     "format:check": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore --check",
     "unused": "knip",
+    "db:seed": "node scripts/seed.ts",
+    "test:api": "vitest run",
     "db:migrate": "node scripts/migrate.ts",
     "test:e2e": "playwright test --pass-with-no-tests",
     "boundaries": "easement check",

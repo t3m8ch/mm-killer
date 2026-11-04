@@ -30,7 +30,9 @@ jobs:
       - run: mise run check
       - run: pnpm test:guards
       - run: pnpm test
+      - run: pnpm test:api
       - run: pnpm db:migrate
+      - run: pnpm db:seed
       - run: env -u DATABASE_URL pnpm build
       - run: pnpm test:runtime
       - run: pnpm test:bundle
