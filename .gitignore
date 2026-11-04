@@ -10,3 +10,7 @@ playwright-report/
 *.scip
 .easement/
 .tools/
+
+.nitro/
+.env.*
+!.env.example

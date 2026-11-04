@@ -10,11 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HealthLiveRouteImport } from './routes/health/live'
+import { Route as HealthReadyRouteImport } from './routes/health/ready'
 import { Route as RpcSplatRouteImport } from './routes/rpc/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthLiveRoute = HealthLiveRouteImport.update({
+  id: '/health/live',
+  path: '/health/live',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HealthReadyRoute = HealthReadyRouteImport.update({
+  id: '/health/ready',
+  path: '/health/ready',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RpcSplatRoute = RpcSplatRouteImport.update({
@@ -25,27 +37,35 @@ const RpcSplatRoute = RpcSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/health/live': typeof HealthLiveRoute
+  '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/health/live': typeof HealthLiveRoute
+  '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/health/live': typeof HealthLiveRoute
+  '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/rpc/$'
+  fullPaths: '/' | '/health/live' | '/health/ready' | '/rpc/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/rpc/$'
-  id: '__root__' | '/' | '/rpc/$'
+  to: '/' | '/health/live' | '/health/ready' | '/rpc/$'
+  id: '__root__' | '/' | '/health/live' | '/health/ready' | '/rpc/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HealthLiveRoute: typeof HealthLiveRoute
+  HealthReadyRoute: typeof HealthReadyRoute
   RpcSplatRoute: typeof RpcSplatRoute
 }
 
@@ -56,6 +76,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health/live': {
+      id: '/health/live'
+      path: '/health/live'
+      fullPath: '/health/live'
+      preLoaderRoute: typeof HealthLiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/health/ready': {
+      id: '/health/ready'
+      path: '/health/ready'
+      fullPath: '/health/ready'
+      preLoaderRoute: typeof HealthReadyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rpc/$': {
@@ -70,6 +104,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HealthLiveRoute: HealthLiveRoute,
+  HealthReadyRoute: HealthReadyRoute,
   RpcSplatRoute: RpcSplatRoute,
 }
 export const routeTree = rootRouteImport

@@ -26,6 +26,14 @@ mise exec -- pnpm dev
 Тестовый пользователь Postgres должен иметь CREATEDB; тесты создают временные
 БД с префиксом `mm_template_`/`mm_test_` и удаляют их по завершении.
 
+## Production-запуск
+
+`pnpm build` создаёт `.output/` через Nitro; `pnpm start` запускает готовую сборку.
+Сервер и миграции требуют `DATABASE_URL` из окружения. Для сборки БД не нужна.
+HTTP-порт задаётся через `HOST`/`PORT`, миграции выполняются отдельным процессом.
+Порядок выпуска, сигналы завершения и применение 12 факторов описаны в
+[договорённостях о запуске](docs/development/deployment.md).
+
 ## Проверки
 
 ```sh
@@ -33,6 +41,7 @@ mise run check
 mise exec -- pnpm test:guards
 mise exec -- pnpm test
 mise exec -- pnpm build
+mise exec -- pnpm test:runtime
 mise exec -- pnpm exec playwright install chromium
 mise exec -- pnpm test:e2e
 mise exec -- lychee --no-progress README.md 'docs/**/*.md'

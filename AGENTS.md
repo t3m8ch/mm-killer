@@ -14,6 +14,10 @@ Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-
 
 Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. Documentation is written in Russian with Russian terms; every glossary term carries its English equivalent. See `docs/agents/domain.md`.
 
+### Runtime and deployment
+
+При изменении конфигурации, подключения внешних сервисов, хранения состояния или запуска и завершения процессов соблюдать [договорённости о запуске и 12 факторах](docs/development/deployment.md).
+
 ## Code readability
 
 Разделять логические этапы кода пустыми строками: подготовку данных, выполнение действия и проверку или возврат результата. Выбирать границы по смыслу; ограничение линтера на семь стейтментов подряд — дополнительный сигнал пересмотреть группировку.
