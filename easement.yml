@@ -2,7 +2,6 @@ version: 1
 components:
   # plop:components
   platform: { in: src/platform, public: [src/platform/index.ts] }
-  example: { in: src/modules/example, public: [src/modules/example/index.ts] }
   courses: { in: src/modules/courses, public: [src/modules/courses/index.ts], optional: true }
   invitations:
     { in: src/modules/invitations, public: [src/modules/invitations/index.ts], optional: true }
@@ -15,12 +14,11 @@ components:
   app: { in: [src/app, src/routes, src/router.tsx] }
   generated: { in: src/routeTree.gen.ts }
   test_helpers: { in: tests/helpers, allow_importers: [tests] }
-  tests: { in: ["src/**/*.test.ts", tests/e2e], priority: 10 }
+  tests: { in: ["**/*.test.ts", tests/e2e], priority: 10 }
   tooling: { in: ["*.ts", scripts], priority: -1 }
 rules:
   # plop:rules
   platform: { may_depend_on: [] }
-  example: { may_depend_on: [platform] }
   courses: { may_depend_on: [platform] }
   invitations: { may_depend_on: [platform, courses] }
   tasks: { may_depend_on: [platform, courses] }
@@ -32,7 +30,6 @@ rules:
     may_depend_on:
       # plop:app-dependencies
       - platform
-      - example
       - courses
       - invitations
       - tasks
@@ -47,7 +44,6 @@ rules:
     may_depend_on:
       # plop:test-dependencies
       - platform
-      - example
       - courses
       - invitations
       - tasks
@@ -57,5 +53,5 @@ rules:
       - notifications
       - test_helpers
   tooling: { may_depend_on: [platform] }
-no_cycles: [platform, example, courses, invitations, tasks, attempts, reviews, git, notifications]
+no_cycles: [platform, courses, invitations, tasks, attempts, reviews, git, notifications]
 exclude: [".agents/**", ".claude/**", ".codex/**", "generators/**"]
