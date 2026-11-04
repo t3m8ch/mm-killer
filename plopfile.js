@@ -44,8 +44,7 @@ export default function generators(plop) {
       ].includes(answers.name)
     )
       throw new Error("Недопустимое имя модуля");
-    if (existsSync(`src/modules/${answers.name}`) || existsSync(`migrations/${answers.name}.sql`))
-      throw new Error("Модуль уже существует");
+    if (existsSync(`src/modules/${answers.name}`)) throw new Error("Модуль уже существует");
     for (const [file, markers] of Object.entries({
       "src/app/api.ts": ["// plop:imports", "// plop:api"],
       "easement.yml": [
@@ -120,11 +119,6 @@ export default function generators(plop) {
         })),
       )
       .concat([
-        {
-          type: "add",
-          path: "migrations/{{name}}.sql",
-          templateFile: "generators/module/migration.sql.hbs",
-        },
         {
           type: "append",
           unique: false,

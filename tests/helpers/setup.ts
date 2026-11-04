@@ -1,4 +1,5 @@
-import { connect, migrate } from "../../src/platform";
+import { migrate } from "drizzle-orm/node-postgres/migrator";
+import { connect } from "../../src/platform";
 export default async function setup() {
   const admin = connect(process.env.TEST_DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm");
   const name = `mm_template_${crypto.randomUUID().replaceAll("-", "")}`;
@@ -7,7 +8,7 @@ export default async function setup() {
   url.pathname = `/${name}`;
   const template = connect(url.toString());
   try {
-    await migrate(template.pool);
+    await migrate(template.db, { migrationsFolder: "migrations" });
   } finally {
     await template.pool.end();
   }

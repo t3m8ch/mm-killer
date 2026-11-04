@@ -23,12 +23,22 @@ if (generator === "module") {
     String(values.updatedBy),
   ];
 }
-const result = spawnSync("plop", ["--plopfile", "plopfile.js", ...parameters], {
+const env = {
+  ...process.env,
+  PATH: `${resolve("node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}`,
+};
+const plop = spawnSync("plop", ["--plopfile", "plopfile.js", ...parameters], {
   stdio: "inherit",
-  env: {
-    ...process.env,
-    PATH: `${resolve("node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}`,
-  },
+  env,
 });
-if (result.error) throw result.error;
-process.exitCode = result.status ?? 1;
+if (plop.error) throw plop.error;
+process.exitCode = plop.status ?? 1;
+if (plop.status === 0 && generator === "module") {
+  const kit = spawnSync(
+    "drizzle-kit",
+    ["generate", "--name", `create_${parameters[1].replaceAll("-", "_")}`],
+    { stdio: "inherit", env },
+  );
+  if (kit.error) throw kit.error;
+  process.exitCode = kit.status ?? 1;
+}

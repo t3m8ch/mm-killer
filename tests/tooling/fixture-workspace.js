@@ -14,6 +14,7 @@ export function withFixture(run, options = {}) {
       "migrations",
       "package.json",
       "plopfile.js",
+      "drizzle.config.ts",
       "tsconfig.json",
       "vitest.config.ts",
       "easement.yml",
