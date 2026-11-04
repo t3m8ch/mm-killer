@@ -1,19 +1,20 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
+const id = z.bigint().positive().max(9223372036854775807n);
 const entry = z.object({
-  id: z.number().int(),
+  id,
   createdAt: z.string().datetime(),
 {{#if updatedAt}}
   updatedAt: z.string().datetime().nullable(),
 {{/if}}
 {{#if updatedBy}}
-  updatedBy: z.number().int().positive().nullable(),
+  updatedBy: id.nullable(),
 {{/if}}
 });
 export const contract = {
   // plop:contracts
   update: oc
-    .input(z.object({ id: z.number().int().positive() }))
+    .input(z.object({ id }))
     .output(entry)
 {{#if audit}}
     .errors({ NOT_FOUND: {}{{#if updatedBy}}, UNAUTHORIZED: {}{{/if}} }),
@@ -21,13 +22,13 @@ export const contract = {
     .errors({ NOT_FOUND: {}, NOT_IMPLEMENTED: {} }),
 {{/if}}
   delete: oc
-    .input(z.object({ id: z.number().int().positive() }))
+    .input(z.object({ id }))
     .output(z.object({ deleted: z.literal(true) }))
     .errors({ NOT_FOUND: {} }),
   create: oc.input(z.object({})).output(entry),
   list: oc.output(z.array(entry)),
   get: oc
-    .input(z.object({ id: z.number().int().positive() }))
+    .input(z.object({ id }))
     .output(entry)
     .errors({ NOT_FOUND: {} }),
 };
