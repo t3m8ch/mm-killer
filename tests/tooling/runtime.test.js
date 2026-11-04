@@ -19,7 +19,7 @@ await describe("production-релиз", async () => {
   after(() => rmSync(release, { recursive: true, force: true }));
 
   function launch(environment, entry = join(release, ".output/server/index.mjs")) {
-    const env = { ...process.env, HOST: "127.0.0.1", PORT: "0", ...environment };
+    const env = { ...process.env, HOST: "127.0.0.1", PORT: "0", LOG_LEVEL: "info", ...environment };
 
     delete env.NITRO_HOST;
     delete env.NITRO_PORT;
@@ -27,15 +27,17 @@ await describe("production-релиз", async () => {
     const child = spawn(process.execPath, [entry], { cwd: release, env });
     const exited = once(child, "exit");
     let output = "";
+    let stdout = "";
 
     child.stdout.on("data", (chunk) => {
+      stdout += chunk;
       output += chunk;
     });
     child.stderr.on("data", (chunk) => {
       output += chunk;
     });
 
-    return { child, exited, output: () => output };
+    return { child, exited, output: () => output, stdout: () => stdout };
   }
 
   async function listen(server) {
@@ -89,7 +91,13 @@ await describe("production-релиз", async () => {
 
         assert.equal(receivedSignal, null, server.output());
         assert.equal(code, 0, server.output());
-        assert.match(server.output(), /Пул Postgres закрыт/);
+        const closed = server
+          .stdout()
+          .split("\n")
+          .find((line) => line.startsWith("{") && line.includes('"event":"postgres.pool_closed"'));
+
+        assert.ok(closed, server.output());
+        assert.equal(JSON.parse(closed).level, 30);
       },
     );
   }
@@ -124,7 +132,7 @@ await describe("production-релиз", async () => {
         const [code] = await server.exited;
 
         assert.notEqual(code, 0);
-        assert.match(server.output(), /Задать DATABASE_URL/);
+        assert.match(server.output(), /Некорректные переменные окружения: DATABASE_URL/);
       },
     );
   }
