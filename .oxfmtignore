@@ -1,0 +1,9 @@
+.agents/
+.claude/
+.codex/
+.tools/
+node_modules/
+dist/
+src/routeTree.gen.ts
+pnpm-lock.yaml
+generators/

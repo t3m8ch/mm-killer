@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["vite/client", "node"],
+    "allowJs": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "*.ts",
+    "scripts/**/*.ts",
+    "*.js",
+    "scripts/**/*.js"
+  ]
+}

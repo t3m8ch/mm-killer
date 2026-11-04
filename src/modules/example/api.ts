@@ -1,0 +1,43 @@
+import { implement } from "@orpc/server";
+import { eq } from "drizzle-orm";
+import { mutationTransaction, type Context } from "../../platform";
+import { contract } from "./contract";
+import { entries } from "./schema";
+// plop:imports
+const os = implement(contract).$context<Context>();
+const serialize = (row: typeof entries.$inferSelect) => ({
+  ...row,
+  createdAt: row.createdAt.toISOString(),
+});
+export const api = {
+  // plop:handlers
+  update: os.update.use(mutationTransaction).handler(async ({ input, context, errors }) => {
+    const [entry] = await context.db
+      .update(entries)
+      .set({ text: input.text })
+      .where(eq(entries.id, input.id))
+      .returning();
+    if (!entry) throw errors.NOT_FOUND();
+    return serialize(entry);
+  }),
+  delete: os.delete.use(mutationTransaction).handler(async ({ input, context, errors }) => {
+    const [entry] = await context.db.delete(entries).where(eq(entries.id, input.id)).returning();
+    if (!entry) throw errors.NOT_FOUND();
+    return { deleted: true };
+  }),
+  create: os.create.use(mutationTransaction).handler(async ({ input, context }) => {
+    const [entry] = await context.db
+      .insert(entries)
+      .values({ ...input, createdAt: context.now() })
+      .returning();
+    return serialize(entry);
+  }),
+  list: os.list.handler(async ({ context }) =>
+    (await context.db.select().from(entries).orderBy(entries.id)).map(serialize),
+  ),
+  get: os.get.handler(async ({ input, context, errors }) => {
+    const [entry] = await context.db.select().from(entries).where(eq(entries.id, input.id));
+    if (!entry) throw errors.NOT_FOUND();
+    return serialize(entry);
+  }),
+};

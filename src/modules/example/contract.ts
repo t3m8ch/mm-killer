@@ -1,0 +1,24 @@
+import { oc } from "@orpc/contract";
+import { z } from "zod";
+const entry = z.object({
+  id: z.number().int(),
+  text: z.string(),
+  createdAt: z.string().datetime(),
+});
+export const contract = {
+  // plop:contracts
+  update: oc
+    .input(z.object({ id: z.number().int().positive(), text: z.string().trim().min(1).max(200) }))
+    .output(entry)
+    .errors({ NOT_FOUND: {} }),
+  delete: oc
+    .input(z.object({ id: z.number().int().positive() }))
+    .output(z.object({ deleted: z.literal(true) }))
+    .errors({ NOT_FOUND: {} }),
+  create: oc.input(z.object({ text: z.string().trim().min(1).max(200) })).output(entry),
+  list: oc.output(z.array(entry)),
+  get: oc
+    .input(z.object({ id: z.number().int().positive() }))
+    .output(entry)
+    .errors({ NOT_FOUND: {} }),
+};

@@ -1,0 +1,13 @@
+{
+  "entry": [
+    "src/routes/**/*.{ts,tsx}",
+    "src/**/*.test.ts",
+    "src/modules/*/index.ts",
+    "src/platform/index.ts",
+    "scripts/*.ts",
+    "scripts/*.js"
+  ],
+  "project": ["src/**/*.{ts,tsx}", "tests/**/*.ts", "scripts/**/*.ts"],
+  "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript"],
+  "ignoreBinaries": ["easement"]
+}
