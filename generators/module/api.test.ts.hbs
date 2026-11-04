@@ -1,10 +1,21 @@
-import { it, expect } from 'vitest'; import { createRouterClient } from '@orpc/server'; import {
-rollbackTest } from '../../../tests/helpers/database'; import { api } from './index'; it('сохраняет
-запись через публичный API', () => rollbackTest(async (context) => { const client =
-createRouterClient(api, { context }); const entry = await client.create({ text: 'Сквозной пример'
-}); expect(await client.get({ id: entry.id })).toEqual({ ...entry, text: 'Сквозной пример',
-createdAt: '2026-11-04T12:00:00.000Z' }); expect(await client.list()).toContainEqual(entry);
-expect(await client.update({ id: entry.id, text: 'Изменено' })).toMatchObject({ text: 'Изменено' });
-expect(await client.delete({ id: entry.id })).toEqual({ deleted: true }); await expect(client.get({
-id: entry.id })).rejects.toMatchObject({ code: 'NOT_FOUND' }); await expect(client.get({ id:
-2147483647 })).rejects.toMatchObject({ code: 'NOT_FOUND' }); }));
+import { it, expect } from "vitest";
+import { createRouterClient } from "@orpc/server";
+import { rollbackTest } from "../../../tests/helpers/database";
+import { api } from "./index";
+it("сохраняет запись через публичный API", () =>
+  rollbackTest(async (context) => {
+    const client = createRouterClient(api, { context });
+    const entry = await client.create({ text: "Сквозной пример" });
+    expect(await client.get({ id: entry.id })).toEqual({
+      ...entry,
+      text: "Сквозной пример",
+      createdAt: "2026-11-04T12:00:00.000Z",
+    });
+    expect(await client.list()).toContainEqual(entry);
+    expect(await client.update({ id: entry.id, text: "Изменено" })).toMatchObject({
+      text: "Изменено",
+    });
+    expect(await client.delete({ id: entry.id })).toEqual({ deleted: true });
+    await expect(client.get({ id: entry.id })).rejects.toMatchObject({ code: "NOT_FOUND" });
+    await expect(client.get({ id: 2147483647 })).rejects.toMatchObject({ code: "NOT_FOUND" });
+  }));
