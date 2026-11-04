@@ -1,5 +1,6 @@
 import { oc } from "@orpc/contract";
 import { z } from "zod";
+
 const id = z.bigint().positive().max(9223372036854775807n);
 const entry = z.object({
   id,
@@ -11,6 +12,7 @@ const entry = z.object({
   updatedBy: id.nullable(),
 {{/if}}
 });
+
 export const contract = {
   // plop:contracts
   update: oc

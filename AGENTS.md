@@ -14,6 +14,10 @@ Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-
 
 Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. Documentation is written in Russian with Russian terms; every glossary term carries its English equivalent. See `docs/agents/domain.md`.
 
+## Code readability
+
+Разделять логические этапы кода пустыми строками: подготовку данных, выполнение действия и проверку или возврат результата. Выбирать границы по смыслу; ограничение линтера на семь стейтментов подряд — дополнительный сигнал пересмотреть группировку.
+
 ## Commits
 
 Use [Conventional Commits](https://www.conventionalcommits.org/). The type, optional scope and `!` are in English; the description and body are in Russian, starting lowercase, in the infinitive, without a trailing period.

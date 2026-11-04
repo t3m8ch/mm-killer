@@ -1,7 +1,33 @@
 import { withFixture } from "./fixture-workspace.js";
 import { writeFileSync, unlinkSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+
 const probes = [
+  {
+    file: "src/modules/fixture/guard-probe.ts",
+    command: ["oxlint"],
+    source: "export function run() { const value = 1; return value; }",
+    expected: "padding-line-between-statements",
+  },
+  {
+    file: "src/modules/fixture/guard-probe.ts",
+    command: ["oxlint"],
+    source: "export function run() { if (true) return 1; }",
+    expected: "curly",
+  },
+  {
+    file: "src/modules/fixture/guard-probe.ts",
+    command: ["oxlint"],
+    source: "export const value = true ? 1 : false ? 2 : 3;",
+    expected: "no-nested-ternary",
+  },
+  {
+    file: "src/modules/fixture/guard-probe.ts",
+    command: ["oxlint"],
+    source:
+      "export function run() { console.log(1); console.log(2); console.log(3); console.log(4); console.log(5); console.log(6); console.log(7); }",
+    expected: "max-unseparated-statements",
+  },
   {
     file: "src/modules/fixture/guard-probe.tsx",
     command: ["oxlint"],
@@ -46,6 +72,7 @@ const probes = [
     expected: "privacy",
   },
 ];
+
 withFixture(() => {
   for (const probe of probes) {
     try {
@@ -56,10 +83,13 @@ withFixture(() => {
         { encoding: "utf8" },
       );
       const output = `${result.stdout}${result.stderr}`;
-      if (result.status !== 1 || !output.includes(probe.expected))
+
+      if (result.status !== 1 || !output.includes(probe.expected)) {
         throw new Error(
           `Проверка ${probe.expected} не обнаружила нарушение: ${result.status} ${result.signal} ${result.error ?? ""} ${output}`,
         );
+      }
+
       console.log(`PASS ${probe.expected}: ${probe.file}`);
     } finally {
       unlinkSync(probe.file);

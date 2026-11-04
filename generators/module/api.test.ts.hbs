@@ -12,6 +12,7 @@ function clientFor(context: Context) {
   const client = createRouterClient(api, {
     context: { ...context, now: time.now{{#if updatedBy}}, userId: 9007199254740995n{{/if}} },
   });
+
   return { client, time };
 }
 
@@ -23,19 +24,26 @@ describe("{{name}}: публичный API", () => {
         url: "http://test.local/rpc",
         fetch: async (request) => {
           const { response } = await handler.handle(request, { prefix: "/rpc", context });
+
           return response ?? new Response(null, { status: 404 });
         },
       }));
+
       const entry = await client.create({});
+
       expect(typeof entry.id).toBe("bigint");
+
       expect(entry.id).toBeGreaterThan(9007199254740991n);
+
       expect(await client.get({ id: entry.id })).toEqual(entry);
     }));
 
   it("возвращает созданную запись с серверным временем", () =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       const entry = await client.create({});
+
       expect(await client.get({ id: entry.id })).toEqual({
         id: entry.id,
         createdAt: "2026-11-04T12:00:00.000Z",
@@ -51,27 +59,34 @@ describe("{{name}}: публичный API", () => {
   it("включает созданную запись в список", () =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       const entry = await client.create({});
+
       expect(await client.list()).toContainEqual(entry);
     }));
 
   it("удалённая запись больше не доступна", () =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       const entry = await client.create({});
+
       expect(await client.delete({ id: entry.id })).toEqual({ deleted: true });
+
       await expect(client.get({ id: entry.id })).rejects.toMatchObject({ code: "NOT_FOUND" });
     }));
 
   it.each([0n, -1n, 9223372036854775808n])("отклоняет id вне положительного диапазона bigint: %s", (id) =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       await expect(client.get({ id })).rejects.toMatchObject({ code: "BAD_REQUEST" });
     }));
 
   it("отклоняет чтение отсутствующей записи", () =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       await expect(client.get({ id: 9223372036854775807n })).rejects.toMatchObject({ code: "NOT_FOUND" });
     }));
 
@@ -79,9 +94,13 @@ describe("{{name}}: публичный API", () => {
   it("обновляет серверные метаданные, сохраняя время создания", () =>
     rollbackTest(async (context) => {
       const { client, time } = clientFor(context);
+
       const entry = await client.create({});
+
       time.set("2026-11-05T15:00:00.000Z");
+
       const updated = await client.update({ id: entry.id });
+
       expect(updated).toEqual({
         id: entry.id,
         createdAt: "2026-11-04T12:00:00.000Z",
@@ -92,20 +111,27 @@ describe("{{name}}: публичный API", () => {
         updatedBy: 9007199254740995n,
   {{/if}}
       });
+
       expect(await client.get({ id: entry.id })).toEqual(updated);
     }));
 
   it("игнорирует подставленные клиентом поля аудита", () =>
     rollbackTest(async (context) => {
       const { client, time } = clientFor(context);
+
       const entry = await client.create({});
+
       time.set("2026-11-05T15:00:00.000Z");
+
       const input = { id: entry.id, updatedAt: "2000-01-01T00:00:00.000Z", updatedBy: 999n };
+
       const updated = await client.update(input);
   {{#if updatedAt}}
+
       expect(updated.updatedAt).toBe("2026-11-05T15:00:00.000Z");
   {{/if}}
   {{#if updatedBy}}
+
       expect(updated.updatedBy).toBe(9007199254740995n);
   {{/if}}
     }));
@@ -113,15 +139,19 @@ describe("{{name}}: публичный API", () => {
   it("отклоняет обновление отсутствующей записи", () =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       await expect(client.update({ id: 9223372036854775807n })).rejects.toMatchObject({ code: "NOT_FOUND" });
     }));
   {{#if updatedBy}}
   it("отклоняет обновление без пользователя и сохраняет запись", () =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       const entry = await client.create({});
       const anonymous = createRouterClient(api, { context });
+
       await expect(anonymous.update({ id: entry.id })).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+
       expect(await client.get({ id: entry.id })).toEqual(entry);
     }));
   {{/if}}
@@ -129,7 +159,9 @@ describe("{{name}}: публичный API", () => {
   it("оставляет обновление каркасом без изменяемых полей", () =>
     rollbackTest(async (context) => {
       const { client } = clientFor(context);
+
       const entry = await client.create({});
+
       await expect(client.update({ id: entry.id })).rejects.toMatchObject({ code: "NOT_IMPLEMENTED" });
     }));
   {{/if}}

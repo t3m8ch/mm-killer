@@ -1,4 +1,5 @@
 import { pgTable, bigint, timestamp } from "drizzle-orm/pg-core";
+
 export const {{camelCase name}} = pgTable("{{snakeCase name}}", {
   id: bigint({ mode: "bigint" }).primaryKey().generatedAlwaysAsIdentity(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
