@@ -19,6 +19,7 @@ export function withFixture(run, options = {}) {
       "drizzle.config.ts",
       "tsconfig.json",
       "vitest.config.ts",
+      "vite.config.ts",
       "easement.yml",
       ".oxlintrc.json",
       ".gitignore",

@@ -39,6 +39,7 @@ HTTP-порт задаётся через `HOST`/`PORT`, миграции вып
 ```sh
 mise run check
 mise exec -- pnpm test:guards
+mise exec -- pnpm test:bundle
 mise exec -- pnpm test
 mise exec -- pnpm build
 mise exec -- pnpm test:runtime
