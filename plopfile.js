@@ -61,6 +61,7 @@ export default function generators(plop) {
     }
     const property = plop.getHelper("camelCase")(answers.name);
     if (hasProperty("src/app/api.ts", property)) throw new Error("Имя модуля уже занято в API");
+    answers.audit = Boolean(answers.updatedAt || answers.updatedBy);
     return "Новый модуль проверен";
   });
   plop.setActionType("validate-procedure", (answers) => {
@@ -84,7 +85,11 @@ export default function generators(plop) {
   });
   plop.setGenerator("module", {
     description: "Создать автономный CRUD модуль",
-    prompts: [{ type: "input", name: "name", validate: valid }],
+    prompts: [
+      { type: "input", name: "name", validate: valid },
+      { type: "confirm", name: "updatedAt", default: false },
+      { type: "confirm", name: "updatedBy", default: false },
+    ],
     actions: [{ type: "validate-module" }]
       .concat(
         ["contract.ts", "api.ts", "schema.ts", "index.ts", "api.test.ts"].map((file) => ({

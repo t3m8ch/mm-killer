@@ -14,7 +14,7 @@
     "db:migrate": "node scripts/migrate.ts",
     "test:e2e": "playwright test",
     "boundaries": "easement check",
-    "generate": "plop --plopfile plopfile.js",
+    "generate": "node scripts/generate.js",
     "test:guards": "node scripts/verify-guards.js"
   },
   "dependencies": {

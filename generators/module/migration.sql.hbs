@@ -1,4 +1,10 @@
 CREATE TABLE IF NOT EXISTS {{snakeCase name}} (
   id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  created_at timestamptz NOT NULL
+  created_at timestamptz NOT NULL{{#if audit}},{{/if}}
+{{#if updatedAt}}
+  updated_at timestamptz{{#if updatedBy}},{{/if}}
+{{/if}}
+{{#if updatedBy}}
+  updated_by integer
+{{/if}}
 );
