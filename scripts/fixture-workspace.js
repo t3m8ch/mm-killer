@@ -28,7 +28,7 @@ export function withFixture(run, options = {}) {
       [
         join(directory, "scripts/generate.js"),
         "module",
-        "fixture",
+        options.moduleName ?? "fixture",
         ...(options.updatedAt ? ["--updatedAt"] : []),
         ...(options.updatedBy ? ["--updatedBy"] : []),
       ],

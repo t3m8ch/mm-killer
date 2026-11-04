@@ -2,10 +2,10 @@ import { implement } from "@orpc/server";
 import { eq } from "drizzle-orm";
 import { transaction, type Context } from "../../platform";
 import { contract } from "./contract";
-import { entries } from "./schema";
+import { {{camelCase name}} } from "./schema";
 // plop:imports
 const os = implement(contract).$context<Context>();
-const serialize = (row: typeof entries.$inferSelect) => ({
+const serialize = (row: typeof {{camelCase name}}.$inferSelect) => ({
   ...row,
   createdAt: row.createdAt.toISOString(),
 {{#if updatedAt}}
@@ -19,7 +19,7 @@ export const api = {
 {{#if updatedBy}}
     if (context.userId === undefined) throw errors.UNAUTHORIZED();
 {{/if}}
-    const [entry] = await context.db.update(entries).set({
+    const [entry] = await context.db.update({{camelCase name}}).set({
       // Добавить предметные изменения; поля аудита задаются только сервером.
 {{#if updatedAt}}
       updatedAt: context.now(),
@@ -27,7 +27,7 @@ export const api = {
 {{#if updatedBy}}
       updatedBy: context.userId,
 {{/if}}
-    }).where(eq(entries.id, input.id)).returning();
+    }).where(eq({{camelCase name}}.id, input.id)).returning();
     if (!entry) throw errors.NOT_FOUND();
     return serialize(entry);
   }),
@@ -38,22 +38,22 @@ export const api = {
   }),
 {{/if}}
   delete: os.delete.use(transaction).handler(async ({ input, context, errors }) => {
-    const [entry] = await context.db.delete(entries).where(eq(entries.id, input.id)).returning();
+    const [entry] = await context.db.delete({{camelCase name}}).where(eq({{camelCase name}}.id, input.id)).returning();
     if (!entry) throw errors.NOT_FOUND();
     return { deleted: true };
   }),
   create: os.create.use(transaction).handler(async ({ context }) => {
     const [entry] = await context.db
-      .insert(entries)
+      .insert({{camelCase name}})
       .values({ createdAt: context.now() })
       .returning();
     return serialize(entry);
   }),
   list: os.list.handler(async ({ context }) =>
-    (await context.db.select().from(entries).orderBy(entries.id)).map(serialize),
+    (await context.db.select().from({{camelCase name}}).orderBy({{camelCase name}}.id)).map(serialize),
   ),
   get: os.get.handler(async ({ input, context, errors }) => {
-    const [entry] = await context.db.select().from(entries).where(eq(entries.id, input.id));
+    const [entry] = await context.db.select().from({{camelCase name}}).where(eq({{camelCase name}}.id, input.id));
     if (!entry) throw errors.NOT_FOUND();
     return serialize(entry);
   }),

@@ -1,5 +1,5 @@
 import { pgTable, integer, timestamp } from "drizzle-orm/pg-core";
-export const entries = pgTable("{{snakeCase name}}", {
+export const {{camelCase name}} = pgTable("{{snakeCase name}}", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
 {{#if updatedAt}}
