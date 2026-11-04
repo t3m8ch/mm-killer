@@ -48,6 +48,28 @@ Git-хуки: pre-commit форматирует и проверяет линт/A
 Conventional Commits; pre-push проверяет типы, архитектуру и неиспользуемый код.
 Тесты Postgres, сборка и ссылки выполняются в CI.
 
+## Инструменты
+
+Точные версии зависимостей закреплены в `package.json` и `pnpm-lock.yaml`,
+системных инструментов — в `mise.toml`. Совместимость проверяется сборкой,
+проверкой типов, API-тестами на Postgres и браузерным сценарием.
+
+[Easement](https://github.com/mokevnin/easement#readme) устанавливается через
+mise из GitHub и использует SCIP-индексатор `@sourcegraph/scip-typescript`
+из devDependencies. Команды pnpm добавляют `node_modules/.bin` в PATH.
+Исключения knip учитывают запуск индексатора из easement и commitlint из hk;
+публичные точки входа модулей перечислены в `entry`.
+
+[Плагин oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) запрещает
+в предметных модулях `className`, `style`, импорт CSS, raw SQL, прямой драйвер
+Postgres и низкоуровневые `query`/`execute`. Схемы остаются внутренними файлами
+модулей; easement запрещает их импорт через границу модуля.
+
+Для установленного Drizzle подключение передаётся как `drizzle({ client: pool })`;
+прежняя сигнатура с Pool не проходит проверку типов. Браузерный раннер —
+Playwright с Chromium: сервер занимает отдельный порт 4312 со `strictPort`
+и без переиспользования чужого процесса.
+
 ## Генерация
 
 ```sh
@@ -72,5 +94,4 @@ API-тесты работают с мигрированной БД-шаблон�
 Основные сценарии проверяются без HTTP; Playwright проверяет настоящее
 приложение, сохранение записи и её наличие после перезагрузки.
 
-[Архитектура](docs/development/architecture.md) ·
-[Проверенные версии](docs/development/toolchain.md) · [Словарь](GLOSSARY.md)
+[Архитектура](docs/development/architecture.md) · [Словарь](GLOSSARY.md)
