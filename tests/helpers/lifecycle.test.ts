@@ -2,7 +2,7 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { it, expect, vi } from "vitest";
 import { isolatedDatabase } from "./database";
 import { connect } from "../../src/platform";
-it("закрывает независимые соединения перед удалением тестовой базы", async () => {
+it("database.close() удаляет БД после закрытия дополнительных соединений", async () => {
   const admin = connect(process.env.TEST_DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm");
   try {
     for (let iteration = 0; iteration < 10; iteration++) {
@@ -32,7 +32,7 @@ it("повторное применение миграций не выполня
   }
 });
 
-it("восстанавливает работу после потери простаивающего соединения", async () => {
+it("пул из connect() выполняет следующий запрос после потери простаивающего соединения", async () => {
   const database = await isolatedDatabase("idle_error");
   const admin = connect(database.url);
   const log = vi.spyOn(console, "error").mockImplementation(() => {});
