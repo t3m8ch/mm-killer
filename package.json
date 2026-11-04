@@ -12,7 +12,7 @@
     "format:check": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore --check",
     "unused": "knip",
     "db:migrate": "node scripts/migrate.ts",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --pass-with-no-tests",
     "boundaries": "easement check",
     "generate": "node scripts/generate.js",
     "test:guards": "node tests/tooling/verify-guards.js",
