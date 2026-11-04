@@ -1,7 +1,7 @@
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { it, expect, vi } from "vitest";
 import { isolatedDatabase } from "./database";
-import { connect } from "../../src/platform";
+import { connect, createLogger } from "../../src/platform";
 
 it("database.close() удаляет БД после закрытия дополнительных соединений", async () => {
   const admin = connect(process.env.TEST_DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm");
@@ -40,21 +40,27 @@ it("повторное применение миграций не выполня
 
 it("пул из connect() выполняет следующий запрос после потери простаивающего соединения", async () => {
   const database = await isolatedDatabase("idle_error");
+  const messages: string[] = [];
+  const logger = createLogger("info", {
+    write: (line) => {
+      messages.push(line);
+    },
+  });
+  const connection = connect(database.url, logger);
   const admin = connect(database.url);
-  const log = vi.spyOn(console, "error").mockImplementation(() => {});
 
   try {
-    const { rows } = await database.pool.query<{ pid: number }>("SELECT pg_backend_pid() AS pid");
+    const { rows } = await connection.pool.query<{ pid: number }>("SELECT pg_backend_pid() AS pid");
 
     await admin.pool.query("SELECT pg_terminate_backend($1)", [rows[0].pid]);
     await vi.waitFor(() => {
-      expect(log.mock.calls.flat().join(" ")).toContain("terminating connection");
+      expect(messages.join(" ")).toContain("terminating connection");
     });
-    const result = await database.pool.query("SELECT 1 AS value");
+    const result = await connection.pool.query("SELECT 1 AS value");
 
     expect(result.rows).toEqual([{ value: 1 }]);
   } finally {
-    log.mockRestore();
+    await connection.pool.end();
     await admin.pool.end();
     await database.close();
   }

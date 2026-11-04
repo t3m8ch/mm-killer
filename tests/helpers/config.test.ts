@@ -18,9 +18,19 @@ describe("конфигурация подключения к Postgres", () => {
     "https://user:secret@host/database",
   ])("отклоняет отсутствующий или некорректный URL без раскрытия значения", (value) => {
     expect(() => readConfig({ DATABASE_URL: value })).toThrow(
-      "Задать DATABASE_URL с корректным URL подключения к Postgres",
+      "Некорректные переменные окружения: DATABASE_URL",
     );
   });
+  it("по умолчанию выбирает уровень info", () => {
+    expect(readConfig({ DATABASE_URL: "postgres://host/database" }).LOG_LEVEL).toBe("info");
+  });
+
+  it("отклоняет неизвестный уровень логирования без вывода значения", () => {
+    expect(() =>
+      readConfig({ DATABASE_URL: "postgres://host/database", LOG_LEVEL: "secret" }),
+    ).toThrow("Некорректные переменные окружения: LOG_LEVEL");
+  });
+
   it("блокирует чтение серверной переменной в браузере", () => {
     vi.stubGlobal("window", {});
 

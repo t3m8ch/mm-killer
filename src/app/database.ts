@@ -1,10 +1,14 @@
-import { connect, readConfig } from "../platform";
+import { connect, readConfig, createLogger } from "../platform";
 
 declare global {
   var mergeMindsDatabase: ReturnType<typeof connect> | undefined;
 }
 
+const config = readConfig();
+
+export const logger = createLogger(config.LOG_LEVEL);
+
 // Nitro и SSR собираются отдельно; оба используют один пул в процессе.
-const connection = (globalThis.mergeMindsDatabase ??= connect(readConfig().DATABASE_URL));
+const connection = (globalThis.mergeMindsDatabase ??= connect(config.DATABASE_URL, logger));
 
 export const { db, pool } = connection;
