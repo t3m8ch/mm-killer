@@ -12,7 +12,11 @@ const serialize = (row: typeof entries.$inferSelect) => ({
 export const api = {
   // plop:handlers
   update: os.update.use(mutationTransaction).handler(async ({ input, context, errors }) => {
-    const [entry] = await context.db.update(entries).set({ text: input.text }).where(eq(entries.id, input.id)).returning();
+    const [entry] = await context.db
+      .update(entries)
+      .set({ text: input.text })
+      .where(eq(entries.id, input.id))
+      .returning();
     if (!entry) throw errors.NOT_FOUND();
     return serialize(entry);
   }),

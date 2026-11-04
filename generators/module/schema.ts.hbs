@@ -1,3 +1,6 @@
-import { pgTable, integer, text, timestamp } from "drizzle-orm/pg-core"; export const entries =
-pgTable("{{snakeCase name}}_entries", { id: integer().primaryKey().generatedAlwaysAsIdentity(),
-text: text().notNull(), createdAt: timestamp("created_at", { withTimezone: true }).notNull(), });
+import { pgTable, integer, text, timestamp } from "drizzle-orm/pg-core";
+export const entries = pgTable("{{snakeCase name}}_entries", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  text: text().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+});
