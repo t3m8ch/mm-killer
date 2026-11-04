@@ -1,0 +1,21 @@
+{
+  "plugins": ["typescript", "react"],
+  "ignorePatterns": [
+    ".agents/**",
+    ".claude/**",
+    ".codex/**",
+    "src/routeTree.gen.ts",
+    "dist/**",
+    ".tools/**"
+  ],
+  "rules": {
+    "typescript/switch-exhaustiveness-check": "error",
+    "project/module-boundaries": "error"
+  },
+  "jsPlugins": [
+    {
+      "name": "project",
+      "specifier": "./scripts/oxlint-plugin.js"
+    }
+  ]
+}

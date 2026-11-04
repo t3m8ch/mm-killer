@@ -1,0 +1,18 @@
+amends "package://github.com/jdx/hk/releases/download/v2.11.1/hk@2.11.1#/Config.pkl"
+hooks {
+  ["pre-commit"] {
+    steps {
+      ["format"] { glob = List("*"); check = "pnpm format:check"; fix = "pnpm format"; stage = List("*") }
+      ["lint"] { check = "pnpm lint" }
+      ["actions"] { check = "jactionlint" }
+    }
+  }
+  ["commit-msg"] { steps { ["commitlint"] { check = "pnpm exec commitlint --edit {{commit_msg_file}}" } } }
+  ["pre-push"] {
+    steps {
+      ["types"] { check = "pnpm typecheck" }
+      ["boundaries"] { check = "pnpm boundaries" }
+      ["unused"] { check = "pnpm unused" }
+    }
+  }
+}

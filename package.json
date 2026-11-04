@@ -1,0 +1,59 @@
+{
+  "name": "mm-killer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "test": "vitest run",
+    "lint": "oxlint",
+    "typecheck": "oxlint --type-aware --type-check",
+    "format": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore",
+    "format:check": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore --check",
+    "unused": "knip",
+    "db:migrate": "node scripts/migrate.ts",
+    "test:e2e": "playwright test",
+    "boundaries": "easement check",
+    "generate": "plop --plopfile plopfile.js",
+    "test:guards": "node scripts/verify-guards.js"
+  },
+  "dependencies": {
+    "@mantine/core": "9.7.4",
+    "@mantine/hooks": "9.7.4",
+    "@orpc/client": "1.16.1",
+    "@orpc/contract": "1.16.1",
+    "@orpc/server": "1.16.1",
+    "@orpc/tanstack-query": "1.16.1",
+    "@tanstack/react-query": "5.105.3",
+    "@tanstack/react-router": "1.170.46",
+    "@tanstack/react-start": "1.169.4",
+    "drizzle-orm": "1.0.0-rc.5",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.4",
+    "@commitlint/config-conventional": "21.2.4",
+    "@playwright/test": "1.64.1",
+    "@sourcegraph/scip-typescript": "0.6.1",
+    "@types/node": "26.6.6",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.2.1",
+    "knip": "6.44.1",
+    "oxfmt": "0.76.0",
+    "oxlint": "1.91.0",
+    "oxlint-tsgolint": "7.0.2005",
+    "plop": "4.0.5",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vitest": "5.1.0"
+  },
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "packageManager": "pnpm@11.28.10"
+}

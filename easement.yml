@@ -1,0 +1,61 @@
+version: 1
+components:
+  # plop:components
+  platform: { in: src/platform, public: [src/platform/index.ts] }
+  example: { in: src/modules/example, public: [src/modules/example/index.ts] }
+  courses: { in: src/modules/courses, public: [src/modules/courses/index.ts], optional: true }
+  invitations:
+    { in: src/modules/invitations, public: [src/modules/invitations/index.ts], optional: true }
+  tasks: { in: src/modules/tasks, public: [src/modules/tasks/index.ts], optional: true }
+  attempts: { in: src/modules/attempts, public: [src/modules/attempts/index.ts], optional: true }
+  reviews: { in: src/modules/reviews, public: [src/modules/reviews/index.ts], optional: true }
+  git: { in: src/modules/git, public: [src/modules/git/index.ts], optional: true }
+  notifications:
+    { in: src/modules/notifications, public: [src/modules/notifications/index.ts], optional: true }
+  app: { in: [src/app, src/routes, src/router.tsx] }
+  generated: { in: src/routeTree.gen.ts }
+  test_helpers: { in: tests/helpers, allow_importers: [tests] }
+  tests: { in: ["src/**/*.test.ts", tests/e2e], priority: 10 }
+  tooling: { in: ["*.ts", scripts], priority: -1 }
+rules:
+  # plop:rules
+  platform: { may_depend_on: [] }
+  example: { may_depend_on: [platform] }
+  courses: { may_depend_on: [platform] }
+  invitations: { may_depend_on: [platform, courses] }
+  tasks: { may_depend_on: [platform, courses] }
+  attempts: { may_depend_on: [platform, tasks] }
+  reviews: { may_depend_on: [platform, attempts] }
+  git: { may_depend_on: [platform, attempts] }
+  notifications: { may_depend_on: [platform, tasks] }
+  app:
+    may_depend_on:
+      # plop:app-dependencies
+      - platform
+      - example
+      - courses
+      - invitations
+      - tasks
+      - attempts
+      - reviews
+      - git
+      - notifications
+      - generated
+  generated: { may_depend_on: [app] }
+  test_helpers: { may_depend_on: [platform] }
+  tests:
+    may_depend_on:
+      # plop:test-dependencies
+      - platform
+      - example
+      - courses
+      - invitations
+      - tasks
+      - attempts
+      - reviews
+      - git
+      - notifications
+      - test_helpers
+  tooling: { may_depend_on: [platform] }
+no_cycles: [platform, example, courses, invitations, tasks, attempts, reviews, git, notifications]
+exclude: [".agents/**", ".claude/**", ".codex/**", "generators/**"]
