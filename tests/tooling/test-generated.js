@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { withFixture } from "./fixture-workspace.js";
@@ -11,13 +11,14 @@ for (const options of [
   withFixture(
     () => {
       // Проверить PostgreSQL и API на значениях выше Number.MAX_SAFE_INTEGER.
-      const migration = "migrations/course-notes.sql";
+      const folder = readdirSync("migrations").find((name) =>
+        name.endsWith("_create_course_notes"),
+      );
+      if (!folder) throw new Error("Drizzle Kit не создал миграцию");
+      const migration = `migrations/${folder}/migration.sql`;
       writeFileSync(
         migration,
-        readFileSync(migration, "utf8").replace(
-          "GENERATED ALWAYS AS IDENTITY",
-          "GENERATED ALWAYS AS IDENTITY (START WITH 9007199254740993)",
-        ),
+        readFileSync(migration, "utf8").replace("START WITH 1", "START WITH 9007199254740993"),
       );
       for (const { command, args } of [
         {

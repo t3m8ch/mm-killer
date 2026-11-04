@@ -1,3 +1,4 @@
+import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { it, expect } from "vitest";
 import { isolatedDatabase } from "./database";
 import { connect } from "../../src/platform";
@@ -18,5 +19,15 @@ it("закрывает независимые соединения перед у
     }
   } finally {
     await admin.pool.end();
+  }
+});
+
+it("повторное применение миграций не выполняет SQL заново", async () => {
+  const database = await isolatedDatabase("migration");
+  try {
+    await expect(migrate(database.db, { migrationsFolder: "migrations" })).resolves.toBeUndefined();
+    await expect(migrate(database.db, { migrationsFolder: "migrations" })).resolves.toBeUndefined();
+  } finally {
+    await database.close();
   }
 });
