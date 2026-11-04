@@ -5,9 +5,11 @@
     "src/modules/*/index.ts",
     "src/platform/index.ts",
     "scripts/*.ts",
-    "scripts/*.js"
+    "scripts/*.js",
+    "src/app/client.ts",
+    "tests/helpers/database.ts"
   ],
   "project": ["src/**/*.{ts,tsx}", "tests/**/*.ts", "scripts/**/*.ts"],
-  "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript"],
+  "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript", "@orpc/contract"],
   "ignoreBinaries": ["easement"]
 }

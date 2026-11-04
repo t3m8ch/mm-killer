@@ -13,7 +13,7 @@ export default async function setup() {
   }
   process.env.MM_TEST_TEMPLATE = name;
   return async () => {
-    await admin.pool.query(`DROP DATABASE "${name}" WITH (FORCE)`);
+    await admin.pool.query(`DROP DATABASE "${name}"`);
     await admin.pool.end();
   };
 }

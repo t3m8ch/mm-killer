@@ -26,7 +26,7 @@ export async function isolatedDatabase(label: string) {
     url: url.toString(),
     async close() {
       await connection.pool.end();
-      await admin.pool.query(`DROP DATABASE "${name}" WITH (FORCE)`);
+      await admin.pool.query(`DROP DATABASE "${name}"`);
       await admin.pool.end();
     },
   };
