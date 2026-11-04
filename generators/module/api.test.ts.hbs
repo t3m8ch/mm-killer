@@ -1,47 +1,111 @@
-import { it, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { createRouterClient } from "@orpc/server";
+import type { Context } from "../../platform";
 import { rollbackTest, clock } from "../../../tests/helpers/database";
 import { api } from "./index";
-it("сохраняет запись через публичный API", () =>
-  rollbackTest(async (context) => {
-    const time = clock();
-    const client = createRouterClient(api, { context: { ...context, now: time.now{{#if updatedBy}}, userId: 17{{/if}} } });
-    const entry = await client.create({});
-    expect(await client.get({ id: entry.id })).toEqual({
-      id: entry.id,
-      createdAt: "2026-11-04T12:00:00.000Z",
-{{#if updatedAt}}
-      updatedAt: null,
-{{/if}}
-{{#if updatedBy}}
-      updatedBy: null,
-{{/if}}
-    });
-    expect(await client.list()).toContainEqual(entry);
-{{#if audit}}
-    time.set("2026-11-05T15:00:00.000Z");
-    const input = { id: entry.id, updatedAt: "2000-01-01T00:00:00.000Z", updatedBy: 999 };
-    const updated = await client.update(input);
-    expect(updated).toEqual({
-      id: entry.id,
-      createdAt: "2026-11-04T12:00:00.000Z",
-{{#if updatedAt}}
-      updatedAt: "2026-11-05T15:00:00.000Z",
-{{/if}}
-{{#if updatedBy}}
-      updatedBy: 17,
-{{/if}}
-    });
-    expect(await client.get({ id: entry.id })).toEqual(updated);
-    await expect(client.update({ id: 2147483647 })).rejects.toMatchObject({ code: "NOT_FOUND" });
-{{#if updatedBy}}
-    const anonymous = createRouterClient(api, { context });
-    await expect(anonymous.update({ id: entry.id })).rejects.toMatchObject({ code: "UNAUTHORIZED" });
-    expect(await client.get({ id: entry.id })).toEqual(updated);
-{{/if}}
-{{else}}
-    await expect(client.update({ id: entry.id })).rejects.toMatchObject({ code: "NOT_IMPLEMENTED" });
-{{/if}}
-    expect(await client.delete({ id: entry.id })).toEqual({ deleted: true });
-    await expect(client.get({ id: entry.id })).rejects.toMatchObject({ code: "NOT_FOUND" });
-  }));
+
+function clientFor(context: Context) {
+  const time = clock();
+  const client = createRouterClient(api, {
+    context: { ...context, now: time.now{{#if updatedBy}}, userId: 17{{/if}} },
+  });
+  return { client, time };
+}
+
+describe("{{name}}: публичный API", () => {
+  it("возвращает созданную запись с серверным временем", () =>
+    rollbackTest(async (context) => {
+      const { client } = clientFor(context);
+      const entry = await client.create({});
+      expect(await client.get({ id: entry.id })).toEqual({
+        id: entry.id,
+        createdAt: "2026-11-04T12:00:00.000Z",
+  {{#if updatedAt}}
+        updatedAt: null,
+  {{/if}}
+  {{#if updatedBy}}
+        updatedBy: null,
+  {{/if}}
+      });
+    }));
+
+  it("включает созданную запись в список", () =>
+    rollbackTest(async (context) => {
+      const { client } = clientFor(context);
+      const entry = await client.create({});
+      expect(await client.list()).toContainEqual(entry);
+    }));
+
+  it("удалённая запись больше не доступна", () =>
+    rollbackTest(async (context) => {
+      const { client } = clientFor(context);
+      const entry = await client.create({});
+      expect(await client.delete({ id: entry.id })).toEqual({ deleted: true });
+      await expect(client.get({ id: entry.id })).rejects.toMatchObject({ code: "NOT_FOUND" });
+    }));
+
+  it("отклоняет чтение отсутствующей записи", () =>
+    rollbackTest(async (context) => {
+      const { client } = clientFor(context);
+      await expect(client.get({ id: 2147483647 })).rejects.toMatchObject({ code: "NOT_FOUND" });
+    }));
+
+  {{#if audit}}
+  it("обновляет серверные метаданные, сохраняя время создания", () =>
+    rollbackTest(async (context) => {
+      const { client, time } = clientFor(context);
+      const entry = await client.create({});
+      time.set("2026-11-05T15:00:00.000Z");
+      const updated = await client.update({ id: entry.id });
+      expect(updated).toEqual({
+        id: entry.id,
+        createdAt: "2026-11-04T12:00:00.000Z",
+  {{#if updatedAt}}
+        updatedAt: "2026-11-05T15:00:00.000Z",
+  {{/if}}
+  {{#if updatedBy}}
+        updatedBy: 17,
+  {{/if}}
+      });
+      expect(await client.get({ id: entry.id })).toEqual(updated);
+    }));
+
+  it("игнорирует подставленные клиентом поля аудита", () =>
+    rollbackTest(async (context) => {
+      const { client, time } = clientFor(context);
+      const entry = await client.create({});
+      time.set("2026-11-05T15:00:00.000Z");
+      const input = { id: entry.id, updatedAt: "2000-01-01T00:00:00.000Z", updatedBy: 999 };
+      const updated = await client.update(input);
+  {{#if updatedAt}}
+      expect(updated.updatedAt).toBe("2026-11-05T15:00:00.000Z");
+  {{/if}}
+  {{#if updatedBy}}
+      expect(updated.updatedBy).toBe(17);
+  {{/if}}
+    }));
+
+  it("отклоняет обновление отсутствующей записи", () =>
+    rollbackTest(async (context) => {
+      const { client } = clientFor(context);
+      await expect(client.update({ id: 2147483647 })).rejects.toMatchObject({ code: "NOT_FOUND" });
+    }));
+  {{#if updatedBy}}
+  it("отклоняет обновление без пользователя и сохраняет запись", () =>
+    rollbackTest(async (context) => {
+      const { client } = clientFor(context);
+      const entry = await client.create({});
+      const anonymous = createRouterClient(api, { context });
+      await expect(anonymous.update({ id: entry.id })).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+      expect(await client.get({ id: entry.id })).toEqual(entry);
+    }));
+  {{/if}}
+  {{else}}
+  it("оставляет обновление каркасом без изменяемых полей", () =>
+    rollbackTest(async (context) => {
+      const { client } = clientFor(context);
+      const entry = await client.create({});
+      await expect(client.update({ id: entry.id })).rejects.toMatchObject({ code: "NOT_IMPLEMENTED" });
+    }));
+  {{/if}}
+});
