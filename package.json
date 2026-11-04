@@ -18,7 +18,8 @@
     "test:guards": "node tests/tooling/verify-guards.js",
     "db:generate": "drizzle-kit generate",
     "start": "node .output/server/index.mjs",
-    "test:runtime": "node --test tests/tooling/runtime.test.js"
+    "test:runtime": "node --test tests/tooling/runtime.test.js",
+    "test:bundle": "node tests/tooling/verify-client-bundle.js"
   },
   "dependencies": {
     "@mantine/core": "9.7.4",

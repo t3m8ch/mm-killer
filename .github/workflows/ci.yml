@@ -33,6 +33,7 @@ jobs:
       - run: pnpm db:migrate
       - run: env -u DATABASE_URL pnpm build
       - run: pnpm test:runtime
+      - run: pnpm test:bundle
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - run: lychee --no-progress README.md docs/**/*.md
