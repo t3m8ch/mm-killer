@@ -742,3 +742,24 @@
   font: inherit;
   cursor: pointer;
 }
+.np-loading-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #77818e;
+}
+.np-loading-content[aria-busy="true"] {
+  opacity: 0.45;
+  cursor: progress;
+}
+.np-loading-content[aria-busy="true"] > div {
+  pointer-events: none;
+}
+@media (max-width: 720px) {
+  .np-loading-label {
+    font-size: 0;
+    gap: 0;
+  }
+}

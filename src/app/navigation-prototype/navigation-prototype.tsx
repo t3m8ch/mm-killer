@@ -2,8 +2,15 @@
 // Вопрос: как перемещаться между курсами и проверкой, сохраняя контекст?
 import { useEffect, useState, type ReactNode } from "react";
 import { useMounted } from "@mantine/hooks";
-import { Link, useNavigate, useParams, useSearch } from "@tanstack/react-router";
-import { Button, Drawer, Menu, Select, TextInput, Textarea, Badge } from "@mantine/core";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearch,
+  useRouterState,
+  useLoaderData,
+} from "@tanstack/react-router";
+import { Button, Drawer, Menu, Select, TextInput, Textarea, Badge, Loader } from "@mantine/core";
 import "./navigation-prototype.css";
 
 const courses = [
@@ -116,6 +123,7 @@ function Nav({ path, children, className, onClick }: NavProps) {
     <Link
       to="/prototype/$"
       activeOptions={{ exact: true }}
+      preload={false}
       params={{ _splat: path.replace(/^\//, "") }}
       search={(old) => ({
         variant: old.variant ?? "A",
@@ -463,6 +471,8 @@ function VariantC({
 
 export function NavigationPrototype() {
   const mounted = useMounted();
+  const loading = useRouterState({ select: (state) => state.isLoading });
+  const { delayMs } = useLoaderData({ from: "/prototype/$" });
   const { _splat = "" } = useParams({ from: "/prototype/$" });
   const search = useSearch({ from: "/prototype/$" });
   const navigate = useNavigate();
@@ -546,6 +556,12 @@ export function NavigationPrototype() {
         variant={variant}
         courseName={renamed[courseId] || course.name}
       />
+      {loading && (
+        <span className="np-loading-label" role="status">
+          <Loader size={14} />
+          Загрузка…
+        </span>
+      )}
       <span className="np-header-right">
         {diff && (
           <Badge color="orange" variant="light">
@@ -557,19 +573,23 @@ export function NavigationPrototype() {
     </header>
   );
   const content = (
-    <PageContent
-      path={path}
-      courseId={courseId}
-      courseName={renamed[courseId] || course.name}
-      teacher={teacher}
-      file={file}
-      setFile={setFile}
-      rename={(name) => setRenamed((old) => ({ ...old, [courseId]: name }))}
-    />
+    <div className="np-loading-content" aria-busy={loading}>
+      <div inert={loading}>
+        <PageContent
+          path={path}
+          courseId={courseId}
+          courseName={renamed[courseId] || course.name}
+          teacher={teacher}
+          file={file}
+          setFile={setFile}
+          rename={(name) => setRenamed((old) => ({ ...old, [courseId]: name }))}
+        />
+      </div>
+    </div>
   );
 
   return (
-    <div className="np-root" data-ready={mounted}>
+    <div className="np-root" data-ready={mounted} data-loading={loading}>
       {variant === "A" && (
         <VariantA sidebar={sidebar} header={header} hidden={hidden}>
           {content}
@@ -621,7 +641,12 @@ export function NavigationPrototype() {
       </Drawer>
       {import.meta.env.DEV && (
         <div className="np-prototype-bar">
-          <span className="np-prototype-tag">Прототип</span>
+          <span
+            className="np-prototype-tag"
+            title="Симуляция задержки данных: страницы 0,7–1,6 с, diff 1,4–2,6 с"
+          >
+            Средний интернет
+          </span>
           <button aria-label="Предыдущий вариант" onClick={() => changeVariant(-1)}>
             ←
           </button>
@@ -654,6 +679,8 @@ export function NavigationPrototype() {
             <pre>
               {JSON.stringify(
                 {
+                  loading,
+                  delayMs,
                   variant,
                   path,
                   role: search.role,
