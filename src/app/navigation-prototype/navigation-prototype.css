@@ -982,3 +982,20 @@
 .np-c .np-theme-button:hover {
   background: #364b61;
 }
+
+.np-theme-symbol {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.np-theme-symbol > svg:first-child {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.np-theme-symbol > svg:last-child {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}

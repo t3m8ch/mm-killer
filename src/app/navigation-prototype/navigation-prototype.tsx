@@ -773,10 +773,6 @@ export function NavigationPrototype() {
     return () => window.removeEventListener("keydown", handle);
   });
 
-  const selectedTheme =
-    themeOptions.find((option) => option.value === colorScheme) ?? themeOptions[0];
-  const ThemeIcon = selectedTheme.icon;
-
   const sidebar = <Sidebar variant={variant} path={path} courseId={courseId} teacher={teacher} />;
   const header = (
     <header className="np-header">
@@ -810,10 +806,13 @@ export function NavigationPrototype() {
           <Menu.Target>
             <button
               className="np-theme-button"
-              aria-label={`Тема: ${selectedTheme.label}`}
-              title={`Тема: ${selectedTheme.label}`}
+              aria-label="Тема оформления"
+              title="Тема оформления"
             >
-              <ThemeIcon size={20} weight="regular" aria-hidden="true" />
+              <span className="np-theme-symbol" aria-hidden="true">
+                <SunIcon size={16} weight="regular" />
+                <MoonIcon size={14} weight="regular" />
+              </span>
             </button>
           </Menu.Target>
           <Menu.Dropdown>
