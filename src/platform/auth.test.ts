@@ -6,12 +6,12 @@ import { rollbackTest } from "../../tests/helpers/database";
 it("вход выдаёт сессию, выход отзывает доступ", () =>
   rollbackTest(async (context) => {
     await seedUsers(context.db, context.now());
-    let cookie = "";
+    let token = "";
     const client = createRouterClient(authApi, {
       context: {
         ...context,
         setSessionCookie: (value: string) => {
-          cookie = value;
+          token = value;
         },
       },
     });
@@ -19,7 +19,6 @@ it("вход выдаёт сессию, выход отзывает доступ
 
     expect(await client.login({ userId: user.id })).toEqual(user);
 
-    const token = cookie.split(";")[0].split("=")[1];
     const current = await resolveUser(context.db, token, context.now());
 
     expect(current).toEqual(user);
@@ -41,7 +40,7 @@ it("истечение и отзыв всех сессий закрывают д
       context: {
         ...context,
         setSessionCookie: (value: string) => {
-          tokens.push(value.split(";")[0].slice(8));
+          tokens.push(value);
         },
       },
     });

@@ -8,7 +8,7 @@ export type Context = {
   user?: User | null;
   userId?: bigint;
   sessionToken?: string;
-  setSessionCookie?: (value: string) => void;
+  setSessionCookie?: (token: string, maxAge: number) => void;
 };
 export const transaction = os.$context<Context>().middleware(({ context, next }) =>
   context.db.transaction(async (db) => await next({ context: { db } }), {
