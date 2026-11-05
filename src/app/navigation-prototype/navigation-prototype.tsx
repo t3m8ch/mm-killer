@@ -16,6 +16,10 @@ import {
   SidebarSimpleIcon,
   FileCodeIcon,
   ArrowClockwiseIcon,
+  SunIcon,
+  MoonIcon,
+  MonitorIcon,
+  CheckIcon,
   type Icon,
 } from "@phosphor-icons/react";
 import {
@@ -175,6 +179,12 @@ const names: Record<string, string> = {
   B: "Курсы + разделы",
   C: "Рабочее пространство",
 };
+
+const themeOptions = [
+  { value: "light", label: "Светлая", icon: SunIcon },
+  { value: "dark", label: "Тёмная", icon: MoonIcon },
+  { value: "auto", label: "Системная", icon: MonitorIcon },
+] as const;
 
 type NavProps = {
   path: string;
@@ -763,6 +773,10 @@ export function NavigationPrototype() {
     return () => window.removeEventListener("keydown", handle);
   });
 
+  const selectedTheme =
+    themeOptions.find((option) => option.value === colorScheme) ?? themeOptions[0];
+  const ThemeIcon = selectedTheme.icon;
+
   const sidebar = <Sidebar variant={variant} path={path} courseId={courseId} teacher={teacher} />;
   const header = (
     <header className="np-header">
@@ -792,23 +806,33 @@ export function NavigationPrototype() {
             На проверке
           </Badge>
         )}
-        <Select
-          id="prototype-theme"
-          aria-label="Тема"
-          size="xs"
-          w={130}
-          value={colorScheme}
-          data={[
-            { value: "light", label: "Светлая" },
-            { value: "dark", label: "Тёмная" },
-            { value: "auto", label: "Системная" },
-          ]}
-          onChange={(value) => {
-            if (value === "light" || value === "dark" || value === "auto") {
-              setColorScheme(value);
-            }
-          }}
-        />
+        <Menu position="bottom-end" width={190}>
+          <Menu.Target>
+            <button
+              className="np-theme-button"
+              aria-label={`Тема: ${selectedTheme.label}`}
+              title={`Тема: ${selectedTheme.label}`}
+            >
+              <ThemeIcon size={20} weight="regular" aria-hidden="true" />
+            </button>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Label>Тема оформления</Menu.Label>
+            {themeOptions.map(({ value, label, icon: OptionIcon }) => (
+              <Menu.Item
+                key={value}
+                leftSection={<OptionIcon size={18} weight="regular" aria-hidden="true" />}
+                rightSection={
+                  colorScheme === value ? <CheckIcon size={16} aria-label="Выбрано" /> : undefined
+                }
+                aria-current={colorScheme === value ? "true" : undefined}
+                onClick={() => setColorScheme(value)}
+              >
+                {label}
+              </Menu.Item>
+            ))}
+          </Menu.Dropdown>
+        </Menu>
       </div>
     </header>
   );

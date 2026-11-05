@@ -960,8 +960,25 @@
 .np-header-right {
   flex-shrink: 0;
 }
-@media (max-width: 720px) {
-  .np-header-right .mantine-Select-root {
-    max-width: 110px;
-  }
+
+.np-theme-button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--np-secondary);
+}
+.np-theme-button:hover {
+  background: var(--np-hover);
+  color: var(--np-text);
+}
+.np-c .np-theme-button {
+  color: #e0e7ef;
+}
+.np-c .np-theme-button:hover {
+  background: #364b61;
 }
