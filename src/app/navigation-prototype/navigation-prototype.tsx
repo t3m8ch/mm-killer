@@ -1,7 +1,7 @@
 // THROWAWAY: три структуры навигации на /prototype/$; ?variant=A|B|C.
 // Вопрос: как перемещаться между курсами и проверкой, сохраняя контекст?
 import { useEffect, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   prototypePageQuery,
   prototypeStaleTime,
@@ -585,6 +585,11 @@ export function NavigationPrototype() {
   const search = useSearch({ from: "/prototype/$" });
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+  const refreshCache = useMutation({
+    mutationFn: () => queryClient.invalidateQueries({ queryKey: ["navigation-prototype"] }),
+  });
+
   const query = useQuery({
     ...prototypePageQuery(_splat, search),
     initialData,
@@ -801,6 +806,16 @@ export function NavigationPrototype() {
               });
             }}
           />
+          <button
+            className="np-cache-refresh"
+            aria-label="Обновить кэш"
+            aria-busy={refreshCache.isPending}
+            disabled={refreshCache.isPending}
+            title="Пометить все запросы прототипа устаревшими и обновить открытые в фоне"
+            onClick={() => refreshCache.mutate()}
+          >
+            {refreshCache.isPending ? "Обновление кэша…" : "Обновить кэш"}
+          </button>
           <details>
             <summary>Состояние</summary>
             <pre>
@@ -810,6 +825,7 @@ export function NavigationPrototype() {
                   delayMs,
                   fromCache,
                   refreshing,
+                  refreshingCache: refreshCache.isPending,
                   queryKey: prototypePageQuery(_splat, search).queryKey,
                   staleTimeMs: prototypeStaleTime,
                   dataUpdatedAt: query.data.loadedAt,

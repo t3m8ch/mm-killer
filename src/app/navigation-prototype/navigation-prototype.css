@@ -817,3 +817,17 @@
 .np-tree-loading .mantine-Loader-root {
   flex-shrink: 0;
 }
+.np-prototype-bar {
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.np-prototype-bar > .np-cache-refresh {
+  width: auto;
+  padding: 0 10px;
+}
+.np-prototype-bar > .np-cache-refresh:disabled {
+  cursor: progress;
+  opacity: 0.65;
+}
