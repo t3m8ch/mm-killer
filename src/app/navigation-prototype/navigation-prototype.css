@@ -692,7 +692,7 @@
   .np-breadcrumbs [aria-current] {
     max-width: 140px;
   }
-  .np-header-right {
+  .np-header-right .mantine-Badge-root {
     display: none;
   }
   .np-page-heading {
@@ -857,7 +857,8 @@
 }
 .np-tree-refresh {
   position: absolute;
-  top: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   right: 10px;
   display: flex;
   pointer-events: none;
@@ -954,4 +955,13 @@
 .np-drawer-surface .mantine-Drawer-header {
   background: var(--np-surface);
   color: var(--np-text);
+}
+
+.np-header-right {
+  flex-shrink: 0;
+}
+@media (max-width: 720px) {
+  .np-header-right .mantine-Select-root {
+    max-width: 110px;
+  }
 }

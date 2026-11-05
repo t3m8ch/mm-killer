@@ -786,14 +786,30 @@ export function NavigationPrototype() {
           {loading ? "Загрузка…" : "Обновление…"}
         </span>
       )}
-      <span className="np-header-right">
+      <div className="np-header-right">
         {diff && (
           <Badge color="orange" variant="light">
             На проверке
           </Badge>
         )}
-        <span className="np-avatar">АС</span>
-      </span>
+        <Select
+          id="prototype-theme"
+          aria-label="Тема"
+          size="xs"
+          w={130}
+          value={colorScheme}
+          data={[
+            { value: "light", label: "Светлая" },
+            { value: "dark", label: "Тёмная" },
+            { value: "auto", label: "Системная" },
+          ]}
+          onChange={(value) => {
+            if (value === "light" || value === "dark" || value === "auto") {
+              setColorScheme(value);
+            }
+          }}
+        />
+      </div>
     </header>
   );
   const content = (
@@ -910,23 +926,7 @@ export function NavigationPrototype() {
               });
             }}
           />
-          <Select
-            id="prototype-theme"
-            aria-label="Тема"
-            size="xs"
-            w={130}
-            value={colorScheme}
-            data={[
-              { value: "light", label: "Светлая" },
-              { value: "dark", label: "Тёмная" },
-              { value: "auto", label: "Системная" },
-            ]}
-            onChange={(value) => {
-              if (value === "light" || value === "dark" || value === "auto") {
-                setColorScheme(value);
-              }
-            }}
-          />
+
           <button
             className="np-cache-refresh"
             aria-label="Обновить кэш"
