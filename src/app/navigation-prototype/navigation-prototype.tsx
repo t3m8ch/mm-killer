@@ -161,12 +161,72 @@ function NavItem({
   );
 }
 
+function CourseNavigation({
+  courseId,
+  path,
+  teacher,
+  withTasks = false,
+}: {
+  courseId: string;
+  path: string;
+  teacher: boolean;
+  withTasks?: boolean;
+}) {
+  const base = `/courses/${courseId}`;
+
+  return (
+    <>
+      <NavItem
+        path={base}
+        label={withTasks ? "Все задания" : "Задания"}
+        icon="▤"
+        active={path === base || (!withTasks && path.startsWith(`${base}/tasks/`))}
+      />
+      {withTasks && (
+        <div className="np-task-links" aria-label="Задания курса">
+          {tasks.map((name, index) => (
+            <NavItem
+              key={name}
+              path={`${base}/tasks/${index + 1}`}
+              label={name}
+              icon="·"
+              active={path === `${base}/tasks/${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
+      <NavItem
+        path={`${base}/attempts`}
+        label={teacher ? "Попытки" : "Мои попытки"}
+        icon="◷"
+        active={path.startsWith(`${base}/attempts`)}
+      />
+      <NavItem
+        path={`${base}/members`}
+        label="Участники"
+        icon="♧"
+        active={path === `${base}/members`}
+      />
+      {teacher && (
+        <NavItem
+          path={`${base}/settings`}
+          label="Настройки курса"
+          icon="⚙"
+          active={path === `${base}/settings`}
+        />
+      )}
+    </>
+  );
+}
+
 function Sidebar({
   variant,
   path,
   courseId,
   teacher,
+  placement = "page",
 }: {
+  placement?: string;
   variant: string;
   path: string;
   courseId: string;
@@ -174,36 +234,17 @@ function Sidebar({
 }) {
   const base = `/courses/${courseId}`;
   const course = courses.find((item) => item.id === courseId) ?? courses[0];
-  const links = (
-    <>
-      <NavItem
-        path={base}
-        label="Задания"
-        icon="▤"
-        active={path === base || path.includes("/tasks/")}
-      />
-      <NavItem
-        path={`${base}/attempts`}
-        label={teacher ? "Попытки" : "Мои попытки"}
-        icon="◷"
-        active={path.includes("/attempts")}
-      />
-      <NavItem
-        path={`${base}/members`}
-        label="Участники"
-        icon="♧"
-        active={path.endsWith("/members")}
-      />
-      {teacher && (
-        <NavItem
-          path={`${base}/settings`}
-          label="Настройки курса"
-          icon="⚙"
-          active={path.endsWith("/settings")}
-        />
-      )}
-    </>
-  );
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [previousPath, setPreviousPath] = useState(path);
+
+  if (previousPath !== path) {
+    setPreviousPath(path);
+    if (path.startsWith("/courses/")) {
+      setExpanded((old) => ({ ...old, [courseId]: true }));
+    }
+  }
+
+  const links = <CourseNavigation courseId={courseId} path={path} teacher={teacher} />;
 
   return (
     <div className={`np-sidebar np-sidebar-${variant}`}>
@@ -233,20 +274,44 @@ function Sidebar({
         {variant === "A" ? (
           <>
             <p className="np-group-label">Курсы</p>
-            {courses.map((item) => (
-              <div key={item.id} className="np-course-group">
-                <Nav
-                  path={`/courses/${item.id}`}
-                  className={`np-course-name ${courseId === item.id ? "selected" : ""}`}
-                >
-                  <span className="np-course-dot">{item.short}</span>
-                  {item.name}
-                </Nav>
-                {courseId === item.id && path.startsWith("/courses/") && (
-                  <div className="np-nested">{links}</div>
-                )}
-              </div>
-            ))}
+            {courses.map((item) => {
+              const isExpanded =
+                expanded[item.id] ?? (courseId === item.id && path.startsWith("/courses/"));
+              const childrenId = `prototype-course-${item.id}-${placement}`;
+
+              return (
+                <div key={item.id} className="np-course-group">
+                  <div className="np-course-heading">
+                    <button
+                      className="np-course-toggle"
+                      aria-label={`${isExpanded ? "Свернуть" : "Раскрыть"} курс: ${item.name}`}
+                      aria-expanded={isExpanded}
+                      aria-controls={childrenId}
+                      onClick={() => setExpanded((old) => ({ ...old, [item.id]: !isExpanded }))}
+                    >
+                      <span aria-hidden="true">{isExpanded ? "⌄" : "›"}</span>
+                    </button>
+                    <Nav
+                      path={`/courses/${item.id}`}
+                      className={`np-course-name ${courseId === item.id && path.startsWith("/courses/") ? "selected" : ""}`}
+                    >
+                      <span className="np-course-dot">{item.short}</span>
+                      {item.name}
+                    </Nav>
+                  </div>
+                  <div id={childrenId} className="np-nested" hidden={!isExpanded}>
+                    {isExpanded && (
+                      <CourseNavigation
+                        courseId={item.id}
+                        path={path}
+                        teacher={teacher}
+                        withTasks
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </>
         ) : (
           <>
@@ -651,7 +716,13 @@ export function NavigationPrototype() {
               ))}
             </div>
           )}
-          {sidebar}
+          <Sidebar
+            variant={variant}
+            path={path}
+            courseId={courseId}
+            teacher={teacher}
+            placement="drawer"
+          />
         </div>
       </Drawer>
       {import.meta.env.DEV && (
