@@ -394,7 +394,6 @@ function Sidebar({
     <div className={`np-sidebar np-sidebar-${variant}`}>
       {placement === "page" && (
         <Nav path="/" className="np-brand">
-          <span className="np-logo">m</span>
           <strong>MergeMinds</strong>
         </Nav>
       )}
@@ -904,9 +903,6 @@ export function NavigationPrototype() {
         onClose={() => setDrawer(false)}
         title={
           <Nav path="/" className="np-brand np-drawer-brand" onClick={() => setDrawer(false)}>
-            <span className="np-logo" aria-hidden="true">
-              m
-            </span>
             <strong>MergeMinds</strong>
           </Nav>
         }

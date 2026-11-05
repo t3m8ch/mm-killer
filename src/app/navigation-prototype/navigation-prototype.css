@@ -96,7 +96,6 @@
   font-size: 17px;
   letter-spacing: -0.4px;
 }
-.np-logo,
 .np-rail-logo {
   display: grid;
   place-items: center;
@@ -438,9 +437,6 @@
 .np-sidebar-B .np-brand {
   font-size: 15px;
   padding-bottom: 10px;
-}
-.np-sidebar-B .np-logo {
-  display: none;
 }
 .np-sidebar-B .np-group-label:first-child {
   font-size: 14px;
