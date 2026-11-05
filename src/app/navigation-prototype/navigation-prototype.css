@@ -855,3 +855,47 @@
   white-space: nowrap;
   border: 0;
 }
+.np-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.np-task-links .np-icon {
+  flex-basis: 18px;
+}
+.np-task-links .np-icon svg {
+  width: 16px;
+  height: 16px;
+}
+.np-course-toggle > span {
+  display: flex;
+}
+.np-separator {
+  display: flex;
+  align-items: center;
+}
+.np-crumb-menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.np-mobile-toggle {
+  padding: 2px;
+  align-items: center;
+  justify-content: center;
+}
+.np-prototype-bar > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.np-file-name,
+.np-open-diff {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.np-file-name svg {
+  flex-shrink: 0;
+}

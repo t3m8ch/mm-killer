@@ -3,6 +3,23 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
+  BooksIcon,
+  ListChecksIcon,
+  FileTextIcon,
+  ClockCounterClockwiseIcon,
+  UsersIcon,
+  GearSixIcon,
+  CaretDownIcon,
+  CaretRightIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ListIcon,
+  SidebarSimpleIcon,
+  FileCodeIcon,
+  ArrowClockwiseIcon,
+  type Icon,
+} from "@phosphor-icons/react";
+import {
   prototypePageQuery,
   prototypeStaleTime,
   prototypeCourseTreeQuery,
@@ -122,9 +139,15 @@ const names: Record<string, string> = {
   C: "Рабочее пространство",
 };
 
-type NavProps = { path: string; children: ReactNode; className?: string; onClick?: () => void };
+type NavProps = {
+  path: string;
+  children: ReactNode;
+  className?: string;
+  ariaLabel?: string;
+  onClick?: () => void;
+};
 
-function Nav({ path, children, className, onClick }: NavProps) {
+function Nav({ path, children, className, ariaLabel, onClick }: NavProps) {
   return (
     <Link
       to="/prototype/$"
@@ -137,6 +160,7 @@ function Nav({ path, children, className, onClick }: NavProps) {
         status: old.status ?? "all",
       })}
       className={className}
+      aria-label={ariaLabel}
       onClick={onClick}
     >
       {children}
@@ -147,18 +171,18 @@ function Nav({ path, children, className, onClick }: NavProps) {
 function NavItem({
   path,
   label,
-  icon,
+  icon: ItemIcon,
   active,
 }: {
   path: string;
   label: string;
-  icon: string;
+  icon: Icon;
   active: boolean;
 }) {
   return (
     <Nav path={path} className={`np-nav-item ${active ? "active" : ""}`}>
       <span aria-hidden="true" className="np-icon">
-        {icon}
+        <ItemIcon size={18} weight={active ? "bold" : "regular"} />
       </span>
       <span>{label}</span>
     </Nav>
@@ -185,7 +209,7 @@ function CourseNavigation({
       <NavItem
         path={base}
         label={withTasks ? "Все задания" : "Задания"}
-        icon="▤"
+        icon={ListChecksIcon}
         active={path === base || (!withTasks && path.startsWith(`${base}/tasks/`))}
       />
       {withTasks && (
@@ -195,7 +219,7 @@ function CourseNavigation({
               key={id}
               path={`${base}/tasks/${id}`}
               label={name}
-              icon="·"
+              icon={FileTextIcon}
               active={path === `${base}/tasks/${id}`}
             />
           ))}
@@ -204,20 +228,20 @@ function CourseNavigation({
       <NavItem
         path={`${base}/attempts`}
         label={teacher ? "Попытки" : "Мои попытки"}
-        icon="◷"
+        icon={ClockCounterClockwiseIcon}
         active={path.startsWith(`${base}/attempts`)}
       />
       <NavItem
         path={`${base}/members`}
         label="Участники"
-        icon="♧"
+        icon={UsersIcon}
         active={path === `${base}/members`}
       />
       {teacher && (
         <NavItem
           path={`${base}/settings`}
           label="Настройки курса"
-          icon="⚙"
+          icon={GearSixIcon}
           active={path === `${base}/settings`}
         />
       )}
@@ -298,13 +322,15 @@ function Sidebar({
         <span className="np-logo">m</span>
         <strong>MergeMinds</strong>
       </Nav>
-      {variant !== "B" && <NavItem path="/" label="Мои курсы" icon="▦" active={path === "/"} />}
+      {variant !== "B" && (
+        <NavItem path="/" label="Мои курсы" icon={BooksIcon} active={path === "/"} />
+      )}
       {variant === "C" && (
         <Menu width={270} position="bottom-start">
           <Menu.Target>
             <button className="np-course-select">
               {course.name}
-              <span>⌄</span>
+              <CaretDownIcon size={14} aria-hidden="true" />
             </button>
           </Menu.Target>
           <Menu.Dropdown>
@@ -335,7 +361,9 @@ function Sidebar({
                       aria-controls={childrenId}
                       onClick={() => setExpanded((old) => ({ ...old, [item.id]: !isExpanded }))}
                     >
-                      <span aria-hidden="true">{isExpanded ? "⌄" : "›"}</span>
+                      <span aria-hidden="true">
+                        {isExpanded ? <CaretDownIcon size={14} /> : <CaretRightIcon size={14} />}
+                      </span>
                     </button>
                     <Nav
                       path={`/courses/${item.id}`}
@@ -364,7 +392,7 @@ function Sidebar({
                 key={name}
                 path={`${base}/tasks/${index + 1}`}
                 label={name}
-                icon="·"
+                icon={FileTextIcon}
                 active={path === `${base}/tasks/${index + 1}`}
               />
             ))}
@@ -372,13 +400,18 @@ function Sidebar({
         )}
       </div>
       <div className="np-account">
-        <NavItem path="/settings" label="Личные настройки" icon="⚙" active={path === "/settings"} />
+        <NavItem
+          path="/settings"
+          label="Личные настройки"
+          icon={GearSixIcon}
+          active={path === "/settings"}
+        />
         <Nav path="/login" className="np-user">
           <span className="np-avatar">АС</span>
           <span>
             Алексей Смирнов<small>{teacher ? "Преподаватель" : "Студент"}</small>
           </span>
-          <span>⌄</span>
+          <CaretDownIcon size={14} aria-hidden="true" />
         </Nav>
       </div>
     </div>
@@ -440,7 +473,7 @@ function Breadcrumbs({
           <li key={part.path}>
             {i > 0 && (
               <span className="np-separator" aria-hidden="true">
-                {variant === "C" ? "/" : "›"}
+                {variant === "C" ? "/" : <CaretRightIcon size={12} />}
               </span>
             )}
             {i === parts.length - 1 ? (
@@ -454,7 +487,7 @@ function Breadcrumbs({
               <Menu>
                 <Menu.Target>
                   <button aria-label="Выбрать курс" className="np-crumb-menu">
-                    ⌄
+                    <CaretDownIcon size={12} aria-hidden="true" />
                   </button>
                 </Menu.Target>
                 <Menu.Dropdown>
@@ -470,7 +503,7 @@ function Breadcrumbs({
               <Menu>
                 <Menu.Target>
                   <button aria-label="Выбрать задание" className="np-crumb-menu">
-                    ⌄
+                    <CaretDownIcon size={12} aria-hidden="true" />
                   </button>
                 </Menu.Target>
                 <Menu.Dropdown>
@@ -530,8 +563,8 @@ function VariantB({
         <Nav path="/" className="np-rail-logo">
           m
         </Nav>
-        <Nav path="/" className="np-rail-item">
-          ▦
+        <Nav path="/" className="np-rail-item" ariaLabel="Мои курсы">
+          <BooksIcon size={20} aria-hidden="true" />
         </Nav>
         {courses.map((course) => (
           <Nav
@@ -542,8 +575,8 @@ function VariantB({
             <span title={course.name}>{course.short}</span>
           </Nav>
         ))}
-        <Nav path="/settings" className="np-rail-bottom">
-          ⚙
+        <Nav path="/settings" className="np-rail-bottom" ariaLabel="Личные настройки">
+          <GearSixIcon size={20} aria-hidden="true" />
         </Nav>
       </aside>
       <aside className="np-permanent">{sidebar}</aside>
@@ -659,17 +692,7 @@ export function NavigationPrototype() {
         onClick={() => (hidden ? setDrawer(true) : setCollapsed(true))}
         title="Навигация"
       >
-        <svg
-          width="19"
-          height="19"
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.4"
-        >
-          <rect x="2" y="3" width="16" height="14" rx="2" />
-          <path d="M7 3v14M4 7h1M4 10h1" />
-        </svg>
+        <SidebarSimpleIcon size={20} aria-hidden="true" />
       </button>
       <Breadcrumbs
         path={path}
@@ -736,7 +759,7 @@ export function NavigationPrototype() {
         aria-label="Открыть мобильную навигацию"
         onClick={() => setDrawer(true)}
       >
-        ☰
+        <ListIcon size={20} aria-hidden="true" />
       </button>
       <Drawer
         opened={drawer}
@@ -780,13 +803,13 @@ export function NavigationPrototype() {
             Средний интернет · кэш
           </span>
           <button aria-label="Предыдущий вариант" onClick={() => changeVariant(-1)}>
-            ←
+            <ArrowLeftIcon size={16} aria-hidden="true" />
           </button>
           <span className="np-variant-name">
             {variant} · {names[variant]}
           </span>
           <button aria-label="Следующий вариант" onClick={() => changeVariant(1)}>
-            →
+            <ArrowRightIcon size={16} aria-hidden="true" />
           </button>
           <Select
             id="prototype-role"
@@ -814,6 +837,7 @@ export function NavigationPrototype() {
             title="Пометить все запросы прототипа устаревшими и обновить открытые в фоне"
             onClick={() => refreshCache.mutate()}
           >
+            <ArrowClockwiseIcon size={15} aria-hidden="true" />
             {refreshCache.isPending ? "Обновление кэша…" : "Обновить кэш"}
           </button>
           <details>
@@ -886,7 +910,10 @@ function PageContent({
               className={file === name ? "active" : ""}
               onClick={() => setFile(name)}
             >
-              <span>▤ {name}</span>
+              <span className="np-file-name">
+                <FileCodeIcon size={16} aria-hidden="true" />
+                {name}
+              </span>
               <small>+12 −3</small>
             </button>
           ))}
@@ -957,7 +984,9 @@ function PageContent({
                 <p>{course.teacher}</p>
                 <small>{course.term} · 3 задания</small>
               </div>
-              <span>›</span>
+              <span>
+                <CaretRightIcon size={16} aria-hidden="true" />
+              </span>
             </Nav>
           ))}
         </div>
@@ -1087,7 +1116,9 @@ function PageContent({
               <Badge color={id === 3 ? "green" : "orange"} variant="light">
                 {id === 3 ? "Зачтено" : "На проверке"}
               </Badge>
-              <span>›</span>
+              <span>
+                <CaretRightIcon size={16} aria-hidden="true" />
+              </span>
             </Nav>
           ))}
       </main>
@@ -1112,7 +1143,12 @@ function PageContent({
           <Badge color="orange" variant="light">
             На проверке
           </Badge>
-          <span>Открыть diff ›</span>
+          <span className="np-open-diff">
+            Открыть diff{" "}
+            <span>
+              <CaretRightIcon size={16} aria-hidden="true" />
+            </span>
+          </span>
         </Nav>
       </main>
     );
@@ -1131,7 +1167,9 @@ function PageContent({
             <strong>{task}</strong>
             <small>До 15 ноября · {index === 0 ? "Есть попытка на проверке" : "Нет попыток"}</small>
           </span>
-          <span>›</span>
+          <span>
+            <CaretRightIcon size={16} aria-hidden="true" />
+          </span>
         </Nav>
       ))}
       <div className="np-inline-links">
