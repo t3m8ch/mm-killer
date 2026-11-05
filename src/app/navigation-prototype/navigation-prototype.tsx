@@ -13,7 +13,6 @@ import {
   CaretRightIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
-  ListIcon,
   SidebarSimpleIcon,
   FileCodeIcon,
   ArrowClockwiseIcon,
@@ -357,6 +356,10 @@ function CourseTreeContent({
   );
 }
 
+function PrototypeDrawerFrame({ children }: { children: ReactNode }) {
+  return <div className="np-drawer-frame">{children}</div>;
+}
+
 function Sidebar({
   variant,
   path,
@@ -389,10 +392,12 @@ function Sidebar({
 
   return (
     <div className={`np-sidebar np-sidebar-${variant}`}>
-      <Nav path="/" className="np-brand">
-        <span className="np-logo">m</span>
-        <strong>MergeMinds</strong>
-      </Nav>
+      {placement === "page" && (
+        <Nav path="/" className="np-brand">
+          <span className="np-logo">m</span>
+          <strong>MergeMinds</strong>
+        </Nav>
+      )}
       {variant !== "B" && (
         <NavItem path="/" label="Мои курсы" icon={BooksIcon} active={path === "/"} />
       )}
@@ -792,7 +797,14 @@ export function NavigationPrototype() {
   const header = (
     <header className="np-header">
       <button
-        className="np-panel-toggle"
+        className="np-panel-toggle np-mobile-toggle"
+        aria-label="Открыть мобильную навигацию"
+        onClick={() => setDrawer(true)}
+      >
+        <SidebarSimpleIcon size={20} aria-hidden="true" />
+      </button>
+      <button
+        className="np-panel-toggle np-desktop-toggle"
         aria-label={hidden ? "Открыть навигацию" : "Скрыть навигацию"}
         onClick={() => (hidden ? setDrawer(true) : setCollapsed(true))}
         title="Навигация"
@@ -885,18 +897,21 @@ export function NavigationPrototype() {
           {content}
         </VariantC>
       )}
-      <button
-        className="np-mobile-toggle"
-        aria-label="Открыть мобильную навигацию"
-        onClick={() => setDrawer(true)}
-      >
-        <ListIcon size={20} aria-hidden="true" />
-      </button>
+
       <Drawer
         classNames={{ content: "np-drawer-surface" }}
         opened={drawer}
         onClose={() => setDrawer(false)}
-        title="Навигация"
+        title={
+          <Nav path="/" className="np-brand np-drawer-brand" onClick={() => setDrawer(false)}>
+            <span className="np-logo" aria-hidden="true">
+              m
+            </span>
+            <strong>MergeMinds</strong>
+          </Nav>
+        }
+        closeButtonProps={{ "aria-label": "Закрыть меню" }}
+        scrollAreaComponent={PrototypeDrawerFrame}
         size={{ A: 332, B: 350, C: 290 }[variant]}
         position="left"
       >

@@ -650,10 +650,7 @@
   gap: 20px;
   padding: 8px 12px 20px;
 }
-.mantine-Drawer-body .np-sidebar {
-  height: calc(100dvh - 100px);
-  position: static;
-}
+
 @media (max-width: 1000px) {
   .np-page {
     padding: 32px 28px 120px;
@@ -680,20 +677,10 @@
   .np-permanent {
     display: none !important;
   }
-  .np-mobile-toggle {
-    display: block;
-    position: fixed;
-    top: 17px;
-    left: 12px;
-    z-index: 5;
-    background: var(--np-surface);
-    border: 1px solid var(--np-tree-line);
-    border-radius: 4px;
+  .np-header > .np-mobile-toggle {
+    display: flex;
   }
-  .np-header {
-    padding-left: 49px;
-  }
-  .np-header > .np-panel-toggle {
+  .np-header > .np-desktop-toggle {
     display: none;
   }
   .np-breadcrumbs ol {
@@ -1000,4 +987,71 @@
 .np-drawer-content button:focus-visible {
   outline: 2px solid var(--np-accent);
   outline-offset: 3px;
+}
+
+.np-header > .np-panel-toggle {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--np-secondary);
+}
+.np-header > .np-panel-toggle:hover {
+  background: var(--np-hover);
+  color: var(--np-text);
+}
+.np-header > .np-mobile-toggle {
+  display: none;
+}
+@media (max-width: 720px) {
+  .np-header > .np-mobile-toggle {
+    display: flex;
+  }
+  .np-header > .np-desktop-toggle {
+    display: none;
+  }
+}
+.np-drawer-frame {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.np-drawer-surface {
+  overflow: hidden;
+}
+.np-drawer-surface .mantine-Drawer-header {
+  flex: 0 0 60px;
+  min-height: 60px;
+  padding: 12px 16px;
+}
+.np-drawer-surface .mantine-Drawer-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.np-drawer-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.np-drawer-content .np-sidebar {
+  position: static;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  padding: 8px 12px max(12px, env(safe-area-inset-bottom));
+}
+.np-drawer-brand {
+  padding: 0;
+  color: var(--np-text);
+  text-decoration: none;
 }
