@@ -8,28 +8,29 @@ it("вход выдаёт сессию, выход отзывает доступ
     await seedUsers(context.db, context.now());
     let token = "";
     const client = createRouterClient(authApi, {
-      context: {
+      context: async () => ({
         ...context,
+        user: await resolveUser(context.db, token, context.now()),
+        sessionToken: token,
         setSessionCookie: (value: string) => {
           token = value;
         },
-      },
+      }),
     });
     const [user] = await client.users();
 
     expect(await client.login({ userId: user.id })).toEqual(user);
+    expect(await client.me()).toEqual(user);
 
-    const current = await resolveUser(context.db, token, context.now());
+    const revokedToken = token;
 
-    expect(current).toEqual(user);
+    await client.logout();
+    await expect(client.me()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
 
-    const authed = createRouterClient(authApi, {
-      context: { ...context, user: current, sessionToken: token, setSessionCookie: () => {} },
-    });
+    // Повторное использование старого токена тоже не возвращает доступ.
+    token = revokedToken;
 
-    expect(await authed.me()).toEqual(user);
-    await authed.logout();
-    expect(await resolveUser(context.db, token, context.now())).toBeNull();
+    await expect(client.me()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
   }));
 
 it("истечение и отзыв всех сессий закрывают доступ", () =>
