@@ -40,6 +40,7 @@ import "./navigation-prototype.css";
 const courses = [
   {
     id: "1",
+    emoji: "🧩",
     name: "Алгоритмы и структуры данных",
     short: "А",
     teacher: "Алексей Смирнов",
@@ -47,14 +48,23 @@ const courses = [
   },
   {
     id: "2",
+    emoji: "🐍",
     name: "Практикум по программированию на Python и разработке приложений",
     short: "П",
     teacher: "Мария Волкова",
     term: "Осень 2026",
   },
-  { id: "3", name: "Базы данных", short: "Б", teacher: "Алексей Смирнов", term: "Весна 2027" },
+  {
+    id: "3",
+    emoji: "🗄️",
+    name: "Базы данных",
+    short: "Б",
+    teacher: "Алексей Смирнов",
+    term: "Весна 2027",
+  },
   {
     id: "4",
+    emoji: "♟️",
     name: "Дискретная математика",
     short: "Д",
     teacher: "Мария Волкова",
@@ -62,14 +72,23 @@ const courses = [
   },
   {
     id: "5",
+    emoji: "⚙️",
     name: "Операционные системы",
     short: "О",
     teacher: "Алексей Смирнов",
     term: "Осень 2026",
   },
-  { id: "6", name: "Компьютерные сети", short: "С", teacher: "Мария Волкова", term: "Весна 2027" },
+  {
+    id: "6",
+    emoji: "🌐",
+    name: "Компьютерные сети",
+    short: "С",
+    teacher: "Мария Волкова",
+    term: "Весна 2027",
+  },
   {
     id: "7",
+    emoji: "📈",
     name: "Математический анализ",
     short: "М",
     teacher: "Алексей Смирнов",
@@ -77,6 +96,7 @@ const courses = [
   },
   {
     id: "8",
+    emoji: "📐",
     name: "Линейная алгебра и аналитическая геометрия",
     short: "Л",
     teacher: "Мария Волкова",
@@ -84,6 +104,7 @@ const courses = [
   },
   {
     id: "9",
+    emoji: "🎲",
     name: "Теория вероятностей и математическая статистика",
     short: "Т",
     teacher: "Алексей Смирнов",
@@ -91,6 +112,7 @@ const courses = [
   },
   {
     id: "10",
+    emoji: "💻",
     name: "Архитектура компьютера",
     short: "А",
     teacher: "Мария Волкова",
@@ -98,6 +120,7 @@ const courses = [
   },
   {
     id: "11",
+    emoji: "🧠",
     name: "Функциональное программирование",
     short: "Ф",
     teacher: "Алексей Смирнов",
@@ -105,6 +128,7 @@ const courses = [
   },
   {
     id: "12",
+    emoji: "🌍",
     name: "Разработка веб-приложений",
     short: "В",
     teacher: "Мария Волкова",
@@ -112,6 +136,7 @@ const courses = [
   },
   {
     id: "13",
+    emoji: "🧪",
     name: "Тестирование и обеспечение качества программного обеспечения",
     short: "Т",
     teacher: "Алексей Смирнов",
@@ -119,6 +144,7 @@ const courses = [
   },
   {
     id: "14",
+    emoji: "🤖",
     name: "Основы машинного обучения",
     short: "М",
     teacher: "Мария Волкова",
@@ -126,6 +152,7 @@ const courses = [
   },
   {
     id: "15",
+    emoji: "🚀",
     name: "Командный проект: разработка и сопровождение программного продукта",
     short: "К",
     teacher: "Алексей Смирнов",
@@ -369,7 +396,10 @@ function Sidebar({
                       path={`/courses/${item.id}`}
                       className={`np-course-name ${courseId === item.id && path.startsWith("/courses/") ? "selected" : ""}`}
                     >
-                      {item.name}
+                      <span className="np-course-emoji" aria-hidden="true">
+                        {item.emoji}
+                      </span>
+                      <span>{item.name}</span>
                     </Nav>
                   </div>
                   <div id={childrenId} className="np-nested" hidden={!isExpanded}>

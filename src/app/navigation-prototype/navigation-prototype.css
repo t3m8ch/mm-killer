@@ -890,3 +890,13 @@
 .np-file-name svg {
   flex-shrink: 0;
 }
+.np-course-emoji {
+  flex: 0 0 22px;
+  width: 22px;
+  text-align: center;
+  font:
+    18px/1.1 "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji",
+    sans-serif;
+}
