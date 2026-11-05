@@ -809,10 +809,7 @@ export function NavigationPrototype() {
               aria-label="Тема оформления"
               title="Тема оформления"
             >
-              <span className="np-theme-symbol" aria-hidden="true">
-                <SunIcon size={16} weight="regular" />
-                <MoonIcon size={14} weight="regular" />
-              </span>
+              <SunIcon size={20} weight="regular" aria-hidden="true" />
             </button>
           </Menu.Target>
           <Menu.Dropdown>
