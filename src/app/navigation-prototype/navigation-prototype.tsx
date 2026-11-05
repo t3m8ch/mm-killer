@@ -182,7 +182,7 @@ function NavItem({
   return (
     <Nav path={path} className={`np-nav-item ${active ? "active" : ""}`}>
       <span aria-hidden="true" className="np-icon">
-        <ItemIcon size={18} weight={active ? "bold" : "regular"} />
+        <ItemIcon size={18} weight="regular" />
       </span>
       <span>{label}</span>
     </Nav>
