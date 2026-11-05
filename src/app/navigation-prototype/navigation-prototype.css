@@ -806,3 +806,14 @@
 .np-task-links .np-icon {
   flex-basis: 10px;
 }
+.np-tree-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  font-size: 12px;
+  color: #77818e;
+}
+.np-tree-loading .mantine-Loader-root {
+  flex-shrink: 0;
+}

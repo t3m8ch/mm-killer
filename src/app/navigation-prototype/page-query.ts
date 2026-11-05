@@ -21,3 +21,28 @@ export function prototypePageQuery(splat: string, search: { role: string; status
     gcTime: 5 * 60_000,
   });
 }
+
+export const prototypeTasks = [
+  "Двоичный поиск",
+  "Сортировки и оценка сложности",
+  "Деревья и обход графа",
+];
+
+export function prototypeCourseTreeQuery(courseId: string, teacher: boolean) {
+  return queryOptions({
+    queryKey: ["navigation-prototype", "course-tree", courseId, teacher ? "teacher" : "student"],
+    queryFn: async () => {
+      const delayMs = Math.round(700 + Math.random() * 900);
+
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+      return {
+        tasks: prototypeTasks.map((name, index) => ({ id: String(index + 1), name })),
+        delayMs,
+        loadedAt: Date.now(),
+      };
+    },
+    staleTime: prototypeStaleTime,
+    gcTime: 5 * 60_000,
+  });
+}

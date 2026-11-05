@@ -2,7 +2,12 @@
 // Вопрос: как перемещаться между курсами и проверкой, сохраняя контекст?
 import { useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { prototypePageQuery, prototypeStaleTime } from "./page-query";
+import {
+  prototypePageQuery,
+  prototypeStaleTime,
+  prototypeCourseTreeQuery,
+  prototypeTasks as tasks,
+} from "./page-query";
 import { useMounted } from "@mantine/hooks";
 import {
   Link,
@@ -110,7 +115,6 @@ const courses = [
     term: "Весна 2027",
   },
 ];
-const tasks = ["Двоичный поиск", "Сортировки и оценка сложности", "Деревья и обход графа"];
 const variants = ["A", "B", "C"];
 const names: Record<string, string> = {
   A: "Единое дерево",
@@ -166,11 +170,13 @@ function CourseNavigation({
   path,
   teacher,
   withTasks = false,
+  loadedTasks = [],
 }: {
   courseId: string;
   path: string;
   teacher: boolean;
   withTasks?: boolean;
+  loadedTasks?: { id: string; name: string }[];
 }) {
   const base = `/courses/${courseId}`;
 
@@ -184,13 +190,13 @@ function CourseNavigation({
       />
       {withTasks && (
         <div className="np-task-links" aria-label="Задания курса">
-          {tasks.map((name, index) => (
+          {loadedTasks.map(({ id, name }) => (
             <NavItem
-              key={name}
-              path={`${base}/tasks/${index + 1}`}
+              key={id}
+              path={`${base}/tasks/${id}`}
               label={name}
               icon="·"
-              active={path === `${base}/tasks/${index + 1}`}
+              active={path === `${base}/tasks/${id}`}
             />
           ))}
         </div>
@@ -216,6 +222,46 @@ function CourseNavigation({
         />
       )}
     </>
+  );
+}
+
+function CourseTreeContent({
+  courseId,
+  path,
+  teacher,
+}: {
+  courseId: string;
+  path: string;
+  teacher: boolean;
+}) {
+  const mounted = useMounted();
+  const query = useQuery({ ...prototypeCourseTreeQuery(courseId, teacher), enabled: mounted });
+
+  if (!query.data) {
+    return (
+      <div className="np-tree-loading" role="status" aria-busy="true">
+        <Loader size={14} />
+        Загрузка раздела…
+      </div>
+    );
+  }
+
+  return (
+    <div className="np-course-content" data-fetching={query.isFetching}>
+      {query.isFetching && (
+        <div className="np-tree-loading" role="status">
+          <Loader size={12} />
+          Обновление…
+        </div>
+      )}
+      <CourseNavigation
+        courseId={courseId}
+        path={path}
+        teacher={teacher}
+        withTasks
+        loadedTasks={query.data.tasks}
+      />
+    </div>
   );
 }
 
@@ -301,12 +347,7 @@ function Sidebar({
                   </div>
                   <div id={childrenId} className="np-nested" hidden={!isExpanded}>
                     {isExpanded && (
-                      <CourseNavigation
-                        courseId={item.id}
-                        path={path}
-                        teacher={teacher}
-                        withTasks
-                      />
+                      <CourseTreeContent courseId={item.id} path={path} teacher={teacher} />
                     )}
                   </div>
                 </div>
