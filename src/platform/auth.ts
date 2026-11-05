@@ -48,8 +48,6 @@ export async function resolveUser(
 }
 
 const os = implement(authContract).$context<Context>();
-const cookie = (token: string, age: number) =>
-  `session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${age}`;
 
 export const authApi = {
   users: os.users.handler(async ({ context }) =>
@@ -75,7 +73,7 @@ export const authApi = {
       createdAt: now,
       expiresAt: new Date(now.getTime() + duration * 1000),
     });
-    context.setSessionCookie?.(cookie(token, duration));
+    context.setSessionCookie?.(token, duration);
 
     return serialize(user);
   }),
@@ -88,7 +86,7 @@ export const authApi = {
         await context.db.delete(sessions).where(eq(sessions.tokenHash, hash(context.sessionToken)));
       }
 
-      context.setSessionCookie?.(cookie("", 0));
+      context.setSessionCookie?.("", 0);
 
       return { ok: true };
     }),
@@ -97,7 +95,7 @@ export const authApi = {
     .use(transaction)
     .handler(async ({ context }) => {
       await context.db.delete(sessions).where(eq(sessions.userId, context.user.id));
-      context.setSessionCookie?.(cookie("", 0));
+      context.setSessionCookie?.("", 0);
 
       return { ok: true };
     }),

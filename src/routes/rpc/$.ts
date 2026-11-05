@@ -15,16 +15,11 @@ export const Route = createFileRoute("/rpc/$")({
           return new Response("Forbidden", { status: 403 });
         }
 
-        const headers = new Headers();
-        const context = await authContext(request, headers);
+        const context = await authContext(request);
         const { response } = await handler.handle(request, {
           prefix: "/rpc",
           context,
         });
-
-        if (response) {
-          headers.forEach((value, key) => response.headers.append(key, value));
-        }
 
         return response ?? new Response("Not found", { status: 404 });
       },

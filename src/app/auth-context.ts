@@ -1,8 +1,8 @@
-import { getCookie } from "@tanstack/react-start/server";
+import { getCookie, setCookie } from "@tanstack/react-start/server";
 import { resolveUser, type Context } from "../platform";
 import { db } from "./database";
 
-export async function authContext(request: Request, headers: Headers): Promise<Context> {
+export async function authContext(request: Request): Promise<Context> {
   const now = () => new Date();
   const sessionToken = getCookie("session");
   const user = await resolveUser(db, sessionToken, now());
@@ -12,14 +12,14 @@ export async function authContext(request: Request, headers: Headers): Promise<C
     now,
     user,
     sessionToken,
-    setSessionCookie: (cookie) => {
-      headers.append(
-        "set-cookie",
-        cookie +
-          (process.env.NODE_ENV === "production" || new URL(request.url).protocol === "https:"
-            ? "; Secure"
-            : ""),
-      );
+    setSessionCookie: (token, maxAge) => {
+      setCookie("session", token, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge,
+        secure: process.env.NODE_ENV === "production" || new URL(request.url).protocol === "https:",
+      });
     },
   };
 }
