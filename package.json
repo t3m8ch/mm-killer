@@ -21,7 +21,8 @@
     "db:generate": "drizzle-kit generate",
     "start": "node .output/server/index.mjs",
     "test:runtime": "node --test tests/tooling/runtime.test.js",
-    "test:bundle": "node tests/tooling/verify-client-bundle.js"
+    "test:bundle": "node tests/tooling/verify-client-bundle.js",
+    "prototype": "mise exec -- vite --host 0.0.0.0 --port 4174"
   },
   "dependencies": {
     "@mantine/core": "9.7.4",
