@@ -3,7 +3,8 @@ import { implement } from "@orpc/server";
 import { and, eq, gt } from "drizzle-orm";
 import { authContract } from "./auth-contract.ts";
 import { users, sessions } from "./auth-schema.ts";
-import { authed, transaction, type Context } from "./rpc.ts";
+import { authed, transaction } from "./rpc.ts";
+import type { Context } from "./context.ts";
 import type { Database, Transaction } from "./db.ts";
 
 const hash = (token: string) => createHash("sha256").update(token).digest();

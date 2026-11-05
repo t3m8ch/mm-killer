@@ -1,14 +1,6 @@
 import { os, ORPCError } from "@orpc/server";
-import type { Database, Transaction } from "./db.ts";
-import type { User } from "./auth.ts";
+import type { Context } from "./context.ts";
 
-export type Context = {
-  db: Database | Transaction;
-  now: () => Date;
-  user?: User | null;
-  sessionToken?: string;
-  setSessionCookie?: (token: string, maxAge: number) => void;
-};
 export const transaction = os.$context<Context>().middleware(({ context, next }) =>
   context.db.transaction(async (db) => await next({ context: { db } }), {
     isolationLevel: "read committed",
