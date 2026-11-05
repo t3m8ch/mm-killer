@@ -798,6 +798,7 @@ export function NavigationPrototype() {
       <button
         className="np-panel-toggle np-mobile-toggle"
         aria-label="Открыть мобильную навигацию"
+        aria-expanded={drawer}
         onClick={() => setDrawer(true)}
       >
         <SidebarSimpleIcon size={20} aria-hidden="true" />
@@ -805,7 +806,8 @@ export function NavigationPrototype() {
       <button
         className="np-panel-toggle np-desktop-toggle"
         aria-label={hidden ? "Открыть навигацию" : "Скрыть навигацию"}
-        onClick={() => (hidden ? setDrawer(true) : setCollapsed(true))}
+        aria-expanded={diff ? drawer : !collapsed}
+        onClick={() => (diff ? setDrawer(true) : setCollapsed((value) => !value))}
         title="Навигация"
       >
         <SidebarSimpleIcon size={20} aria-hidden="true" />
