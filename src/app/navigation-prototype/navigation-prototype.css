@@ -169,16 +169,30 @@
 .np-user {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 12px 6px 0;
-  font-size: 12px;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--np-text);
+  text-align: left;
+  font-size: 13px;
 }
-.np-user small {
-  display: block;
-  color: var(--np-muted);
+.np-user:hover,
+.np-user[aria-expanded="true"] {
+  background: var(--np-hover);
 }
-.np-user > span:last-child {
+.np-user-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.np-user-caret {
   margin-left: auto;
+  flex-shrink: 0;
+  color: var(--np-muted);
 }
 .np-avatar {
   flex-shrink: 0;
@@ -981,4 +995,9 @@
 }
 .np-c .np-theme-button:hover {
   background: #364b61;
+}
+
+.np-drawer-content button:focus-visible {
+  outline: 2px solid var(--np-accent);
+  outline-offset: 3px;
 }

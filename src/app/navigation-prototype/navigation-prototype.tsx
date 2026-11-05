@@ -1,6 +1,6 @@
 // THROWAWAY: три структуры навигации на /prototype/$; ?variant=A|B|C.
 // Вопрос: как перемещаться между курсами и проверкой, сохраняя контекст?
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type ComponentPropsWithRef } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   BooksIcon,
@@ -8,6 +8,7 @@ import {
   ClockCounterClockwiseIcon,
   UsersIcon,
   GearSixIcon,
+  SignOutIcon,
   CaretDownIcon,
   CaretRightIcon,
   ArrowLeftIcon,
@@ -186,17 +187,12 @@ const themeOptions = [
   { value: "auto", label: "Системная", icon: MonitorIcon },
 ] as const;
 
-type NavProps = {
-  path: string;
-  children: ReactNode;
-  className?: string;
-  ariaLabel?: string;
-  onClick?: () => void;
-};
+type NavProps = { path: string; ariaLabel?: string } & Omit<ComponentPropsWithRef<"a">, "href">;
 
-function Nav({ path, children, className, ariaLabel, onClick }: NavProps) {
+function Nav({ path, children, className, ariaLabel, onClick, ...anchorProps }: NavProps) {
   return (
     <Link
+      {...anchorProps}
       to="/prototype/$"
       activeOptions={{ exact: true }}
       preload={false}
@@ -207,7 +203,7 @@ function Nav({ path, children, className, ariaLabel, onClick }: NavProps) {
         status: old.status ?? "all",
       })}
       className={className}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? anchorProps["aria-label"]}
       onClick={onClick}
     >
       {children}
@@ -367,8 +363,10 @@ function Sidebar({
   courseId,
   teacher,
   placement = "page",
+  onNavigate,
 }: {
   placement?: string;
+  onNavigate?: () => void;
   variant: string;
   path: string;
   courseId: string;
@@ -486,19 +484,36 @@ function Sidebar({
         )}
       </div>
       <div className="np-account">
-        <NavItem
-          path="/settings"
-          label="Личные настройки"
-          icon={GearSixIcon}
-          active={path === "/settings"}
-        />
-        <Nav path="/login" className="np-user">
-          <span className="np-avatar">АС</span>
-          <span>
-            Алексей Смирнов<small>{teacher ? "Преподаватель" : "Студент"}</small>
-          </span>
-          <CaretDownIcon size={14} aria-hidden="true" />
-        </Nav>
+        <Menu position="top-start" width="target" offset={8}>
+          <Menu.Target>
+            <button className="np-user" aria-label="Меню аккаунта: Алексей Смирнов">
+              <span className="np-avatar" aria-hidden="true">
+                АС
+              </span>
+              <span className="np-user-name">Алексей Смирнов</span>
+              <CaretDownIcon className="np-user-caret" size={16} aria-hidden="true" />
+            </button>
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item
+              component={Nav}
+              path="/settings"
+              onClick={onNavigate}
+              leftSection={<GearSixIcon size={18} aria-hidden="true" />}
+            >
+              Личные настройки
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
+              component={Nav}
+              path="/login"
+              onClick={onNavigate}
+              leftSection={<SignOutIcon size={18} aria-hidden="true" />}
+            >
+              Выйти
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
       </div>
     </div>
   );
@@ -908,6 +923,7 @@ export function NavigationPrototype() {
             courseId={courseId}
             teacher={teacher}
             placement="drawer"
+            onNavigate={() => setDrawer(false)}
           />
         </div>
       </Drawer>
@@ -930,7 +946,7 @@ export function NavigationPrototype() {
           </button>
           <Select
             id="prototype-role"
-            aria-label="Роль"
+            aria-label="Роль в курсе"
             size="xs"
             w={145}
             value={search.role}
