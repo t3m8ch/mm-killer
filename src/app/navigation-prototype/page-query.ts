@@ -22,11 +22,29 @@ export function prototypePageQuery(splat: string, search: { role: string; status
   });
 }
 
-export const prototypeTasks = [
-  "Двоичный поиск",
-  "Сортировки и оценка сложности",
-  "Деревья и обход графа",
+const defaultTasks = ["Двоичный поиск", "Сортировки и оценка сложности", "Деревья и обход графа"];
+
+const projectTasks = [
+  "Выбор темы и состава команды",
+  "Описание пользователей и сценариев работы",
+  "Формулировка требований к программному продукту",
+  "Прототип интерфейса",
+  "Проектирование модели данных",
+  "Настройка репозитория и рабочего окружения",
+  "Первый вертикальный срез приложения",
+  "Авторизация и разграничение доступа",
+  "Основные пользовательские сценарии",
+  "Интеграция с внешними сервисами",
+  "Автоматизированное тестирование",
+  "Обработка ошибок и наблюдаемость",
+  "Проверка производительности на реалистичных объёмах данных",
+  "Развёртывание, документация и подготовка демонстрации",
+  "Защита командного проекта и план дальнейшего сопровождения",
 ];
+
+export function prototypeTasks(courseId: string) {
+  return courseId === "15" ? projectTasks : defaultTasks;
+}
 
 export function prototypeCourseTreeQuery(courseId: string, teacher: boolean) {
   return queryOptions({
@@ -37,7 +55,7 @@ export function prototypeCourseTreeQuery(courseId: string, teacher: boolean) {
       await new Promise((resolve) => setTimeout(resolve, delayMs));
 
       return {
-        tasks: prototypeTasks.map((name, index) => ({ id: String(index + 1), name })),
+        tasks: prototypeTasks(courseId).map((name, index) => ({ id: String(index + 1), name })),
         delayMs,
         loadedAt: Date.now(),
       };

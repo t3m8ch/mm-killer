@@ -22,7 +22,7 @@ import {
   prototypePageQuery,
   prototypeStaleTime,
   prototypeCourseTreeQuery,
-  prototypeTasks as tasks,
+  prototypeTasks,
 } from "./page-query";
 import { useMounted } from "@mantine/hooks";
 import {
@@ -330,6 +330,7 @@ function Sidebar({
   teacher: boolean;
 }) {
   const base = `/courses/${courseId}`;
+  const tasks = prototypeTasks(courseId);
   const course = courses.find((item) => item.id === courseId) ?? courses[0];
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [previousPath, setPreviousPath] = useState(path);
@@ -458,6 +459,7 @@ function Breadcrumbs({
   courseName: string;
 }) {
   const base = `/courses/${courseId}`;
+  const tasks = prototypeTasks(courseId);
   const taskId = Number(path.split("/tasks/")[1] ?? 1);
 
   const diff = /\/attempts\/\d+$/.test(path);
@@ -923,6 +925,7 @@ function PageContent({
   const search = useSearch({ from: "/prototype/$" });
   const navigate = useNavigate();
   const base = `/courses/${courseId}`;
+  const tasks = prototypeTasks(courseId);
   const taskId = Number(path.split("/tasks/")[1] ?? 1);
 
   if (/\/attempts\/\d+$/.test(path)) {
@@ -1010,7 +1013,10 @@ function PageContent({
               <div>
                 <h2>{course.name}</h2>
                 <p>{course.teacher}</p>
-                <small>{course.term} · 3 задания</small>
+                <small>
+                  {course.term} · {prototypeTasks(course.id).length}{" "}
+                  {course.id === "15" ? "заданий" : "задания"}
+                </small>
               </div>
               <span>
                 <CaretRightIcon size={16} aria-hidden="true" />
@@ -1156,9 +1162,15 @@ function PageContent({
   if (path.includes("/tasks/")) {
     return (
       <main className="np-page">
-        <p className="np-muted">Задание {taskId} из 3</p>
+        <p className="np-muted">
+          Задание {taskId} из {tasks.length}
+        </p>
         <h1>{tasks[taskId - 1] ?? tasks[0]}</h1>
-        <p>Реализуйте алгоритм поиска элемента в отсортированном массиве.</p>
+        <p>
+          {courseId === "15"
+            ? "Подготовьте результат этапа командного проекта и разместите его в репозитории."
+            : "Реализуйте алгоритм поиска элемента в отсортированном массиве."}
+        </p>
         <p>Срок сдачи: 15 ноября, 23:59</p>
         <h2>Сдача задания</h2>
         <TextInput label="Коммит" placeholder="Вставьте хеш коммита" />
@@ -1186,7 +1198,9 @@ function PageContent({
     <main className="np-page">
       <p className="np-muted">{courses.find((course) => course.id === courseId)?.term}</p>
       <h1>{courseName}</h1>
-      <p className="np-muted">24 студента · 3 задания</p>
+      <p className="np-muted">
+        24 студента · {tasks.length} {courseId === "15" ? "заданий" : "задания"}
+      </p>
       <h2>Задания</h2>
       {tasks.map((task, index) => (
         <Nav path={`${base}/tasks/${index + 1}`} key={task} className="np-task">
