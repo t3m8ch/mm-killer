@@ -696,7 +696,7 @@ export function NavigationPrototype() {
         opened={drawer}
         onClose={() => setDrawer(false)}
         title="Навигация"
-        size={variant === "B" ? 350 : 290}
+        size={{ A: 332, B: 350, C: 290 }[variant]}
         position="left"
       >
         <div

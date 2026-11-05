@@ -37,7 +37,7 @@
 }
 .np-permanent {
   flex-shrink: 0;
-  width: 258px;
+  width: 300px;
   background: #f7f8fa;
   border-right: 1px solid var(--np-line);
 }
