@@ -33,7 +33,18 @@ import {
   useRouterState,
   useLoaderData,
 } from "@tanstack/react-router";
-import { Button, Drawer, Menu, Select, TextInput, Textarea, Badge, Loader } from "@mantine/core";
+import {
+  Button,
+  Drawer,
+  Menu,
+  Select,
+  TextInput,
+  Textarea,
+  Badge,
+  Loader,
+  useMantineColorScheme,
+  useComputedColorScheme,
+} from "@mantine/core";
 import "./navigation-prototype.css";
 
 const courses = [
@@ -677,7 +688,10 @@ function VariantC({
 }
 
 export function NavigationPrototype() {
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme("light");
   const mounted = useMounted();
+
   const loading = useRouterState({ select: (state) => state.isLoading });
   const { data: initialData, fromCache } = useLoaderData({ from: "/prototype/$" });
   const { _splat = "" } = useParams({ from: "/prototype/$" });
@@ -828,6 +842,7 @@ export function NavigationPrototype() {
         <ListIcon size={20} aria-hidden="true" />
       </button>
       <Drawer
+        classNames={{ content: "np-drawer-surface" }}
         opened={drawer}
         onClose={() => setDrawer(false)}
         title="Навигация"
@@ -895,6 +910,23 @@ export function NavigationPrototype() {
               });
             }}
           />
+          <Select
+            id="prototype-theme"
+            aria-label="Тема"
+            size="xs"
+            w={130}
+            value={colorScheme}
+            data={[
+              { value: "light", label: "Светлая" },
+              { value: "dark", label: "Тёмная" },
+              { value: "auto", label: "Системная" },
+            ]}
+            onChange={(value) => {
+              if (value === "light" || value === "dark" || value === "auto") {
+                setColorScheme(value);
+              }
+            }}
+          />
           <button
             className="np-cache-refresh"
             aria-label="Обновить кэш"
@@ -911,6 +943,8 @@ export function NavigationPrototype() {
             <pre>
               {JSON.stringify(
                 {
+                  colorScheme,
+                  computedColorScheme,
                   loading,
                   delayMs,
                   fromCache,

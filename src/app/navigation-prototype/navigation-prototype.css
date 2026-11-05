@@ -1,19 +1,53 @@
+/* Общая палитра экрана и портальных панелей. */
+.np-root,
+.np-drawer-content,
+.np-drawer-surface {
+  --np-surface: #fff;
+  --np-sidebar-bg: #f7f8fa;
+  --np-text: #27313d;
+  --np-secondary: #566171;
+  --np-muted: #77818e;
+  --np-line: #e4e8ed;
+  --np-tree-line: #dce2ea;
+  --np-hover: #eaeef3;
+  --np-active: #e7edf9;
+  --np-accent: #345bb4;
+  --np-rail-bg: #e9eef5;
+  --np-avatar-bg: #e3e9e8;
+  --np-avatar-text: #4a655b;
+  --np-added-bg: #e7f5eb;
+  --np-added-text: #638674;
+}
+[data-mantine-color-scheme="dark"] :is(.np-root, .np-drawer-content, .np-drawer-surface) {
+  --np-surface: #20242b;
+  --np-sidebar-bg: #191d24;
+  --np-text: #e2e7ee;
+  --np-secondary: #bcc6d3;
+  --np-muted: #929eae;
+  --np-line: #353d49;
+  --np-tree-line: #39414e;
+  --np-hover: #2c3440;
+  --np-active: #2a3d60;
+  --np-accent: #a6c4ff;
+  --np-rail-bg: #151922;
+  --np-avatar-bg: #2f4440;
+  --np-avatar-text: #b6d8c8;
+  --np-added-bg: #223c2e;
+  --np-added-text: #9bc9ad;
+  color-scheme: dark;
+}
 .np-root {
   position: fixed;
   inset: 0;
   overflow: auto;
-  background: #fff;
-  color: #27313d;
+  background: var(--np-surface);
+  color: var(--np-text);
   font:
     14px/1.5 -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
   z-index: 10;
-  --np-line: #e4e8ed;
-  --np-muted: #77818e;
-  --np-active: #e7edf9;
-  --np-accent: #345bb4;
 }
 .np-root * {
   box-sizing: border-box;
@@ -28,7 +62,7 @@
 }
 .np-root a:focus-visible,
 .np-root button:focus-visible {
-  outline: 2px solid #345bb4;
+  outline: 2px solid var(--np-accent);
   outline-offset: 3px;
 }
 .np-shell {
@@ -38,7 +72,7 @@
 .np-permanent {
   flex-shrink: 0;
   width: 300px;
-  background: #f7f8fa;
+  background: var(--np-sidebar-bg);
   border-right: 1px solid var(--np-line);
 }
 .np-work {
@@ -81,13 +115,13 @@
   min-height: 36px;
   padding: 7px 10px;
   border-radius: 5px;
-  color: #566171 !important;
+  color: var(--np-secondary) !important;
   line-height: 1.35;
   margin: 2px 0;
 }
 .np-nav-item:hover,
 .np-course-name:hover {
-  background: #eaeef3;
+  background: var(--np-hover);
 }
 .np-nav-item.active {
   background: var(--np-active);
@@ -119,14 +153,14 @@
   font-size: 13px;
 }
 .np-course-name.selected {
-  color: #263a5b;
+  color: var(--np-text);
   font-weight: 600;
 }
 
 .np-nested {
   padding-left: 20px;
   margin-left: 18px;
-  border-left: 1px solid #dce2ea;
+  border-left: 1px solid var(--np-tree-line);
 }
 .np-account {
   border-top: 1px solid var(--np-line);
@@ -153,14 +187,14 @@
   display: inline-grid;
   place-items: center;
   border-radius: 50%;
-  background: #e3e9e8;
-  color: #4a655b;
+  background: var(--np-avatar-bg);
+  color: var(--np-avatar-text);
   font-size: 10px;
 }
 .np-header {
   position: sticky;
   top: 0;
-  background: #fff;
+  background: var(--np-surface);
   height: 60px;
   border-bottom: 1px solid var(--np-line);
   display: flex;
@@ -173,7 +207,7 @@
   background: none;
   border: 0;
   padding: 5px;
-  color: #74808d;
+  color: var(--np-muted);
   display: flex;
 }
 .np-breadcrumbs {
@@ -203,18 +237,18 @@
   max-width: 230px;
 }
 .np-breadcrumbs a {
-  color: #77818e;
+  color: var(--np-muted);
 }
 .np-breadcrumbs a:hover {
-  color: #345bb4;
+  color: var(--np-accent);
   text-decoration: underline;
 }
 .np-breadcrumbs [aria-current] {
-  color: #27313d;
+  color: var(--np-text);
   font-weight: 500;
 }
 .np-separator {
-  color: #b2bac4;
+  color: var(--np-muted);
 }
 .np-header-right {
   display: flex;
@@ -224,9 +258,9 @@
 }
 .np-crumb-menu {
   border: 0;
-  background: #f0f3f6;
+  background: var(--np-hover);
   border-radius: 3px;
-  color: #647080;
+  color: var(--np-secondary);
 }
 .np-page {
   padding: 48px 48px 120px;
@@ -287,22 +321,22 @@
 }
 .np-course-card p {
   margin: 0 0 4px;
-  color: #626e7c;
+  color: var(--np-secondary);
 }
 .np-course-card small {
   color: var(--np-muted);
 }
 .np-course-card > span:last-child {
   margin-left: auto;
-  color: #a2aab5;
+  color: var(--np-muted);
 }
 .np-course-symbol {
   display: grid;
   place-items: center;
   flex: 0 0 50px;
   height: 56px;
-  background: #edf1f8;
-  color: #6b80a4;
+  background: var(--np-hover);
+  color: var(--np-secondary);
   font-size: 24px;
   border-radius: 8px;
 }
@@ -359,7 +393,7 @@
   flex-direction: column;
   gap: 15px;
   padding: 18px 8px;
-  background: #e9eef5;
+  background: var(--np-rail-bg);
   height: 100dvh;
   position: sticky;
   top: 0;
@@ -373,19 +407,19 @@
   width: 38px;
   height: 38px;
   border-radius: 9px;
-  color: #6b7b90 !important;
+  color: var(--np-secondary) !important;
 }
 .np-rail-item.active {
-  background: #fff;
+  background: var(--np-surface);
   box-shadow: 0 1px 3px #acb8cb55;
-  color: #345bb4 !important;
+  color: var(--np-accent) !important;
 }
 .np-rail-bottom {
   margin-top: auto;
 }
 .np-b .np-permanent:not(.np-rail) {
   width: 226px;
-  background: #fff;
+  background: var(--np-surface);
 }
 .np-sidebar-B .np-brand {
   font-size: 15px;
@@ -396,14 +430,14 @@
 }
 .np-sidebar-B .np-group-label:first-child {
   font-size: 14px;
-  color: #364355;
+  color: var(--np-text);
   font-weight: 600;
   margin-top: 12px;
   margin-bottom: 18px;
 }
 .np-c {
   display: block;
-  background: #f2f4f7;
+  background: var(--np-sidebar-bg);
 }
 .np-c-top {
   position: sticky;
@@ -437,7 +471,7 @@
   height: calc(100dvh - 66px);
 }
 .np-c .np-work {
-  background: #fff;
+  background: var(--np-surface);
   margin: 10px 10px 0 0;
   border-radius: 8px 8px 0 0;
   border: 1px solid var(--np-line);
@@ -456,8 +490,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: #fff;
-  border: 1px solid #dce2e9;
+  background: var(--np-surface);
+  border: 1px solid var(--np-tree-line);
   border-radius: 6px;
   padding: 12px;
   margin: 12px 0 4px;
@@ -471,7 +505,7 @@
 .np-files {
   flex: 0 0 250px;
   border-right: 1px solid var(--np-line);
-  background: #fafbfc;
+  background: var(--np-sidebar-bg);
   padding: 20px 12px;
 }
 .np-files > strong {
@@ -493,14 +527,14 @@
   font-size: 12px;
 }
 .np-files button.active {
-  background: #e7edf9;
+  background: var(--np-active);
 }
 .np-files small {
-  color: #638674;
+  color: var(--np-added-text);
 }
 .np-files > a {
   display: block;
-  color: #637896;
+  color: var(--np-accent);
   margin: 30px 8px;
   font-size: 12px;
 }
@@ -515,7 +549,7 @@
   justify-content: space-between;
   gap: 15px;
   font-size: 12px;
-  color: #78838f;
+  color: var(--np-muted);
 }
 .np-code-lines {
   padding: 20px 0;
@@ -528,7 +562,7 @@
   white-space: pre;
 }
 .np-code-lines > div > span {
-  color: #a0aab6;
+  color: var(--np-muted);
   font: 12px monospace;
   width: 20px;
   text-align: right;
@@ -537,7 +571,7 @@
   font-size: 13px;
 }
 .np-code-lines .added {
-  background: #e7f5eb;
+  background: var(--np-added-bg);
 }
 .np-review {
   border-top: 1px solid var(--np-line);
@@ -638,8 +672,8 @@
     top: 17px;
     left: 12px;
     z-index: 5;
-    background: #fff;
-    border: 1px solid #dce2e9;
+    background: var(--np-surface);
+    border: 1px solid var(--np-tree-line);
     border-radius: 4px;
   }
   .np-header {
@@ -714,11 +748,7 @@
   }
 }
 .np-drawer-content {
-  --np-line: #e4e8ed;
-  --np-muted: #77818e;
-  --np-active: #e7edf9;
-  --np-accent: #345bb4;
-  color: #27313d;
+  color: var(--np-text);
   font:
     14px/1.5 -apple-system,
     BlinkMacSystemFont,
@@ -739,7 +769,7 @@
   gap: 8px;
   white-space: nowrap;
   font-size: 12px;
-  color: #77818e;
+  color: var(--np-muted);
 }
 .np-loading-content[aria-busy="true"] {
   opacity: 0.45;
@@ -773,12 +803,12 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: #77818e;
+  color: var(--np-muted);
   border-radius: 4px;
 }
 .np-course-toggle:hover {
-  background: #eaeef3;
-  color: #345bb4;
+  background: var(--np-hover);
+  color: var(--np-accent);
 }
 .np-sidebar-A .np-nested {
   margin-left: 11px;
@@ -787,7 +817,7 @@
 .np-task-links {
   margin: 0 0 10px 17px;
   padding-left: 6px;
-  border-left: 1px solid #e0e5ed;
+  border-left: 1px solid var(--np-tree-line);
 }
 .np-task-links .np-nav-item {
   font-size: 12px;
@@ -800,7 +830,7 @@
   gap: 8px;
   padding: 12px 8px;
   font-size: 12px;
-  color: #77818e;
+  color: var(--np-muted);
 }
 .np-tree-loading .mantine-Loader-root {
   flex-shrink: 0;
@@ -891,10 +921,10 @@
     sans-serif;
 }
 .np-sidebar {
-  --np-sidebar-surface: #f7f8fa;
+  --np-sidebar-surface: var(--np-sidebar-bg);
 }
 .np-drawer-content .np-sidebar {
-  --np-sidebar-surface: #fff;
+  --np-sidebar-surface: var(--np-surface);
 }
 .np-course-actions {
   position: sticky;
@@ -918,4 +948,10 @@
 }
 .np-course-content > .np-nested {
   display: flow-root;
+}
+
+.np-drawer-surface,
+.np-drawer-surface .mantine-Drawer-header {
+  background: var(--np-surface);
+  color: var(--np-text);
 }

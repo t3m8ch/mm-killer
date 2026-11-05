@@ -1,7 +1,22 @@
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
-import { MantineProvider, Container, Text, Loader } from "@mantine/core";
+import {
+  MantineProvider,
+  Container,
+  Text,
+  Loader,
+  type MantineColorSchemeManager,
+} from "@mantine/core";
 import "@mantine/core/styles.css";
+
+// Прототип хранит выбор темы в памяти текущего сеанса.
+const prototypeColorSchemeManager: MantineColorSchemeManager = {
+  get: (defaultValue) => defaultValue,
+  set: () => {},
+  subscribe: () => {},
+  unsubscribe: () => {},
+  clear: () => {},
+};
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: Root,
@@ -19,7 +34,7 @@ function Root() {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <MantineProvider>
+          <MantineProvider colorSchemeManager={prototypeColorSchemeManager}>
             <Container>
               <Outlet />
             </Container>
