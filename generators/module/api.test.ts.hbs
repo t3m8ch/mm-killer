@@ -10,7 +10,19 @@ import { api } from "./index";
 function clientFor(context: Context) {
   const time = clock();
   const client = createRouterClient(api, {
-    context: { ...context, now: time.now{{#if updatedBy}}, userId: 9007199254740995n{{/if}} },
+    context: {
+      ...context,
+      now: time.now,
+{{#if updatedBy}}
+      user: {
+        id: 9007199254740995n,
+        fullName: "Анна Иванова",
+        email: "anna@example.test",
+        createdAt: "2026-11-04T12:00:00.000Z",
+        updatedAt: "2026-11-04T12:00:00.000Z",
+      },
+{{/if}}
+    },
   });
 
   return { client, time };

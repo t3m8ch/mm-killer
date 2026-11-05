@@ -1,6 +1,6 @@
 import { implement } from "@orpc/server";
 import { eq } from "drizzle-orm";
-import { transaction, type Context } from "../../platform";
+import { transaction, {{#if updatedBy}}authed, {{/if}}type Context } from "../../platform";
 import { contract } from "./contract";
 import { {{camelCase name}} } from "./schema";
 
@@ -18,20 +18,14 @@ const serialize = (row: typeof {{camelCase name}}.$inferSelect) => ({
 export const api = {
   // plop:handlers
 {{#if audit}}
-  update: os.update.use(transaction).handler(async ({ input, context, errors }) => {
-{{#if updatedBy}}
-    if (context.userId === undefined) {
-      throw errors.UNAUTHORIZED();
-    }
-
-{{/if}}
+  update: os.update{{#if updatedBy}}.use(authed){{/if}}.use(transaction).handler(async ({ input, context, errors }) => {
     const [entry] = await context.db.update({{camelCase name}}).set({
       // Добавить предметные изменения; поля аудита задаются только сервером.
 {{#if updatedAt}}
       updatedAt: context.now(),
 {{/if}}
 {{#if updatedBy}}
-      updatedBy: context.userId,
+      updatedBy: context.user.id,
 {{/if}}
     }).where(eq({{camelCase name}}.id, input.id)).returning();
 

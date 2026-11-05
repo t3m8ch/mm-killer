@@ -6,7 +6,6 @@ export type Context = {
   db: Database | Transaction;
   now: () => Date;
   user?: User | null;
-  userId?: bigint;
   sessionToken?: string;
   setSessionCookie?: (token: string, maxAge: number) => void;
 };
@@ -20,5 +19,5 @@ export const authed = os.$context<Context>().middleware(({ context, next }) => {
     throw new ORPCError("UNAUTHORIZED");
   }
 
-  return next({ context: { user: context.user, userId: context.user.id } });
+  return next({ context: { user: context.user } });
 });
