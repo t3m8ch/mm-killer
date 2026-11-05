@@ -22,6 +22,10 @@ Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. Documentatio
 
 Разделять логические этапы кода пустыми строками: подготовку данных, выполнение действия и проверку или возврат результата. Выбирать границы по смыслу; ограничение линтера на семь стейтментов подряд — дополнительный сигнал пересмотреть группировку.
 
+## Pull requests
+
+Вливать PR через rebase merge (`gh pr merge --rebase`).
+
 ## Commits
 
 Use [Conventional Commits](https://www.conventionalcommits.org/). The type, optional scope and `!` are in English; the description and body are in Russian, starting lowercase, in the infinitive, without a trailing period.
