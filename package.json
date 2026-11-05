@@ -21,7 +21,8 @@
     "db:generate": "drizzle-kit generate",
     "start": "node .output/server/index.mjs",
     "test:runtime": "node --test tests/tooling/runtime.test.js",
-    "test:bundle": "node tests/tooling/verify-client-bundle.js"
+    "test:bundle": "node tests/tooling/verify-client-bundle.js",
+    "prototype": "mise exec -- vite --host 0.0.0.0 --port 4174"
   },
   "dependencies": {
     "@mantine/core": "9.7.4",
@@ -30,6 +31,7 @@
     "@orpc/contract": "1.16.1",
     "@orpc/server": "1.16.1",
     "@orpc/tanstack-query": "1.16.1",
+    "@phosphor-icons/react": "2.1.10",
     "@t3-oss/env-core": "0.13.11",
     "@tanstack/react-query": "5.105.3",
     "@tanstack/react-router": "1.170.46",
