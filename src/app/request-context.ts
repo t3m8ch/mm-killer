@@ -2,7 +2,7 @@ import { getCookie, setCookie } from "@tanstack/react-start/server";
 import { resolveUser, type Context } from "../platform";
 import { db } from "./database";
 
-export async function authContext(request: Request): Promise<Context> {
+export async function createRequestContext(request: Request): Promise<Context> {
   const now = () => new Date();
   const sessionToken = getCookie("session");
   const user = await resolveUser(db, sessionToken, now());

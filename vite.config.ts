@@ -22,7 +22,7 @@ export default defineConfig({
             "**/src/app/database.ts",
             "**/src/app/server-client.ts",
             "**/src/app/api.ts",
-            "**/src/app/auth-context.ts",
+            "**/src/app/request-context.ts",
             "**/src/platform/auth.ts",
             "**/src/platform/auth-schema.ts",
             "**/src/platform/db.ts",
