@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { prototypePageQuery } from "../app/navigation-prototype/page-query";
 import { NavigationPrototype } from "../app/navigation-prototype/navigation-prototype";
 
 export const Route = createFileRoute("/prototype/$")({
@@ -7,15 +8,16 @@ export const Route = createFileRoute("/prototype/$")({
     role: search.role === "student" ? "student" : "teacher",
     status: typeof search.status === "string" ? search.status : "all",
   }),
-  // Задержка данных, а не CSS-анимация: быстрые переходы обрабатывает роутер.
   loaderDeps: ({ search }) => ({ status: search.status, role: search.role }),
-  loader: async ({ params }) => {
-    const diff = /\/attempts\/\d+$/.test(params._splat ?? "");
-    const delayMs = Math.round((diff ? 1400 : 700) + Math.random() * (diff ? 1200 : 900));
+  loader: async ({ params, deps, context }) => {
+    const options = prototypePageQuery(params._splat ?? "", deps);
+    const fromCache = context.queryClient.getQueryData(options.queryKey) !== undefined;
+    const data = await context.queryClient.ensureQueryData({
+      ...options,
+      revalidateIfStale: true,
+    });
 
-    await new Promise((resolve) => setTimeout(resolve, delayMs));
-
-    return { delayMs };
+    return { data, fromCache };
   },
   shouldReload: true,
   gcTime: 0,

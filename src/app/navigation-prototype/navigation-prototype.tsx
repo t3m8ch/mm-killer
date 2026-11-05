@@ -1,6 +1,8 @@
 // THROWAWAY: три структуры навигации на /prototype/$; ?variant=A|B|C.
 // Вопрос: как перемещаться между курсами и проверкой, сохраняя контекст?
 import { useEffect, useState, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { prototypePageQuery, prototypeStaleTime } from "./page-query";
 import { useMounted } from "@mantine/hooks";
 import {
   Link,
@@ -472,10 +474,18 @@ function VariantC({
 export function NavigationPrototype() {
   const mounted = useMounted();
   const loading = useRouterState({ select: (state) => state.isLoading });
-  const { delayMs } = useLoaderData({ from: "/prototype/$" });
+  const { data: initialData, fromCache } = useLoaderData({ from: "/prototype/$" });
   const { _splat = "" } = useParams({ from: "/prototype/$" });
   const search = useSearch({ from: "/prototype/$" });
   const navigate = useNavigate();
+
+  const query = useQuery({
+    ...prototypePageQuery(_splat, search),
+    initialData,
+    initialDataUpdatedAt: initialData.loadedAt,
+  });
+  const { delayMs } = query.data;
+  const refreshing = !loading && query.isFetching;
 
   const path = `/${_splat}`.replace(/\/$/, "") || "/";
   const courseId = path.split("/")[2] ?? "1";
@@ -556,10 +566,10 @@ export function NavigationPrototype() {
         variant={variant}
         courseName={renamed[courseId] || course.name}
       />
-      {loading && (
+      {(loading || refreshing) && (
         <span className="np-loading-label" role="status">
           <Loader size={14} />
-          Загрузка…
+          {loading ? "Загрузка…" : "Обновление…"}
         </span>
       )}
       <span className="np-header-right">
@@ -589,7 +599,12 @@ export function NavigationPrototype() {
   );
 
   return (
-    <div className="np-root" data-ready={mounted} data-loading={loading}>
+    <div
+      className="np-root"
+      data-ready={mounted}
+      data-loading={loading}
+      data-refreshing={refreshing}
+    >
       {variant === "A" && (
         <VariantA sidebar={sidebar} header={header} hidden={hidden}>
           {content}
@@ -643,9 +658,9 @@ export function NavigationPrototype() {
         <div className="np-prototype-bar">
           <span
             className="np-prototype-tag"
-            title="Симуляция задержки данных: страницы 0,7–1,6 с, diff 1,4–2,6 с"
+            title="Первый запрос с задержкой, кэш свежий 30 секунд, затем фоновое обновление"
           >
-            Средний интернет
+            Средний интернет · кэш
           </span>
           <button aria-label="Предыдущий вариант" onClick={() => changeVariant(-1)}>
             ←
@@ -681,6 +696,11 @@ export function NavigationPrototype() {
                 {
                   loading,
                   delayMs,
+                  fromCache,
+                  refreshing,
+                  queryKey: prototypePageQuery(_splat, search).queryKey,
+                  staleTimeMs: prototypeStaleTime,
+                  dataUpdatedAt: query.data.loadedAt,
                   variant,
                   path,
                   role: search.role,
