@@ -223,23 +223,27 @@ function CourseNavigation({
   teacher,
   withTasks = false,
   loadedTasks = [],
+  hideOverview = false,
 }: {
   courseId: string;
   path: string;
   teacher: boolean;
   withTasks?: boolean;
   loadedTasks?: { id: string; name: string }[];
+  hideOverview?: boolean;
 }) {
   const base = `/courses/${courseId}`;
 
   return (
     <>
-      <NavItem
-        path={base}
-        label={withTasks ? "Все задания" : "Задания"}
-        icon={ListChecksIcon}
-        active={path === base || (!withTasks && path.startsWith(`${base}/tasks/`))}
-      />
+      {!hideOverview && (
+        <NavItem
+          path={base}
+          label={withTasks ? "Все задания" : "Задания"}
+          icon={ListChecksIcon}
+          active={path === base || (!withTasks && path.startsWith(`${base}/tasks/`))}
+        />
+      )}
       {withTasks && (
         <div className="np-task-links" aria-label="Задания курса">
           {loadedTasks.map(({ id, name }) => (
@@ -282,38 +286,56 @@ function CourseTreeContent({
   courseId,
   path,
   teacher,
+  heading,
+  childrenId,
 }: {
   courseId: string;
   path: string;
   teacher: boolean;
+  heading: ReactNode;
+  childrenId: string;
 }) {
   const mounted = useMounted();
   const query = useQuery({ ...prototypeCourseTreeQuery(courseId, teacher), enabled: mounted });
 
-  if (!query.data) {
-    return (
-      <div className="np-tree-loading" role="status" aria-busy="true">
-        <Loader size={14} />
-        Загрузка раздела…
-      </div>
-    );
-  }
-
   return (
     <div className="np-course-content" data-fetching={query.isFetching}>
-      {query.isFetching && (
-        <span className="np-tree-refresh" role="status" title="Обновление раздела">
-          <Loader size={12} aria-hidden="true" />
-          <span className="np-sr-only">Обновление раздела</span>
-        </span>
-      )}
-      <CourseNavigation
-        courseId={courseId}
-        path={path}
-        teacher={teacher}
-        withTasks
-        loadedTasks={query.data.tasks}
-      />
+      <div className="np-course-sticky-header">
+        {heading}
+        {query.data && (
+          <div className="np-course-overview np-nested">
+            <NavItem
+              path={`/courses/${courseId}`}
+              label="Все задания"
+              icon={ListChecksIcon}
+              active={path === `/courses/${courseId}`}
+            />
+            {query.isFetching && (
+              <span className="np-tree-refresh" role="status" title="Обновление раздела">
+                <Loader size={12} aria-hidden="true" />
+                <span className="np-sr-only">Обновление раздела</span>
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+      <div id={childrenId} className="np-nested">
+        {query.data ? (
+          <CourseNavigation
+            courseId={courseId}
+            path={path}
+            teacher={teacher}
+            withTasks
+            hideOverview
+            loadedTasks={query.data.tasks}
+          />
+        ) : (
+          <div className="np-tree-loading" role="status" aria-busy="true">
+            <Loader size={14} />
+            Загрузка раздела…
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -381,35 +403,47 @@ function Sidebar({
                 expanded[item.id] ?? (courseId === item.id && path.startsWith("/courses/"));
               const childrenId = `prototype-course-${item.id}-${placement}`;
 
+              const heading = (
+                <div className="np-course-heading">
+                  <button
+                    className="np-course-toggle"
+                    aria-label={`${isExpanded ? "Свернуть" : "Раскрыть"} курс: ${item.name}`}
+                    aria-expanded={isExpanded}
+                    aria-controls={childrenId}
+                    onClick={() => setExpanded((old) => ({ ...old, [item.id]: !isExpanded }))}
+                  >
+                    <span aria-hidden="true">
+                      {isExpanded ? <CaretDownIcon size={14} /> : <CaretRightIcon size={14} />}
+                    </span>
+                  </button>
+                  <Nav
+                    path={`/courses/${item.id}`}
+                    className={`np-course-name ${courseId === item.id && path.startsWith("/courses/") ? "selected" : ""}`}
+                  >
+                    <span className="np-course-emoji" aria-hidden="true">
+                      {item.emoji}
+                    </span>
+                    <span>{item.name}</span>
+                  </Nav>
+                </div>
+              );
+
               return (
                 <div key={item.id} className="np-course-group">
-                  <div className="np-course-heading">
-                    <button
-                      className="np-course-toggle"
-                      aria-label={`${isExpanded ? "Свернуть" : "Раскрыть"} курс: ${item.name}`}
-                      aria-expanded={isExpanded}
-                      aria-controls={childrenId}
-                      onClick={() => setExpanded((old) => ({ ...old, [item.id]: !isExpanded }))}
-                    >
-                      <span aria-hidden="true">
-                        {isExpanded ? <CaretDownIcon size={14} /> : <CaretRightIcon size={14} />}
-                      </span>
-                    </button>
-                    <Nav
-                      path={`/courses/${item.id}`}
-                      className={`np-course-name ${courseId === item.id && path.startsWith("/courses/") ? "selected" : ""}`}
-                    >
-                      <span className="np-course-emoji" aria-hidden="true">
-                        {item.emoji}
-                      </span>
-                      <span>{item.name}</span>
-                    </Nav>
-                  </div>
-                  <div id={childrenId} className="np-nested" hidden={!isExpanded}>
-                    {isExpanded && (
-                      <CourseTreeContent courseId={item.id} path={path} teacher={teacher} />
-                    )}
-                  </div>
+                  {isExpanded ? (
+                    <CourseTreeContent
+                      courseId={item.id}
+                      path={path}
+                      teacher={teacher}
+                      heading={heading}
+                      childrenId={childrenId}
+                    />
+                  ) : (
+                    <>
+                      {heading}
+                      <div id={childrenId} hidden />
+                    </>
+                  )}
                 </div>
               );
             })}

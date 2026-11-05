@@ -822,7 +822,7 @@
 .np-course-content {
   position: relative;
 }
-.np-course-content > .np-nav-item:first-of-type {
+.np-course-overview > .np-nav-item {
   padding-right: 30px;
 }
 .np-tree-refresh {
@@ -903,4 +903,17 @@
   padding: 6px 0 2px;
   background: var(--np-sidebar-surface);
   border-top: 1px solid var(--np-line);
+}
+
+.np-course-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--np-sidebar-surface);
+}
+.np-course-overview {
+  position: relative;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--np-line);
 }
