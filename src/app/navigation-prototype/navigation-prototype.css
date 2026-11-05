@@ -792,7 +792,7 @@
   flex: 1;
   min-width: 0;
   padding-left: 3px;
-  gap: 6px;
+  gap: 10px;
 }
 .np-course-toggle {
   flex: 0 0 22px;
