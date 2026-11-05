@@ -5,7 +5,6 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   BooksIcon,
   ListChecksIcon,
-  FileTextIcon,
   ClockCounterClockwiseIcon,
   UsersIcon,
   GearSixIcon,
@@ -203,14 +202,16 @@ function NavItem({
 }: {
   path: string;
   label: string;
-  icon: Icon;
+  icon?: Icon;
   active: boolean;
 }) {
   return (
     <Nav path={path} className={`np-nav-item ${active ? "active" : ""}`}>
-      <span aria-hidden="true" className="np-icon">
-        <ItemIcon size={18} weight="regular" />
-      </span>
+      {ItemIcon && (
+        <span aria-hidden="true" className="np-icon">
+          <ItemIcon size={18} weight="regular" />
+        </span>
+      )}
       <span>{label}</span>
     </Nav>
   );
@@ -246,7 +247,6 @@ function CourseNavigation({
               key={id}
               path={`${base}/tasks/${id}`}
               label={name}
-              icon={FileTextIcon}
               active={path === `${base}/tasks/${id}`}
             />
           ))}
@@ -421,7 +421,6 @@ function Sidebar({
                 key={name}
                 path={`${base}/tasks/${index + 1}`}
                 label={name}
-                icon={FileTextIcon}
                 active={path === `${base}/tasks/${index + 1}`}
               />
             ))}

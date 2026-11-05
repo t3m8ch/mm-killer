@@ -794,9 +794,6 @@
   gap: 3px;
   padding: 7px 5px;
 }
-.np-task-links .np-icon {
-  flex-basis: 10px;
-}
 .np-tree-loading {
   display: flex;
   align-items: center;
@@ -851,13 +848,6 @@
   align-items: center;
   justify-content: center;
 }
-.np-task-links .np-icon {
-  flex-basis: 18px;
-}
-.np-task-links .np-icon svg {
-  width: 16px;
-  height: 16px;
-}
 .np-course-toggle > span {
   display: flex;
 }
@@ -891,11 +881,11 @@
   flex-shrink: 0;
 }
 .np-course-emoji {
-  flex: 0 0 22px;
-  width: 22px;
+  flex: 0 0 18px;
+  width: 18px;
   text-align: center;
   font:
-    18px/1.1 "Apple Color Emoji",
+    16px/1.15 "Apple Color Emoji",
     "Segoe UI Emoji",
     "Noto Color Emoji",
     sans-serif;
