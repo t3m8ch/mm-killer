@@ -890,3 +890,17 @@
     "Noto Color Emoji",
     sans-serif;
 }
+.np-sidebar {
+  --np-sidebar-surface: #f7f8fa;
+}
+.np-drawer-content .np-sidebar {
+  --np-sidebar-surface: #fff;
+}
+.np-course-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  padding: 6px 0 2px;
+  background: var(--np-sidebar-surface);
+  border-top: 1px solid var(--np-line);
+}

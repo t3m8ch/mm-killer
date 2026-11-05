@@ -252,26 +252,28 @@ function CourseNavigation({
           ))}
         </div>
       )}
-      <NavItem
-        path={`${base}/attempts`}
-        label={teacher ? "Попытки" : "Мои попытки"}
-        icon={ClockCounterClockwiseIcon}
-        active={path.startsWith(`${base}/attempts`)}
-      />
-      <NavItem
-        path={`${base}/members`}
-        label="Участники"
-        icon={UsersIcon}
-        active={path === `${base}/members`}
-      />
-      {teacher && (
+      <div className={withTasks ? "np-course-actions" : undefined} aria-label="Разделы курса">
         <NavItem
-          path={`${base}/settings`}
-          label="Настройки курса"
-          icon={GearSixIcon}
-          active={path === `${base}/settings`}
+          path={`${base}/attempts`}
+          label={teacher ? "Попытки" : "Мои попытки"}
+          icon={ClockCounterClockwiseIcon}
+          active={path.startsWith(`${base}/attempts`)}
         />
-      )}
+        <NavItem
+          path={`${base}/members`}
+          label="Участники"
+          icon={UsersIcon}
+          active={path === `${base}/members`}
+        />
+        {teacher && (
+          <NavItem
+            path={`${base}/settings`}
+            label="Настройки курса"
+            icon={GearSixIcon}
+            active={path === `${base}/settings`}
+          />
+        )}
+      </div>
     </>
   );
 }
