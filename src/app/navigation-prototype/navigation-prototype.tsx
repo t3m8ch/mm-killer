@@ -369,7 +369,6 @@ function Sidebar({
                       path={`/courses/${item.id}`}
                       className={`np-course-name ${courseId === item.id && path.startsWith("/courses/") ? "selected" : ""}`}
                     >
-                      <span className="np-course-dot">{item.short}</span>
                       {item.name}
                     </Nav>
                   </div>
