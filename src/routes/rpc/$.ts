@@ -9,12 +9,6 @@ export const Route = createFileRoute("/rpc/$")({
   server: {
     handlers: {
       ANY: async ({ request }) => {
-        const origin = request.headers.get("origin");
-
-        if (origin && origin !== new URL(request.url).origin) {
-          return new Response("Forbidden", { status: 403 });
-        }
-
         const context = await authContext(request);
         const { response } = await handler.handle(request, {
           prefix: "/rpc",
