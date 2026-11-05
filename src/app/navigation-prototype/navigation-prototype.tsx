@@ -249,10 +249,10 @@ function CourseTreeContent({
   return (
     <div className="np-course-content" data-fetching={query.isFetching}>
       {query.isFetching && (
-        <div className="np-tree-loading" role="status">
-          <Loader size={12} />
-          Обновление…
-        </div>
+        <span className="np-tree-refresh" role="status" title="Обновление раздела">
+          <Loader size={12} aria-hidden="true" />
+          <span className="np-sr-only">Обновление раздела</span>
+        </span>
       )}
       <CourseNavigation
         courseId={courseId}
