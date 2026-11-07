@@ -21,8 +21,8 @@ import type {
   CourseBranchState,
   NavigationCourse,
   NavigationLink,
-} from "./navigation.shared.ts";
-import "./navigation.css";
+} from "./contract.shared.ts";
+import "./styles.css";
 
 const icons = {
   tasks: ListChecksIcon,

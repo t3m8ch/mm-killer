@@ -4,4 +4,4 @@ export type {
   NavigationLink,
   NavigationCourse,
   CourseBranchState,
-} from "./navigation.shared.ts";
+} from "./navigation/contract.shared.ts";

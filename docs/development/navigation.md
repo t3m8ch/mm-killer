@@ -8,6 +8,10 @@ CSS принадлежит платформе; предметные UI по-пр
 
 ## Публичный контракт
 
+Приватные файлы сгруппированы в `src/platform/navigation`: `contract.shared.ts`
+с описаниями навигации, `layout.ui.tsx` с UI и `styles.css` с оформлением.
+Публичные входы остаются в корне платформы, как у авторизации в `src/platform/auth`.
+
 `platform/public.shared.ts` экспортирует описания `Breadcrumb`, `NavigationLink`,
 `NavigationCourse` и взаимоисключающие состояния `CourseBranchState`.
 `platform/public.ui.ts` экспортирует `AppLayout`, `CourseBranch`, `NavigationItem`.
