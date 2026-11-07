@@ -1,11 +1,6 @@
-import {
-  useMatches,
-  useRouterState,
-  useNavigate,
-  type AnyRouteMatch,
-} from "@tanstack/react-router";
+import { useMatches, useRouterState, type AnyRouteMatch } from "@tanstack/react-router";
 import { useQueries, type UseQueryOptions } from "@tanstack/react-query";
-import { AppLayout, type AppLayoutProps } from "../platform/public.ui.ts";
+import { AppLayout, type AppLayoutProps } from "./navigation/layout.tsx";
 import type { Breadcrumb } from "../platform/public.shared.ts";
 
 declare module "@tanstack/react-router" {
@@ -42,14 +37,10 @@ export function NavigationComposition({
   routes,
   children,
   ...props
-}: Omit<
-  AppLayoutProps,
-  "breadcrumbs" | "path" | "mode" | "pending" | "currentCourseId" | "onNavigate"
-> & {
+}: Omit<AppLayoutProps, "breadcrumbs" | "path" | "mode" | "pending" | "currentCourseId"> & {
   routes: readonly RouteNavigation[];
 }) {
   const matches = useMatches();
-  const navigate = useNavigate();
   const { path, pending } = useRouterState({
     select: (state) => ({ path: state.location.pathname, pending: state.isLoading }),
   });
@@ -67,9 +58,6 @@ export function NavigationComposition({
   return (
     <AppLayout
       {...props}
-      onNavigate={(href) => {
-        void navigate({ to: href });
-      }}
       path={path}
       breadcrumbs={breadcrumbs}
       currentCourseId={currentCourseId}

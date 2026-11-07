@@ -1,8 +1,4 @@
-/** Описания навигации; загрузка данных и проверка доступа принадлежат сборке и модулям. */
-export interface Breadcrumb {
-  label: string;
-  href: string;
-}
+import type { Breadcrumb } from "../../platform/public.shared.ts";
 
 export interface NavigationLink extends Breadcrumb {
   icon?: "tasks" | "attempts" | "members" | "settings";
