@@ -10,9 +10,9 @@ import {
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Button, Text, Title } from "@mantine/core";
 import { z } from "zod";
-import { Layout, CourseBranch } from "../../src/platform/public.ui.ts";
-import type { NavigationCourse } from "../../src/platform/public.shared.ts";
-import { NavigationComposition, type RouteNavigation } from "../../src/app/navigation";
+import { Layout, CourseBranch } from "../../../src/platform/public.ui.ts";
+import type { NavigationCourse } from "../../../src/platform/public.shared.ts";
+import { NavigationComposition, type RouteNavigation } from "../../../src/app/navigation";
 import type { ReactNode } from "react";
 
 const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
