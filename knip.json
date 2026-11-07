@@ -10,8 +10,8 @@
     "tests/helpers/database.ts",
     "src/app/lifecycle.server.ts",
     "src/app/server-entry.server.ts",
-    "tests/navigation/*.config.ts",
-    "tests/navigation/fixture.tsx"
+    "tests/fixtures/navigation/*.config.ts",
+    "tests/fixtures/navigation/fixture.tsx"
   ],
   "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,js}", "scripts/**/*.ts", "tests/**/*.tsx"],
   "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript"],
