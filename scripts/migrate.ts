@@ -1,5 +1,5 @@
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { connect, readConfig, createLogger } from "../src/platform/index.public.server.ts";
+import { connect, readConfig, createLogger } from "../src/platform/public.server.ts";
 
 const config = readConfig();
 const logger = createLogger(config.LOG_LEVEL);

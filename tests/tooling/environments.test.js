@@ -18,11 +18,8 @@ await test("публичные входы и транзитивные грани
     };
 
     // Новый публичный вход автоматически доступен без изменения easement.yml.
-    writeFileSync("src/modules/fixture/extra.public.shared.ts", "export const value = 1;\n");
-    writeFileSync(
-      "src/app/probe.ts",
-      'export { value } from "../modules/fixture/extra.public.shared.ts";\n',
-    );
+    writeFileSync("src/modules/fixture/public.ui.ts", "export const value = 1;\n");
+    writeFileSync("src/app/probe.ts", 'export { value } from "../modules/fixture/public.ui.ts";\n');
     run("easement.yml", true);
 
     writeFileSync("src/modules/fixture/private.shared.ts", "export const value = 1;\n");
@@ -30,6 +27,8 @@ await test("публичные входы и транзитивные грани
       "src/app/probe.ts",
       'export { value } from "../modules/fixture/private.shared.ts";\n',
     );
+    run("easement.yml", false, /privacy/);
+    writeFileSync("src/app/probe.ts", 'export { Layout } from "../platform/layout.ui.tsx";\n');
     run("easement.yml", false, /privacy/);
     unlinkSync("src/app/probe.ts");
 
@@ -63,10 +62,10 @@ await test("публичные входы и транзитивные грани
     unlinkSync("src/app/middle.ts");
 
     for (const entry of [
-      "src/platform/index.public.server.ts",
-      "src/platform/index.public.shared.ts",
-      "src/modules/fixture/index.public.server.ts",
-      "src/modules/fixture/index.public.shared.ts",
+      "src/platform/public.server.ts",
+      "src/platform/public.shared.ts",
+      "src/modules/fixture/public.server.ts",
+      "src/modules/fixture/public.shared.ts",
     ]) {
       const result = spawnSync(
         process.execPath,

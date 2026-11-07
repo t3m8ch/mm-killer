@@ -1,7 +1,7 @@
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { it, expect, vi } from "vitest";
 import { isolatedDatabase } from "./database";
-import { connect, createLogger } from "../../src/platform/index.public.server.ts";
+import { connect, createLogger } from "../../src/platform/public.server.ts";
 
 it("database.close() удаляет БД после закрытия дополнительных соединений", async () => {
   const admin = connect(process.env.TEST_DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm");

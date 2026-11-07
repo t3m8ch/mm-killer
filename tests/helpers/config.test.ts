@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { readConfig } from "../../src/platform/index.public.server.ts";
+import { readConfig } from "../../src/platform/public.server.ts";
 
 describe("конфигурация подключения к Postgres", () => {
   it.each(["postgres://user:password@host/database", "postgresql://host/database"])(

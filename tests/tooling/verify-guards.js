@@ -62,7 +62,7 @@ const probes = [
   {
     file: "src/platform/guard-probe.server.ts",
     command: ["easement", "check"],
-    source: 'export { api } from "../modules/fixture/index.public.server.ts";',
+    source: 'export { api } from "../modules/fixture/public.server.ts";',
     expected: "dependency",
   },
   {

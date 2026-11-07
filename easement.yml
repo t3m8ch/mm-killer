@@ -1,25 +1,19 @@
 version: 1
 components:
   # plop:components
-  platform: { in: src/platform, public: ["src/platform/**/*.public.*"] }
-  courses:
-    { in: src/modules/courses, public: ["src/modules/courses/**/*.public.*"], optional: true }
+  platform: { in: src/platform, public: ["src/platform/**/public.*"] }
+  courses: { in: src/modules/courses, public: ["src/modules/courses/**/public.*"], optional: true }
   invitations:
-    {
-      in: src/modules/invitations,
-      public: ["src/modules/invitations/**/*.public.*"],
-      optional: true,
-    }
-  tasks: { in: src/modules/tasks, public: ["src/modules/tasks/**/*.public.*"], optional: true }
+    { in: src/modules/invitations, public: ["src/modules/invitations/**/public.*"], optional: true }
+  tasks: { in: src/modules/tasks, public: ["src/modules/tasks/**/public.*"], optional: true }
   attempts:
-    { in: src/modules/attempts, public: ["src/modules/attempts/**/*.public.*"], optional: true }
-  reviews:
-    { in: src/modules/reviews, public: ["src/modules/reviews/**/*.public.*"], optional: true }
-  git: { in: src/modules/git, public: ["src/modules/git/**/*.public.*"], optional: true }
+    { in: src/modules/attempts, public: ["src/modules/attempts/**/public.*"], optional: true }
+  reviews: { in: src/modules/reviews, public: ["src/modules/reviews/**/public.*"], optional: true }
+  git: { in: src/modules/git, public: ["src/modules/git/**/public.*"], optional: true }
   notifications:
     {
       in: src/modules/notifications,
-      public: ["src/modules/notifications/**/*.public.*"],
+      public: ["src/modules/notifications/**/public.*"],
       optional: true,
     }
   app: { in: [src/app, src/routes, src/router.tsx] }

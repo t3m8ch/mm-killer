@@ -146,8 +146,8 @@ export default function generators(plop) {
           "contract.shared.ts",
           "api.server.ts",
           "schema.server.ts",
-          "index.public.server.ts",
-          "index.public.shared.ts",
+          "public.server.ts",
+          "public.shared.ts",
           "api.test.ts",
         ].map((file) => ({
           type: "add",
@@ -163,7 +163,7 @@ export default function generators(plop) {
           path: "src/app/api.server.ts",
           pattern: "// plop:imports",
           template:
-            "import { api as {{camelCase name}} } from '../modules/{{name}}/index.public.server.ts';",
+            "import { api as {{camelCase name}} } from '../modules/{{name}}/public.server.ts';",
         },
         {
           type: "append",
@@ -179,7 +179,7 @@ export default function generators(plop) {
           skip: keepDomainGraph,
           pattern: "  # plop:components",
           template:
-            '  {{name}}: { in: src/modules/{{name}}, public: ["src/modules/{{name}}/**/*.public.*"] }',
+            '  {{name}}: { in: src/modules/{{name}}, public: ["src/modules/{{name}}/**/public.*"] }',
         },
         {
           type: "append",

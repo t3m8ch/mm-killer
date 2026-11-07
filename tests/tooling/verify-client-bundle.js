@@ -7,13 +7,13 @@ import { withFixture } from "./fixture-workspace.js";
 const probes = [
   {
     name: "публичный изоморфный вход",
-    imports: 'import { authContract } from "../platform/index.public.shared.ts";',
+    imports: 'import { authContract } from "../platform/public.shared.ts";',
     expression: "String(Boolean(authContract))",
     allowed: true,
   },
   {
     name: "SSR публичного UI",
-    imports: 'import { Layout } from "../platform/layout.public.ui.tsx";',
+    imports: 'import { Layout } from "../platform/public.ui.ts";',
     expression: "<Layout>SSR</Layout>",
     allowed: true,
   },
@@ -24,14 +24,13 @@ const probes = [
   },
   {
     name: "публичный серверный вход",
-    imports: 'import { connect } from "../platform/index.public.server.ts";',
+    imports: 'import { connect } from "../platform/public.server.ts";',
     expression: "String(connect)",
   },
   {
     name: "динамический серверный вход",
     imports: "",
-    expression:
-      '<button onClick={() => import("../platform/index.public.server.ts")}>Загрузить</button>',
+    expression: '<button onClick={() => import("../platform/public.server.ts")}>Загрузить</button>',
   },
   {
     name: "изоморфный RPC-клиент",
