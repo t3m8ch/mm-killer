@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from "react";
+import { Link, type AnyRouter } from "@tanstack/react-router";
+import type { Breadcrumb } from "../../platform/public.shared.ts";
 import { Button, Drawer, Loader, Menu, Tooltip, useMantineColorScheme } from "@mantine/core";
 import { useMediaQuery, useMounted } from "@mantine/hooks";
 import {
@@ -16,13 +18,11 @@ import {
   SunIcon,
   UsersIcon,
 } from "@phosphor-icons/react";
-import type {
-  Breadcrumb,
-  CourseBranchState,
-  NavigationCourse,
-  NavigationLink,
-} from "./contract.shared.ts";
+import type { CourseBranchState, NavigationCourse, NavigationLink } from "./contract.shared.ts";
 import "./styles.css";
+
+// Описания навигации содержат готовые строковые URL, включая маршруты тестового стенда.
+const RouterLink = Link<AnyRouter>;
 
 const icons = {
   tasks: ListChecksIcon,
@@ -31,19 +31,20 @@ const icons = {
   settings: GearSixIcon,
 };
 
-export function NavigationItem({ link, path }: { link: NavigationLink; path: string }) {
+function NavigationItem({ link, path }: { link: NavigationLink; path: string }) {
   const Icon = link.icon ? icons[link.icon] : undefined;
   const active = path === link.href;
 
   return (
-    <a
-      href={link.href}
+    <RouterLink
+      activeOptions={{ exact: true }}
+      to={link.href}
       className={`mm-nav-item${active ? " active" : ""}`}
       aria-current={active ? "page" : undefined}
     >
       {Icon && <Icon size={18} aria-hidden="true" />}
       <span>{link.label}</span>
-    </a>
+    </RouterLink>
   );
 }
 
@@ -108,7 +109,6 @@ export function CourseBranch({
 
 export interface AppLayoutProps {
   children: ReactNode;
-  onNavigate: (href: string) => void;
   path: string;
   breadcrumbs: readonly Breadcrumb[];
   mode?: "normal" | "diff";
@@ -146,18 +146,19 @@ function Sidebar({
   return (
     <div className="mm-sidebar">
       {!drawer && (
-        <a href="/" className="mm-brand">
+        <RouterLink activeOptions={{ exact: true }} to="/" className="mm-brand">
           <strong>MergeMinds</strong>
-        </a>
+        </RouterLink>
       )}
-      <a
-        href="/"
+      <RouterLink
+        activeOptions={{ exact: true }}
+        to="/"
         className={`mm-nav-item${path === "/" ? " active" : ""}`}
         aria-current={path === "/" ? "page" : undefined}
       >
         <BooksIcon size={18} />
         Мои курсы
-      </a>
+      </RouterLink>
       <div className="mm-sidebar-scroll">
         <p className="mm-group-label">Курсы</p>
         {courses.map((course) => {
@@ -175,15 +176,16 @@ function Sidebar({
               >
                 {open ? <CaretDownIcon size={14} /> : <CaretRightIcon size={14} />}
               </button>
-              <a
-                href={course.href}
+              <RouterLink
+                activeOptions={{ exact: true }}
+                to={course.href}
                 className={`mm-course-name${currentCourseId === course.id ? " selected" : ""}`}
               >
                 <span className="mm-course-emoji" aria-hidden="true">
                   {course.emoji}
                 </span>
                 <span>{course.label}</span>
-              </a>
+              </RouterLink>
             </div>
           );
 
@@ -217,8 +219,9 @@ function Sidebar({
             <Menu.Dropdown>
               {user.settingsHref && (
                 <Menu.Item
-                  component="a"
-                  href={user.settingsHref}
+                  component={RouterLink}
+                  activeOptions={{ exact: true }}
+                  to={user.settingsHref}
                   leftSection={<GearSixIcon size={18} />}
                 >
                   Личные настройки
@@ -288,34 +291,7 @@ export function AppLayout(props: AppLayoutProps) {
   }
 
   return (
-    <div
-      className="mm-root"
-      onClick={(event) => {
-        if (
-          event.defaultPrevented ||
-          event.button !== 0 ||
-          event.metaKey ||
-          event.ctrlKey ||
-          event.shiftKey ||
-          event.altKey
-        ) {
-          return;
-        }
-
-        const anchor = event.target instanceof Element ? event.target.closest("a") : null;
-        const href = anchor?.getAttribute("href");
-
-        if (
-          href?.startsWith("/") &&
-          !anchor?.hasAttribute("target") &&
-          !anchor?.hasAttribute("download")
-        ) {
-          event.preventDefault();
-          setDrawer(false);
-          props.onNavigate(href);
-        }
-      }}
-    >
+    <div className="mm-root">
       <div className={`mm-shell${mode === "diff" || collapsed ? " mm-hidden" : ""}`}>
         <aside className="mm-permanent" aria-label="Основная навигация">
           <Sidebar {...props} />
@@ -343,9 +319,13 @@ export function AppLayout(props: AppLayoutProps) {
                         {crumb.label}
                       </span>
                     ) : (
-                      <a href={crumb.href} title={crumb.label}>
+                      <RouterLink
+                        activeOptions={{ exact: true }}
+                        to={crumb.href}
+                        title={crumb.label}
+                      >
                         {crumb.label}
-                      </a>
+                      </RouterLink>
                     )}
                   </li>
                 ))}
@@ -364,9 +344,14 @@ export function AppLayout(props: AppLayoutProps) {
         onClose={() => setDrawer(false)}
         size={300}
         title={
-          <a href="/" className="mm-drawer-brand">
+          <RouterLink
+            activeOptions={{ exact: true }}
+            to="/"
+            className="mm-drawer-brand"
+            onClick={() => setDrawer(false)}
+          >
             MergeMinds
-          </a>
+          </RouterLink>
         }
         classNames={{
           content: "mm-drawer-surface",
@@ -374,7 +359,23 @@ export function AppLayout(props: AppLayoutProps) {
           header: "mm-drawer-header",
         }}
       >
-        <div className="mm-drawer-content">
+        <div
+          className="mm-drawer-content"
+          onClickCapture={(event) => {
+            // Переход выполняет Link; здесь только закрытие панели, в том числе для текущей страницы.
+            if (
+              event.button === 0 &&
+              !event.metaKey &&
+              !event.ctrlKey &&
+              !event.shiftKey &&
+              !event.altKey &&
+              event.target instanceof Element &&
+              event.target.closest("a[href]")
+            ) {
+              setDrawer(false);
+            }
+          }}
+        >
           <Sidebar {...props} drawer />
         </div>
       </Drawer>
