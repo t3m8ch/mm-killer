@@ -4,7 +4,6 @@ const production = process.env.PLAYWRIGHT_PRODUCTION === "true";
 
 export default defineConfig({
   testDir: "./tests/e2e",
-  testIgnore: "navigation.test.ts",
   use: { baseURL: "http://127.0.0.1:4312" },
   webServer: {
     command: production
