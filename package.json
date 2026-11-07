@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "test": "node --test tests/tooling/oxlint-plugin.test.js && node tests/tooling/test-generated.js",
+    "test": "node --test tests/tooling/oxlint-plugin.test.js tests/tooling/environments.test.js && node tests/tooling/test-generated.js",
     "lint": "oxlint",
     "typecheck": "oxlint --type-aware --type-check",
     "format": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore",
@@ -15,7 +15,7 @@
     "test:api": "vitest run",
     "db:migrate": "node scripts/migrate.ts",
     "test:e2e": "playwright test --pass-with-no-tests",
-    "boundaries": "easement check",
+    "boundaries": "easement check && easement check -c easement.environments.yml",
     "generate": "node scripts/generate.js",
     "test:guards": "node tests/tooling/verify-guards.js",
     "db:generate": "drizzle-kit generate",

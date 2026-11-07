@@ -1,4 +1,4 @@
-import { connect, readConfig, seedUsers } from "../src/platform/index.ts";
+import { connect, readConfig, seedUsers } from "../src/platform/index.public.server.ts";
 
 const { db, pool } = connect(readConfig().DATABASE_URL);
 

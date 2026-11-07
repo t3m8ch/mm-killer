@@ -54,9 +54,9 @@ const probes = [
     expected: "switch-exhaustiveness-check",
   },
   {
-    file: "src/platform/guard-probe.ts",
+    file: "src/platform/guard-probe.server.ts",
     command: ["easement", "check"],
-    source: 'export { api } from "../modules/fixture";',
+    source: 'export { api } from "../modules/fixture/index.public.server.ts";',
     expected: "dependency",
   },
   {
@@ -68,7 +68,7 @@ const probes = [
   {
     file: "src/app/guard-probe.ts",
     command: ["easement", "check"],
-    source: 'export { fixture } from "../modules/fixture/schema";',
+    source: 'export { fixture } from "../modules/fixture/schema.server.ts";',
     expected: "privacy",
   },
 ];

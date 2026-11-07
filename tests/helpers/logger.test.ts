@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createLogger } from "../../src/platform";
+import { createLogger } from "../../src/platform/index.public.server.ts";
 
 function capture(level: "info" | "warn" = "info") {
   const lines: string[] = [];

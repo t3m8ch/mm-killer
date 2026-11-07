@@ -1,5 +1,5 @@
 import { os, ORPCError } from "@orpc/server";
-import type { Context } from "./context.ts";
+import type { Context } from "./context.server.ts";
 
 export const transaction = os.$context<Context>().middleware(({ context, next }) =>
   context.db.transaction(async (db) => await next({ context: { db } }), {

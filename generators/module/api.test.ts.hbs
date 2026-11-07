@@ -3,9 +3,9 @@ import { RPCLink } from "@orpc/client/fetch";
 import { RPCHandler } from "@orpc/server/fetch";
 import { describe, it, expect } from "vitest";
 import { createRouterClient, type RouterClient } from "@orpc/server";
-import type { Context } from "../../platform";
+import type { Context } from "../../platform/index.public.server.ts";
 import { rollbackTest, clock } from "../../../tests/helpers/database";
-import { api } from "./index";
+import { api } from "./index.public.server.ts";
 
 function clientFor(context: Context) {
   const time = clock();

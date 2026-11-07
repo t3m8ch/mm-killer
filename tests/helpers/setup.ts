@@ -1,5 +1,5 @@
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { connect } from "../../src/platform";
+import { connect } from "../../src/platform/index.public.server.ts";
 
 export default async function setup() {
   const admin = connect(process.env.TEST_DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm");

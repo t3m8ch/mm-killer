@@ -1,0 +1,80 @@
+version: 1
+components:
+  server: { in: ["src/**/*.server.ts", "src/**/*.server.tsx"], optional: true }
+  shared: { in: ["src/**/*.shared.ts"], optional: true }
+  browser: { in: ["src/**/*.browser.ts", "src/**/*.browser.tsx"], optional: true }
+  ui: { in: ["src/**/*.ui.ts", "src/**/*.ui.tsx"], optional: true }
+  integration: { in: [src, tests, scripts, "*.ts", "*.js"], priority: -1 }
+rules:
+  server: { may_depend_on: [shared, integration], must_not_reach: [browser] }
+  shared:
+    {
+      may_depend_on: [integration],
+      forbid_external:
+        [
+          "node:*",
+          fs,
+          crypto,
+          path,
+          os,
+          child_process,
+          net,
+          tls,
+          pg,
+          pg-pool,
+          drizzle-orm,
+          "@orpc/server",
+          nitro,
+          react,
+          react-dom,
+          "@mantine/core",
+          "@tanstack/react-start/server",
+        ],
+      must_not_reach: [server, browser, ui],
+    }
+  browser:
+    {
+      may_depend_on: [shared, ui, integration],
+      forbid_external:
+        [
+          "node:*",
+          fs,
+          crypto,
+          path,
+          os,
+          child_process,
+          net,
+          tls,
+          pg,
+          pg-pool,
+          drizzle-orm,
+          "@orpc/server",
+          nitro,
+          "@tanstack/react-start/server",
+        ],
+      must_not_reach: [server],
+    }
+  ui:
+    {
+      may_depend_on: [shared, integration],
+      forbid_external:
+        [
+          "node:*",
+          fs,
+          crypto,
+          path,
+          os,
+          child_process,
+          net,
+          tls,
+          pg,
+          pg-pool,
+          drizzle-orm,
+          "@orpc/server",
+          nitro,
+          "@tanstack/react-start/server",
+        ],
+      must_not_reach: [server, browser],
+    }
+  integration: { may_depend_on: [server, shared, browser, ui] }
+exclude: [".agents/**", ".claude/**", ".codex/**", "generators/**"]

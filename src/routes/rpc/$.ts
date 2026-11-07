@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RPCHandler } from "@orpc/server/fetch";
-import { createRequestContext } from "../../app/request-context";
-import { api } from "../../app/api";
+import { createRequestContext } from "../../app/request-context.server.ts";
+import { api } from "../../app/api.server.ts";
 
 const handler = new RPCHandler(api);
 

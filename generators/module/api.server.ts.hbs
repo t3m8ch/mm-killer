@@ -1,8 +1,8 @@
 import { implement } from "@orpc/server";
 import { eq } from "drizzle-orm";
-import { transaction, {{#if updatedBy}}authed, {{/if}}type Context } from "../../platform";
-import { contract } from "./contract";
-import { {{camelCase name}} } from "./schema";
+import { transaction, {{#if updatedBy}}authed, {{/if}}type Context } from "../../platform/index.public.server.ts";
+import { contract } from "./contract.shared.ts";
+import { {{camelCase name}} } from "./schema.server.ts";
 
 // plop:imports
 const os = implement(contract).$context<Context>();

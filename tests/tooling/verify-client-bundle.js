@@ -6,6 +6,34 @@ import { withFixture } from "./fixture-workspace.js";
 
 const probes = [
   {
+    name: "публичный изоморфный вход",
+    imports: 'import { authContract } from "../platform/index.public.shared.ts";',
+    expression: "String(Boolean(authContract))",
+    allowed: true,
+  },
+  {
+    name: "SSR публичного UI",
+    imports: 'import { Layout } from "../platform/layout.public.ui.tsx";',
+    expression: "<Layout>SSR</Layout>",
+    allowed: true,
+  },
+  {
+    name: "browser-only в SSR",
+    imports: 'import { browser } from "../app/probe.browser.ts";',
+    expression: "browser",
+  },
+  {
+    name: "публичный серверный вход",
+    imports: 'import { connect } from "../platform/index.public.server.ts";',
+    expression: "String(connect)",
+  },
+  {
+    name: "динамический серверный вход",
+    imports: "",
+    expression:
+      '<button onClick={() => import("../platform/index.public.server.ts")}>Загрузить</button>',
+  },
+  {
     name: "изоморфный RPC-клиент",
     imports: 'import { rpc } from "../app/client";',
     expression: "String(Boolean(rpc))",
@@ -44,7 +72,11 @@ const probes = [
     imports: 'import { readFileSync } from "fs";',
     expression: "String(readFileSync)",
   },
-  { name: "модуль БД", imports: 'import { db } from "../app/database";', expression: "String(db)" },
+  {
+    name: "модуль БД",
+    imports: 'import { db } from "../app/database.server.ts";',
+    expression: "String(db)",
+  },
   {
     name: "реэкспорт",
     imports: 'import { pg } from "../app/bundle-probe";',
@@ -65,6 +97,7 @@ const probes = [
 ];
 
 withFixture(() => {
+  writeFileSync("src/app/probe.browser.ts", 'export const browser = "browser";\n');
   const route = "src/routes/index.tsx";
   const original = readFileSync(route, "utf8");
   const env = { ...process.env };

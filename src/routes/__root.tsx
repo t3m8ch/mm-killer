@@ -1,7 +1,7 @@
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
-import { MantineProvider, Container, Text, Loader } from "@mantine/core";
-import "@mantine/core/styles.css";
+import { Text, Loader } from "@mantine/core";
+import { Layout } from "../platform/layout.public.ui.tsx";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: Root,
@@ -19,11 +19,9 @@ function Root() {
       </head>
       <body>
         <QueryClientProvider client={queryClient}>
-          <MantineProvider>
-            <Container>
-              <Outlet />
-            </Container>
-          </MantineProvider>
+          <Layout>
+            <Outlet />
+          </Layout>
         </QueryClientProvider>
         <Scripts />
       </body>

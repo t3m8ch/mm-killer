@@ -1,5 +1,5 @@
 import { definePlugin } from "nitro";
-import { pool, logger } from "./database";
+import { pool, logger } from "./database.server.ts";
 
 export default definePlugin((app) => {
   app.hooks.hook("close", async () => {
