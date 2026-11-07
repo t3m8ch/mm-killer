@@ -88,3 +88,16 @@ test("мобильная панель, профиль, тема и Escape", asyn
 
   await expect(page.getByRole("dialog")).toBeHidden();
 });
+
+test("выбранный курс раскрывается после завершения загрузки перехода", async ({ page }) => {
+  await page.goto("/courses/1/tasks/7");
+  const sidebar = page.getByRole("complementary");
+  const name = "Командный проект: разработка и сопровождение программного продукта";
+
+  await sidebar.getByRole("button", { name: `Раскрыть курс: ${name}` }).click();
+  await sidebar.getByRole("button", { name: `Свернуть курс: ${name}` }).click();
+  await sidebar.getByRole("link", { name, exact: true }).click();
+
+  await expect(page).toHaveURL(/courses\/2$/);
+  await expect(sidebar.getByRole("button", { name: `Свернуть курс: ${name}` })).toBeVisible();
+});
