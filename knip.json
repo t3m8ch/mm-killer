@@ -2,16 +2,16 @@
   "entry": [
     "src/routes/**/*.{ts,tsx}",
     "src/**/*.test.ts",
-    "src/modules/*/index.ts",
-    "src/platform/index.ts",
+    "src/modules/*/index.public.*",
+    "src/platform/index.public.*",
     "scripts/*.ts",
     "scripts/*.js",
     "src/app/client.ts",
     "tests/helpers/database.ts",
-    "src/app/lifecycle.ts",
-    "src/app/server-entry.ts"
+    "src/app/lifecycle.server.ts",
+    "src/app/server-entry.server.ts"
   ],
   "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,js}", "scripts/**/*.ts"],
-  "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript", "@orpc/contract"],
+  "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript"],
   "ignoreBinaries": ["easement"]
 }

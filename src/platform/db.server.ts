@@ -1,4 +1,4 @@
-import { createLogger } from "./logger.ts";
+import { createLogger } from "./logger.server.ts";
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 

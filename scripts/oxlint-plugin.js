@@ -48,17 +48,29 @@ export default {
         schema: [],
         messages: {
           ui: "Использовать Mantine без собственного CSS, className и style",
+          environment: "Файл модуля должен иметь суффикс .server, .shared, .ui или .browser",
           sql: "Записывать только свои таблицы через Drizzle; сырой SQL оставлять платформе и миграциям",
         },
       },
       create(context) {
         const filename = context.filename ?? context.getFilename();
 
-        if (!filename.includes("/src/modules/") || filename.endsWith(".test.ts")) {
+        const checkEnvironment = (node) => {
+          if (!/\.(server|shared|ui|browser)\.tsx?$/.test(filename)) {
+            context.report({ node, messageId: "environment" });
+          }
+        };
+
+        if (filename.endsWith(".test.ts")) {
           return {};
         }
 
+        if (!filename.includes("/src/modules/")) {
+          return filename.includes("/src/platform/") ? { Program: checkEnvironment } : {};
+        }
+
         return {
+          Program: checkEnvironment,
           JSXAttribute(node) {
             if (["className", "style"].includes(node.name.name)) {
               context.report({ node, messageId: "ui" });

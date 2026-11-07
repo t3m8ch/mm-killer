@@ -1,6 +1,6 @@
 import { getCookie, setCookie } from "@tanstack/react-start/server";
-import { resolveUser, type Context } from "../platform";
-import { db } from "./database";
+import { resolveUser, type Context } from "../platform/index.public.server.ts";
+import { db } from "./database.server.ts";
 
 export async function createRequestContext(request: Request): Promise<Context> {
   const now = () => new Date();

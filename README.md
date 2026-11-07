@@ -59,7 +59,7 @@ Conventional Commits; pre-push проверяет типы, архитектур
 
 ## Миграции
 
-Конфигурация `drizzle.config.ts` собирает схемы из `src/modules/*/schema.ts`.
+Конфигурация `drizzle.config.ts` собирает схемы из `src/modules/*/schema.server.ts`.
 После изменения существующей схемы создать и проверить миграцию:
 
 ```sh

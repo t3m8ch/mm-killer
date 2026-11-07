@@ -21,6 +21,7 @@ export function withFixture(run, options = {}) {
       "vitest.config.ts",
       "vite.config.ts",
       "easement.yml",
+      "easement.environments.yml",
       ".oxlintrc.json",
       ".gitignore",
     ]) {

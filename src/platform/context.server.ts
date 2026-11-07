@@ -1,5 +1,5 @@
-import type { Database, Transaction } from "./db.ts";
-import type { User } from "./auth.ts";
+import type { Database, Transaction } from "./db.server.ts";
+import type { User } from "./auth.server.ts";
 
 export type Context = {
   db: Database | Transaction;

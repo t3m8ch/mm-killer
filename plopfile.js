@@ -56,7 +56,7 @@ export default function generators(plop) {
     }
 
     for (const [file, markers] of Object.entries({
-      "src/app/api.ts": ["// plop:imports", "// plop:api"],
+      "src/app/api.server.ts": ["// plop:imports", "// plop:api"],
       "easement.yml": [
         "# plop:components",
         "# plop:rules",
@@ -97,7 +97,7 @@ export default function generators(plop) {
       throw new Error("Имя модуля конфликтует с именами в сгенерированном коде");
     }
 
-    if (hasProperty("src/app/api.ts", property)) {
+    if (hasProperty("src/app/api.server.ts", property)) {
       throw new Error("Имя модуля уже занято в API");
     }
 
@@ -115,8 +115,8 @@ export default function generators(plop) {
     }
 
     for (const [file, marker] of [
-      ["contract.ts", "// plop:contracts"],
-      ["api.ts", "// plop:handlers"],
+      ["contract.shared.ts", "// plop:contracts"],
+      ["api.server.ts", "// plop:handlers"],
     ]) {
       if (!readFileSync(`src/modules/${answers.module}/${file}`, "utf8").includes(marker)) {
         throw new Error(`Нет маркера ${marker}`);
@@ -125,7 +125,7 @@ export default function generators(plop) {
 
     const property = plop.getHelper("camelCase")(answers.name);
 
-    for (const file of ["contract.ts", "api.ts"]) {
+    for (const file of ["contract.shared.ts", "api.server.ts"]) {
       if (hasProperty(`src/modules/${answers.module}/${file}`, property)) {
         throw new Error("Имя процедуры уже занято");
       }
@@ -142,7 +142,14 @@ export default function generators(plop) {
     ],
     actions: [{ type: "validate-module" }]
       .concat(
-        ["contract.ts", "api.ts", "schema.ts", "index.ts", "api.test.ts"].map((file) => ({
+        [
+          "contract.shared.ts",
+          "api.server.ts",
+          "schema.server.ts",
+          "index.public.server.ts",
+          "index.public.shared.ts",
+          "api.test.ts",
+        ].map((file) => ({
           type: "add",
           path: `src/modules/{{name}}/${file}`,
           templateFile: `generators/module/${file}.hbs`,
@@ -153,14 +160,15 @@ export default function generators(plop) {
         {
           type: "append",
           unique: false,
-          path: "src/app/api.ts",
+          path: "src/app/api.server.ts",
           pattern: "// plop:imports",
-          template: "import { api as {{camelCase name}} } from '../modules/{{name}}';",
+          template:
+            "import { api as {{camelCase name}} } from '../modules/{{name}}/index.public.server.ts';",
         },
         {
           type: "append",
           unique: false,
-          path: "src/app/api.ts",
+          path: "src/app/api.server.ts",
           pattern: "// plop:api",
           template: "  {{camelCase name}},",
         },
@@ -171,7 +179,7 @@ export default function generators(plop) {
           skip: keepDomainGraph,
           pattern: "  # plop:components",
           template:
-            "  {{name}}: { in: src/modules/{{name}}, public: [src/modules/{{name}}/index.ts] }",
+            '  {{name}}: { in: src/modules/{{name}}, public: ["src/modules/{{name}}/**/*.public.*"] }',
         },
         {
           type: "append",
@@ -222,7 +230,7 @@ export default function generators(plop) {
       {
         type: "append",
         unique: false,
-        path: "src/modules/{{module}}/contract.ts",
+        path: "src/modules/{{module}}/contract.shared.ts",
         pattern: "// plop:contracts",
         template:
           "  {{camelCase name}}: oc.input(z.object({})).output(z.object({})).errors({ NOT_IMPLEMENTED: {} }),",
@@ -230,7 +238,7 @@ export default function generators(plop) {
       {
         type: "append",
         unique: false,
-        path: "src/modules/{{module}}/api.ts",
+        path: "src/modules/{{module}}/api.server.ts",
         pattern: "// plop:handlers",
         template:
           "  {{camelCase name}}: os.{{camelCase name}}.handler(({ errors }) => { throw errors.NOT_IMPLEMENTED(); }),",

@@ -1,4 +1,4 @@
-import { authApi } from "../platform";
+import { authApi } from "../platform/index.public.server.ts";
 // plop:imports
 
 export const api = {
