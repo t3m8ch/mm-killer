@@ -18,6 +18,7 @@ export function ApplicationNavigation({ children }: { children: AppLayoutProps["
     retry: false,
   });
   const logout = useMutation({
+    throwOnError: true,
     mutationFn: (all: boolean) =>
       all ? rpc.auth.logoutAll.call(undefined) : rpc.auth.logout.call(undefined),
     onSuccess: () => {
