@@ -9,21 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated.settings'
 import { Route as HealthLiveRouteImport } from './routes/health/live'
 import { Route as HealthReadyRouteImport } from './routes/health/ready'
+import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as RpcSplatRouteImport } from './routes/rpc/$'
+import { Route as AuthenticatedCoursesCourseIdIndexRouteImport } from './routes/_authenticated.courses.$courseId.index'
+import { Route as AuthenticatedCoursesCourseIdMembersRouteImport } from './routes/_authenticated.courses.$courseId.members'
+import { Route as AuthenticatedCoursesCourseIdSettingsRouteImport } from './routes/_authenticated.courses.$courseId.settings'
+import { Route as AuthenticatedCoursesCourseIdAttemptsIndexRouteImport } from './routes/_authenticated.courses.$courseId.attempts.index'
+import { Route as AuthenticatedCoursesCourseIdAttemptsAttemptIdRouteImport } from './routes/_authenticated.courses.$courseId.attempts.$attemptId'
+import { Route as AuthenticatedCoursesCourseIdTasksTaskIdRouteImport } from './routes/_authenticated.courses.$courseId.tasks.$taskId'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const HealthLiveRoute = HealthLiveRouteImport.update({
   id: '/health/live',
@@ -35,57 +53,165 @@ const HealthReadyRoute = HealthReadyRouteImport.update({
   path: '/health/ready',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvitesTokenRoute = InvitesTokenRouteImport.update({
+  id: '/invites/$token',
+  path: '/invites/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RpcSplatRoute = RpcSplatRouteImport.update({
   id: '/rpc/$',
   path: '/rpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCoursesCourseIdIndexRoute =
+  AuthenticatedCoursesCourseIdIndexRouteImport.update({
+    id: '/courses/$courseId/',
+    path: '/courses/$courseId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCoursesCourseIdMembersRoute =
+  AuthenticatedCoursesCourseIdMembersRouteImport.update({
+    id: '/courses/$courseId/members',
+    path: '/courses/$courseId/members',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCoursesCourseIdSettingsRoute =
+  AuthenticatedCoursesCourseIdSettingsRouteImport.update({
+    id: '/courses/$courseId/settings',
+    path: '/courses/$courseId/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCoursesCourseIdAttemptsIndexRoute =
+  AuthenticatedCoursesCourseIdAttemptsIndexRouteImport.update({
+    id: '/courses/$courseId/attempts/',
+    path: '/courses/$courseId/attempts/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute =
+  AuthenticatedCoursesCourseIdAttemptsAttemptIdRouteImport.update({
+    id: '/courses/$courseId/attempts/$attemptId',
+    path: '/courses/$courseId/attempts/$attemptId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCoursesCourseIdTasksTaskIdRoute =
+  AuthenticatedCoursesCourseIdTasksTaskIdRouteImport.update({
+    id: '/courses/$courseId/tasks/$taskId',
+    path: '/courses/$courseId/tasks/$taskId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/health/live': typeof HealthLiveRoute
   '/health/ready': typeof HealthReadyRoute
+  '/invites/$token': typeof InvitesTokenRoute
   '/rpc/$': typeof RpcSplatRoute
+  '/courses/$courseId/members': typeof AuthenticatedCoursesCourseIdMembersRoute
+  '/courses/$courseId/settings': typeof AuthenticatedCoursesCourseIdSettingsRoute
+  '/courses/$courseId/': typeof AuthenticatedCoursesCourseIdIndexRoute
+  '/courses/$courseId/attempts/$attemptId': typeof AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute
+  '/courses/$courseId/tasks/$taskId': typeof AuthenticatedCoursesCourseIdTasksTaskIdRoute
+  '/courses/$courseId/attempts/': typeof AuthenticatedCoursesCourseIdAttemptsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/health/live': typeof HealthLiveRoute
   '/health/ready': typeof HealthReadyRoute
+  '/invites/$token': typeof InvitesTokenRoute
   '/rpc/$': typeof RpcSplatRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/courses/$courseId/members': typeof AuthenticatedCoursesCourseIdMembersRoute
+  '/courses/$courseId/settings': typeof AuthenticatedCoursesCourseIdSettingsRoute
+  '/courses/$courseId': typeof AuthenticatedCoursesCourseIdIndexRoute
+  '/courses/$courseId/attempts/$attemptId': typeof AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute
+  '/courses/$courseId/tasks/$taskId': typeof AuthenticatedCoursesCourseIdTasksTaskIdRoute
+  '/courses/$courseId/attempts': typeof AuthenticatedCoursesCourseIdAttemptsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/health/live': typeof HealthLiveRoute
   '/health/ready': typeof HealthReadyRoute
+  '/invites/$token': typeof InvitesTokenRoute
   '/rpc/$': typeof RpcSplatRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/courses/$courseId/members': typeof AuthenticatedCoursesCourseIdMembersRoute
+  '/_authenticated/courses/$courseId/settings': typeof AuthenticatedCoursesCourseIdSettingsRoute
+  '/_authenticated/courses/$courseId/': typeof AuthenticatedCoursesCourseIdIndexRoute
+  '/_authenticated/courses/$courseId/attempts/$attemptId': typeof AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute
+  '/_authenticated/courses/$courseId/tasks/$taskId': typeof AuthenticatedCoursesCourseIdTasksTaskIdRoute
+  '/_authenticated/courses/$courseId/attempts/': typeof AuthenticatedCoursesCourseIdAttemptsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/health/live' | '/health/ready' | '/rpc/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/settings'
+    | '/health/live'
+    | '/health/ready'
+    | '/invites/$token'
+    | '/rpc/$'
+    | '/courses/$courseId/members'
+    | '/courses/$courseId/settings'
+    | '/courses/$courseId/'
+    | '/courses/$courseId/attempts/$attemptId'
+    | '/courses/$courseId/tasks/$taskId'
+    | '/courses/$courseId/attempts/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/health/live' | '/health/ready' | '/rpc/$'
-  id: '__root__' | '/' | '/login' | '/health/live' | '/health/ready' | '/rpc/$'
+  to:
+    | '/login'
+    | '/settings'
+    | '/health/live'
+    | '/health/ready'
+    | '/invites/$token'
+    | '/rpc/$'
+    | '/'
+    | '/courses/$courseId/members'
+    | '/courses/$courseId/settings'
+    | '/courses/$courseId'
+    | '/courses/$courseId/attempts/$attemptId'
+    | '/courses/$courseId/tasks/$taskId'
+    | '/courses/$courseId/attempts'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/settings'
+    | '/health/live'
+    | '/health/ready'
+    | '/invites/$token'
+    | '/rpc/$'
+    | '/_authenticated/'
+    | '/_authenticated/courses/$courseId/members'
+    | '/_authenticated/courses/$courseId/settings'
+    | '/_authenticated/courses/$courseId/'
+    | '/_authenticated/courses/$courseId/attempts/$attemptId'
+    | '/_authenticated/courses/$courseId/tasks/$taskId'
+    | '/_authenticated/courses/$courseId/attempts/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   HealthLiveRoute: typeof HealthLiveRoute
   HealthReadyRoute: typeof HealthReadyRoute
+  InvitesTokenRoute: typeof InvitesTokenRoute
   RpcSplatRoute: typeof RpcSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -94,6 +220,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/': {
+      id: '/_authenticated/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/health/live': {
       id: '/health/live'
@@ -109,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HealthReadyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invites/$token': {
+      id: '/invites/$token'
+      path: '/invites/$token'
+      fullPath: '/invites/$token'
+      preLoaderRoute: typeof InvitesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rpc/$': {
       id: '/rpc/$'
       path: '/rpc/$'
@@ -116,14 +263,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/courses/$courseId/': {
+      id: '/_authenticated/courses/$courseId/'
+      path: '/courses/$courseId'
+      fullPath: '/courses/$courseId/'
+      preLoaderRoute: typeof AuthenticatedCoursesCourseIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/courses/$courseId/members': {
+      id: '/_authenticated/courses/$courseId/members'
+      path: '/courses/$courseId/members'
+      fullPath: '/courses/$courseId/members'
+      preLoaderRoute: typeof AuthenticatedCoursesCourseIdMembersRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/courses/$courseId/settings': {
+      id: '/_authenticated/courses/$courseId/settings'
+      path: '/courses/$courseId/settings'
+      fullPath: '/courses/$courseId/settings'
+      preLoaderRoute: typeof AuthenticatedCoursesCourseIdSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/courses/$courseId/attempts/': {
+      id: '/_authenticated/courses/$courseId/attempts/'
+      path: '/courses/$courseId/attempts'
+      fullPath: '/courses/$courseId/attempts/'
+      preLoaderRoute: typeof AuthenticatedCoursesCourseIdAttemptsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/courses/$courseId/attempts/$attemptId': {
+      id: '/_authenticated/courses/$courseId/attempts/$attemptId'
+      path: '/courses/$courseId/attempts/$attemptId'
+      fullPath: '/courses/$courseId/attempts/$attemptId'
+      preLoaderRoute: typeof AuthenticatedCoursesCourseIdAttemptsAttemptIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/courses/$courseId/tasks/$taskId': {
+      id: '/_authenticated/courses/$courseId/tasks/$taskId'
+      path: '/courses/$courseId/tasks/$taskId'
+      fullPath: '/courses/$courseId/tasks/$taskId'
+      preLoaderRoute: typeof AuthenticatedCoursesCourseIdTasksTaskIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCoursesCourseIdMembersRoute: typeof AuthenticatedCoursesCourseIdMembersRoute
+  AuthenticatedCoursesCourseIdSettingsRoute: typeof AuthenticatedCoursesCourseIdSettingsRoute
+  AuthenticatedCoursesCourseIdIndexRoute: typeof AuthenticatedCoursesCourseIdIndexRoute
+  AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute: typeof AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute
+  AuthenticatedCoursesCourseIdTasksTaskIdRoute: typeof AuthenticatedCoursesCourseIdTasksTaskIdRoute
+  AuthenticatedCoursesCourseIdAttemptsIndexRoute: typeof AuthenticatedCoursesCourseIdAttemptsIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCoursesCourseIdMembersRoute:
+    AuthenticatedCoursesCourseIdMembersRoute,
+  AuthenticatedCoursesCourseIdSettingsRoute:
+    AuthenticatedCoursesCourseIdSettingsRoute,
+  AuthenticatedCoursesCourseIdIndexRoute:
+    AuthenticatedCoursesCourseIdIndexRoute,
+  AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute:
+    AuthenticatedCoursesCourseIdAttemptsAttemptIdRoute,
+  AuthenticatedCoursesCourseIdTasksTaskIdRoute:
+    AuthenticatedCoursesCourseIdTasksTaskIdRoute,
+  AuthenticatedCoursesCourseIdAttemptsIndexRoute:
+    AuthenticatedCoursesCourseIdAttemptsIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   HealthLiveRoute: HealthLiveRoute,
   HealthReadyRoute: HealthReadyRoute,
+  InvitesTokenRoute: InvitesTokenRoute,
   RpcSplatRoute: RpcSplatRoute,
 }
 export const routeTree = rootRouteImport

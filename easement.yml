@@ -1,7 +1,7 @@
 version: 1
 components:
   # plop:components
-  platform: { in: src/platform, public: [src/platform/index.ts] }
+  platform: { in: src/platform, public: [src/platform/index.ts, src/platform/ui.ts] }
   courses: { in: src/modules/courses, public: [src/modules/courses/index.ts], optional: true }
   invitations:
     { in: src/modules/invitations, public: [src/modules/invitations/index.ts], optional: true }
