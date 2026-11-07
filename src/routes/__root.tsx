@@ -1,7 +1,20 @@
-import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Outlet,
+  Scripts,
+  useMatches,
+} from "@tanstack/react-router";
+import {
+  QueryClientProvider,
+  useQuery,
+  useMutation,
+  type QueryClient,
+} from "@tanstack/react-query";
 import { Text, Loader } from "@mantine/core";
-import { ApplicationNavigation } from "../app/application-navigation";
+import type { ReactNode } from "react";
+import { NavigationComposition, type RouteNavigation } from "../app/navigation";
+import { rpc } from "../app/client";
 import { Layout } from "../platform/public.ui.ts";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -40,5 +53,50 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+const navigationRoutes: readonly RouteNavigation[] = [
+  { routeId: "/", breadcrumbs: () => [{ label: "Мои курсы", href: "/" }] },
+];
+
+function ApplicationNavigation({ children }: { children: ReactNode }) {
+  const isPublic = useMatches({
+    select: (matches) => matches.some((match) => match.staticData.navigationMode === "public"),
+  });
+  const initialUser = useMatches({
+    select: (matches) => matches.find((match) => match.routeId === "/")?.loaderData,
+  });
+  const { data: user } = useQuery({
+    ...rpc.auth.me.queryOptions(),
+    enabled: !isPublic,
+    initialData: initialUser,
+    retry: false,
+  });
+  const logout = useMutation({
+    throwOnError: true,
+    mutationFn: () => rpc.auth.logout.call(undefined),
+    onSuccess: () => {
+      window.location.href = "/login";
+    },
+  });
+
+  return (
+    <NavigationComposition
+      routes={navigationRoutes}
+      courses={[]}
+      renderCourse={() => null}
+      user={
+        user
+          ? {
+              name: user.fullName,
+              busy: logout.isPending,
+              onLogout: () => logout.mutate(),
+            }
+          : undefined
+      }
+    >
+      {children}
+    </NavigationComposition>
   );
 }
