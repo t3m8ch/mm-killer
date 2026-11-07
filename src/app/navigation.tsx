@@ -54,15 +54,23 @@ export function NavigationComposition({
     return source ? [{ source, loaderData: match.loaderData }] : [];
   });
 
-  const queries = useQueries({
-    queries: active.map(
-      ({ source, loaderData }) =>
-        source.query?.(loaderData) ?? { queryKey: ["navigation", source.routeId], enabled: false },
-    ),
+  const routeQueries = active.flatMap(({ source, loaderData }) => {
+    if (!source.query) {
+      return [];
+    }
+
+    return [{ routeId: source.routeId, options: source.query(loaderData) }];
   });
-  const data = active.map((entry, index) => ({
-    source: entry.source,
-    data: queries[index]?.data ?? entry.loaderData,
+  const queryResults = useQueries({
+    queries: routeQueries.map(({ options }) => options),
+  });
+  const queryDataByRouteId = new Map(
+    routeQueries.map(({ routeId }, index) => [routeId, queryResults[index]?.data]),
+  );
+
+  const data = active.map(({ source, loaderData }) => ({
+    source,
+    data: queryDataByRouteId.get(source.routeId) ?? loaderData,
   }));
 
   const breadcrumbs = data.flatMap((entry) => entry.source.breadcrumbs(entry.data));
