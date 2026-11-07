@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Button, Drawer, Loader, Menu, Tooltip, useMantineColorScheme } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import { useMediaQuery, useMounted } from "@mantine/hooks";
 import {
   BooksIcon,
   CaretDownIcon,
@@ -133,6 +133,7 @@ function Sidebar({
   user,
   drawer = false,
 }: AppLayoutProps & { drawer?: boolean }) {
+  const ready = useMounted();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [previousLocation, setPreviousLocation] = useState({ path, currentCourseId });
 
@@ -167,6 +168,7 @@ function Sidebar({
             <div className="mm-course-heading">
               <button
                 className="mm-course-toggle"
+                disabled={!ready}
                 aria-label={`${open ? "Свернуть" : "Раскрыть"} курс: ${course.label}`}
                 aria-expanded={open}
                 aria-controls={id}
@@ -197,7 +199,11 @@ function Sidebar({
         <div className="mm-account">
           <Menu position="top-start" width="target" offset={8}>
             <Menu.Target>
-              <button className="mm-user" aria-label={`Меню аккаунта: ${user.name}`}>
+              <button
+                disabled={!ready}
+                className="mm-user"
+                aria-label={`Меню аккаунта: ${user.name}`}
+              >
                 <span className="mm-avatar" aria-hidden="true">
                   {user.name
                     .split(" ")
@@ -242,6 +248,7 @@ function Sidebar({
 }
 
 function ThemeMenu() {
+  const ready = useMounted();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const options = [
     { value: "light", label: "Светлая", icon: SunIcon },
@@ -253,7 +260,7 @@ function ThemeMenu() {
     <Menu position="bottom-end">
       <Menu.Target>
         <Tooltip label="Тема оформления">
-          <button className="mm-theme-button" aria-label="Тема оформления">
+          <button disabled={!ready} className="mm-theme-button" aria-label="Тема оформления">
             <SunIcon size={18} />
           </button>
         </Tooltip>
@@ -276,6 +283,7 @@ function ThemeMenu() {
 
 export function AppLayout(props: AppLayoutProps) {
   const { path, mode = "normal", breadcrumbs, children, pending } = props;
+  const ready = useMounted();
   const mobile = useMediaQuery("(max-width: 720px)");
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer] = useState(false);
@@ -324,6 +332,7 @@ export function AppLayout(props: AppLayoutProps) {
           <header className="mm-header">
             <button
               className="mm-panel-toggle"
+              disabled={!ready}
               aria-label="Переключить навигацию"
               aria-expanded={drawer || (!collapsed && mode !== "diff" && !mobile)}
               onClick={() =>
