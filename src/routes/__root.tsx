@@ -1,6 +1,7 @@
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query";
 import { Text, Loader } from "@mantine/core";
+import { ApplicationNavigation } from "../app/application-navigation";
 import { Layout } from "../platform/public.ui.ts";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -28,7 +29,13 @@ function Shell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Layout>{children}</Layout>
+        <QueryClientProvider client={queryClient}>
+          <Layout>
+            <ApplicationNavigation>
+              <Outlet />
+            </ApplicationNavigation>
+          </Layout>
+        </QueryClientProvider>
         <Scripts />
       </body>
     </html>

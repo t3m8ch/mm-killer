@@ -29,7 +29,8 @@ test("вход и выход защищают страницу", async ({ page }
   await page.reload();
   await expect(page.getByText("anna@example.test")).toBeVisible();
 
-  await page.getByRole("button", { name: "Выйти", exact: true }).click();
+  await page.getByRole("button", { name: "Меню аккаунта: Анна Иванова" }).click();
+  await page.getByRole("menuitem", { name: "Выйти", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   expect((await page.context().cookies()).some((cookie) => cookie.name === "session")).toBe(false);
 
