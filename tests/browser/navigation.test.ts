@@ -101,3 +101,33 @@ test("выбранный курс раскрывается после завер
   await expect(page).toHaveURL(/courses\/2$/);
   await expect(sidebar.getByRole("button", { name: `Свернуть курс: ${name}` })).toBeVisible();
 });
+
+test("ссылки сохраняют тему при переходах и закрывают панель на текущей странице", async ({
+  page,
+}) => {
+  await page.goto("/courses/1/tasks/7");
+  await page.getByRole("button", { name: "Тема оформления" }).click();
+  await page.getByRole("menuitem", { name: "Тёмная" }).click();
+
+  await page.getByRole("link", { name: "Открыть diff", exact: true }).click();
+  await expect(page).toHaveURL(/attempts\/9$/);
+  await expect(page.getByRole("complementary")).toBeHidden();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+
+  await page.getByRole("button", { name: "Переключить навигацию" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("link", { name: /^Задание 7:/ })
+    .click();
+  await expect(page).toHaveURL(/tasks\/7$/);
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Переключить навигацию" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("link", { name: /^Задание 7:/ })
+    .click();
+  await expect(page.getByRole("dialog")).toBeHidden();
+});
