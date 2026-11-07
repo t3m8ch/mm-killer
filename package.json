@@ -22,7 +22,7 @@
     "start": "node .output/server/index.mjs",
     "test:runtime": "node --test tests/tooling/runtime.test.js",
     "test:bundle": "node tests/tooling/verify-client-bundle.js",
-    "test:navigation": "playwright test -c tests/navigation/playwright.config.ts --workers=1"
+    "test:navigation": "playwright test -c playwright.navigation.config.ts --workers=1"
   },
   "dependencies": {
     "@mantine/core": "9.7.4",
