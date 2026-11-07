@@ -134,10 +134,10 @@ function Sidebar({
   drawer = false,
 }: AppLayoutProps & { drawer?: boolean }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [previousPath, setPreviousPath] = useState(path);
+  const [previousLocation, setPreviousLocation] = useState({ path, currentCourseId });
 
-  if (previousPath !== path) {
-    setPreviousPath(path);
+  if (previousLocation.path !== path || previousLocation.currentCourseId !== currentCourseId) {
+    setPreviousLocation({ path, currentCourseId });
     if (currentCourseId) {
       setExpanded((old) => ({ ...old, [currentCourseId]: true }));
     }
