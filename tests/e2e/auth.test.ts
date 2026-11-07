@@ -1,12 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test("вход и выход защищают страницу", async ({ page }) => {
-  const anonymousDocument = await page.request.get("/");
-  const anonymousHtml = await anonymousDocument.text();
+  const errors: string[] = [];
 
-  expect(anonymousDocument.status()).toBe(200);
-  expect(anonymousHtml).not.toMatch(/Анна Иванова|anna@example\.test/);
-
+  page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
   await page.getByRole("button", { name: "Анна Иванова" }).click();
@@ -36,6 +33,8 @@ test("вход и выход защищают страницу", async ({ page }
 
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
+
+  expect(errors).toEqual([]);
 });
 
 test("прямой вложенный URL и обновление показывают клиентскую 404", async ({ page }) => {

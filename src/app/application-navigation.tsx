@@ -12,9 +12,13 @@ export function ApplicationNavigation({ children }: { children: AppLayoutProps["
   const isPublic = useMatches({
     select: (matches) => matches.some((match) => match.staticData.navigationMode === "public"),
   });
+  const initialUser = useMatches({
+    select: (matches) => matches.find((match) => match.routeId === "/")?.loaderData,
+  });
   const { data: user } = useQuery({
     ...rpc.auth.me.queryOptions(),
     enabled: !isPublic,
+    initialData: initialUser,
     retry: false,
   });
   const logout = useMutation({
