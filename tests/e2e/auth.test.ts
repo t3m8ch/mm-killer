@@ -40,10 +40,11 @@ test("вход и выход защищают страницу", async ({ page, 
 
   const logout = await holdRequest("**/rpc/auth/logout");
 
-  await page.getByRole("button", { name: "Выйти", exact: true }).click();
+  await page.getByRole("button", { name: "Меню аккаунта: Анна Иванова" }).click();
+  await page.getByRole("menuitem", { name: "Выйти", exact: true }).click();
   await logout.requested;
 
-  await expect(page.getByRole("button", { name: "Выйти", exact: true })).toBeDisabled();
+  await expect(page.getByRole("menuitem", { name: "Выйти", exact: true })).toBeDisabled();
   await expect(page).toHaveURL(/\/$/);
   expect((await page.context().cookies()).some((cookie) => cookie.name === "session")).toBe(true);
 

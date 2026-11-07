@@ -19,7 +19,12 @@ components:
   app: { in: [src/app, src/routes, src/router.tsx] }
   generated: { in: src/routeTree.gen.ts }
   test_helpers: { in: tests/helpers, allow_importers: [tests] }
-  tests: { in: ["**/*.test.ts", tests/e2e, tests/tooling], priority: 10, optional: true }
+  tests:
+    {
+      in: ["**/*.test.ts", tests/e2e, tests/tooling, tests/navigation],
+      priority: 10,
+      optional: true,
+    }
   tooling: { in: ["*.ts", scripts], priority: -1 }
 rules:
   # plop:rules
@@ -57,6 +62,8 @@ rules:
       - git
       - notifications
       - test_helpers
+      - app
+      - generated
   tooling: { may_depend_on: [platform] }
 no_cycles: [platform, courses, invitations, tasks, attempts, reviews, git, notifications]
 exclude: [".agents/**", ".claude/**", ".codex/**", "generators/**"]
