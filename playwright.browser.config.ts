@@ -8,6 +8,6 @@ export default defineConfig({
       "node node_modules/vite/bin/vite.js --config tests/fixtures/navigation/vite.config.ts --host 127.0.0.1 --port 4313 --strictPort",
     url: "http://127.0.0.1:4313",
     cwd: process.cwd(),
-    reuseExistingServer: true,
+    reuseExistingServer: false,
   },
 });
