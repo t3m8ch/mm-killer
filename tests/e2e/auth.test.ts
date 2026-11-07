@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test("вход и выход защищают страницу", async ({ page }) => {
+  const errors: string[] = [];
+
+  page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
   await page.getByRole("button", { name: "Анна Иванова" }).click();
@@ -20,4 +23,6 @@ test("вход и выход защищают страницу", async ({ page }
 
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
+
+  expect(errors).toEqual([]);
 });
