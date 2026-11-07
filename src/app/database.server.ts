@@ -1,4 +1,4 @@
-import { connect, readConfig, createLogger } from "../platform/index.public.server.ts";
+import { connect, readConfig, createLogger } from "../platform/public.server.ts";
 
 declare global {
   var mergeMindsDatabase: ReturnType<typeof connect> | undefined;

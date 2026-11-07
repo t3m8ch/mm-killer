@@ -2,8 +2,8 @@
   "entry": [
     "src/routes/**/*.{ts,tsx}",
     "src/**/*.test.ts",
-    "src/modules/*/index.public.*",
-    "src/platform/index.public.*",
+    "src/modules/*/public.*",
+    "src/platform/public.*",
     "scripts/*.ts",
     "scripts/*.js",
     "src/app/client.ts",

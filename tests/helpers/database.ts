@@ -1,6 +1,6 @@
 import { afterAll } from "vitest";
-import { connect } from "../../src/platform/index.public.server.ts";
-import type { Context } from "../../src/platform/index.public.server.ts";
+import { connect } from "../../src/platform/public.server.ts";
+import type { Context } from "../../src/platform/public.server.ts";
 
 const baseUrl = () => process.env.TEST_DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm";
 

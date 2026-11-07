@@ -1,6 +1,6 @@
 import { implement } from "@orpc/server";
 import { eq } from "drizzle-orm";
-import { transaction, {{#if updatedBy}}authed, {{/if}}type Context } from "../../platform/index.public.server.ts";
+import { transaction, {{#if updatedBy}}authed, {{/if}}type Context } from "../../platform/public.server.ts";
 import { contract } from "./contract.shared.ts";
 import { {{camelCase name}} } from "./schema.server.ts";
 
