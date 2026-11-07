@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./tests/e2e",
+  testDir: "./tests/browser",
   testMatch: "navigation.test.ts",
   use: { baseURL: "http://127.0.0.1:4313" },
   webServer: {
