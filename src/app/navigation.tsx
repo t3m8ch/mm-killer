@@ -1,4 +1,9 @@
-import { useMatches, useRouterState, useNavigate } from "@tanstack/react-router";
+import {
+  useMatches,
+  useRouterState,
+  useNavigate,
+  type AnyRouteMatch,
+} from "@tanstack/react-router";
 import { useQueries, type UseQueryOptions } from "@tanstack/react-query";
 import { AppLayout, type AppLayoutProps } from "../platform/public.ui.ts";
 import type { Breadcrumb } from "../platform/public.shared.ts";
@@ -48,41 +53,12 @@ export function NavigationComposition({
   const { path, pending } = useRouterState({
     select: (state) => ({ path: state.location.pathname, pending: state.isLoading }),
   });
-  const activeNavigationRoutes = matches.flatMap((match) => {
-    const source = routes.find((route) => route.routeId === match.routeId);
 
-    return source ? [{ source, loaderData: match.loaderData }] : [];
-  });
-
-  const routeQueries = activeNavigationRoutes.flatMap(({ source, loaderData }) => {
-    if (!source.query) {
-      return [];
-    }
-
-    return [{ routeId: source.routeId, options: source.query(loaderData) }];
-  });
-  const queryResults = useQueries({
-    queries: routeQueries.map(({ options }) => options),
-  });
-  const queryDataByRouteId = new Map(
-    routeQueries.map(({ routeId }, index) => [routeId, queryResults[index]?.data]),
+  const navigationRoutesWithData = useNavigationRouteData(matches, routes);
+  const { breadcrumbs, currentCourseId, mode } = buildNavigationState(
+    navigationRoutesWithData,
+    matches,
   );
-
-  const navigationRoutesWithData = activeNavigationRoutes.map(({ source, loaderData }) => ({
-    source,
-    data: queryDataByRouteId.get(source.routeId) ?? loaderData,
-  }));
-
-  const breadcrumbs = navigationRoutesWithData.flatMap((entry) =>
-    entry.source.breadcrumbs(entry.data),
-  );
-  const currentCourseId = navigationRoutesWithData
-    .map((entry) => entry.source.courseId?.(entry.data))
-    .findLast((id) => id !== undefined);
-  const mode =
-    matches
-      .map((match) => match.staticData.navigationMode)
-      .findLast((value) => value !== undefined) ?? "normal";
 
   if (mode === "public") {
     return children;
@@ -103,4 +79,59 @@ export function NavigationComposition({
       {children}
     </AppLayout>
   );
+}
+
+type NavigationMatch = Pick<AnyRouteMatch, "routeId" | "loaderData" | "staticData">;
+
+interface NavigationRouteData {
+  source: RouteNavigation;
+  data: unknown;
+}
+
+function useNavigationRouteData(
+  matches: readonly NavigationMatch[],
+  routes: readonly RouteNavigation[],
+): NavigationRouteData[] {
+  const activeNavigationRoutes = matches.flatMap((match) => {
+    const source = routes.find((route) => route.routeId === match.routeId);
+
+    return source ? [{ source, loaderData: match.loaderData }] : [];
+  });
+
+  const routeQueries = activeNavigationRoutes.flatMap(({ source, loaderData }) => {
+    if (!source.query) {
+      return [];
+    }
+
+    return [{ routeId: source.routeId, options: source.query(loaderData) }];
+  });
+  const queryResults = useQueries({
+    queries: routeQueries.map(({ options }) => options),
+  });
+  const queryDataByRouteId = new Map(
+    routeQueries.map(({ routeId }, index) => [routeId, queryResults[index]?.data]),
+  );
+
+  return activeNavigationRoutes.map(({ source, loaderData }) => ({
+    source,
+    data: queryDataByRouteId.get(source.routeId) ?? loaderData,
+  }));
+}
+
+function buildNavigationState(
+  navigationRoutesWithData: readonly NavigationRouteData[],
+  matches: readonly NavigationMatch[],
+) {
+  const breadcrumbs = navigationRoutesWithData.flatMap((entry) =>
+    entry.source.breadcrumbs(entry.data),
+  );
+  const currentCourseId = navigationRoutesWithData
+    .map((entry) => entry.source.courseId?.(entry.data))
+    .findLast((id) => id !== undefined);
+  const mode =
+    matches
+      .map((match) => match.staticData.navigationMode)
+      .findLast((value) => value !== undefined) ?? "normal";
+
+  return { breadcrumbs, currentCourseId, mode };
 }
