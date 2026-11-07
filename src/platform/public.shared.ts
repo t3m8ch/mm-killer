@@ -1,1 +1,1 @@
-export { authContract } from "./auth-contract.shared.ts";
+export { authContract } from "./auth/contract.shared.ts";

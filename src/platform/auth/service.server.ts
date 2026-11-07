@@ -1,11 +1,11 @@
 import { createHash, randomBytes } from "node:crypto";
 import { implement } from "@orpc/server";
 import { and, eq, gt } from "drizzle-orm";
-import { authContract } from "./auth-contract.shared.ts";
-import { users, sessions } from "./auth-schema.server.ts";
-import { authed, transaction } from "./rpc.server.ts";
-import type { Context } from "./context.server.ts";
-import type { Database, Transaction } from "./db.server.ts";
+import { authContract } from "./contract.shared.ts";
+import { users, sessions } from "./schema.server.ts";
+import { authed, transaction } from "../rpc.server.ts";
+import type { Context } from "../context.server.ts";
+import type { Database, Transaction } from "../db.server.ts";
 
 const hash = (token: string) => createHash("sha256").update(token).digest();
 const serialize = (row: typeof users.$inferSelect) => ({
