@@ -7,7 +7,7 @@ import { withFixture } from "./fixture-workspace.js";
 const probes = [
   {
     name: "изоморфный RPC-клиент",
-    imports: 'import { rpc } from "../app/client";',
+    imports: 'import { rpc } from "../../app/client";',
     expression: "String(Boolean(rpc))",
     allowed: true,
   },
@@ -18,7 +18,7 @@ const probes = [
   },
   {
     name: "файл .server.ts",
-    imports: 'import { secret } from "../app/bundle-probe.server";',
+    imports: 'import { secret } from "../../app/bundle-probe.server";',
     expression: "secret()",
   },
   { name: "обычный клиент", imports: "", expression: '"MergeMinds"', allowed: true },
@@ -44,10 +44,14 @@ const probes = [
     imports: 'import { readFileSync } from "fs";',
     expression: "String(readFileSync)",
   },
-  { name: "модуль БД", imports: 'import { db } from "../app/database";', expression: "String(db)" },
+  {
+    name: "модуль БД",
+    imports: 'import { db } from "../../app/database";',
+    expression: "String(db)",
+  },
   {
     name: "реэкспорт",
-    imports: 'import { pg } from "../app/bundle-probe";',
+    imports: 'import { pg } from "../../app/bundle-probe";',
     expression: "String(pg.Pool)",
   },
   {
@@ -65,7 +69,7 @@ const probes = [
 ];
 
 withFixture(() => {
-  const route = "src/routes/_authenticated.index.tsx";
+  const route = "src/routes/_authenticated/index.tsx";
   const original = readFileSync(route, "utf8");
   const env = { ...process.env };
 

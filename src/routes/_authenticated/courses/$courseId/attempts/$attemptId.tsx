@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { loadTestAttempt, numericId, TestPage } from "../app/navigation-test-routes.tsx";
+import {
+  loadTestAttempt,
+  numericId,
+  TestPage,
+} from "../../../../../app/navigation-test-routes.tsx";
 
 export const Route = createFileRoute("/_authenticated/courses/$courseId/attempts/$attemptId")({
   staticData: { hideNavigation: true },

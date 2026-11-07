@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { loadTestTask, numericId, TestPage } from "../app/navigation-test-routes.tsx";
+import { loadTestTask, numericId, TestPage } from "../../../../app/navigation-test-routes.tsx";
 
 export const Route = createFileRoute("/_authenticated/courses/$courseId/tasks/$taskId")({
   loader: ({ context, params }) =>

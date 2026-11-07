@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { loadTestCourse, numericId, TestCoursePage } from "../app/navigation-test-routes.tsx";
+import {
+  loadTestCourse,
+  numericId,
+  TestCoursePage,
+} from "../../../../app/navigation-test-routes.tsx";
 
 export const Route = createFileRoute("/_authenticated/courses/$courseId/")({
   loader: ({ context, params }) => loadTestCourse(context.queryClient, numericId(params.courseId)),

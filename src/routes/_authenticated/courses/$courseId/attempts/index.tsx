@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { loadTestSection, numericId, TestPage } from "../app/navigation-test-routes.tsx";
+import {
+  loadTestSection,
+  numericId,
+  TestPage,
+} from "../../../../../app/navigation-test-routes.tsx";
 
 export const Route = createFileRoute("/_authenticated/courses/$courseId/attempts/")({
   validateSearch: (search: Record<string, unknown>) => ({
