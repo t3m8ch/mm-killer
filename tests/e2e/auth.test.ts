@@ -6,7 +6,9 @@ test("вход и выход защищают страницу", async ({ page, 
 
   expect(anonymousDocument.status()).toBe(200);
   expect(anonymousHtml).not.toMatch(/Анна Иванова|anna@example\.test/);
+  const errors: string[] = [];
 
+  page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
   const login = await holdRequest("**/rpc/auth/login");
@@ -54,6 +56,8 @@ test("вход и выход защищают страницу", async ({ page, 
 
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
+
+  expect(errors).toEqual([]);
 });
 
 test("прямой вложенный URL и обновление показывают клиентскую 404", async ({ page }) => {
