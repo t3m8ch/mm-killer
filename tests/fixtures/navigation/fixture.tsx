@@ -6,12 +6,15 @@ import {
   RouterProvider,
   Outlet,
   useRouterState,
+  Link,
+  type AnyRouter,
 } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Button, Text, Title } from "@mantine/core";
 import { z } from "zod";
-import { Layout, CourseBranch } from "../../../src/platform/public.ui.ts";
-import type { NavigationCourse } from "../../../src/platform/public.shared.ts";
+import { Layout } from "../../../src/platform/public.ui.ts";
+import { CourseBranch } from "../../../src/app/navigation/layout.tsx";
+import type { NavigationCourse } from "../../../src/app/navigation/contract.shared.ts";
 import { NavigationComposition, type RouteNavigation } from "../../../src/app/navigation";
 import type { ReactNode } from "react";
 
@@ -125,7 +128,7 @@ function Page() {
   return (
     <>
       <Title>Тестовый экран</Title>
-      <a href="/courses/1/attempts/9">Открыть diff</a>
+      <Link<AnyRouter> to="/courses/1/attempts/9">Открыть diff</Link>
       <Button
         onClick={() => {
           renamed = true;
