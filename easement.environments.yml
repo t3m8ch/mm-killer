@@ -6,10 +6,10 @@ components:
   ui: { in: ["src/**/*.ui.ts", "src/**/*.ui.tsx"], optional: true }
   integration: { in: [src, tests, scripts, "*.ts", "*.js"], priority: -1 }
 rules:
-  server: { may_depend_on: [shared, integration], must_not_reach: [browser] }
+  server: { may_depend_on: [shared, ui, integration], must_not_reach: [browser] }
   shared:
     {
-      may_depend_on: [integration],
+      may_depend_on: [],
       forbid_external:
         [
           "node:*",
@@ -30,11 +30,11 @@ rules:
           "@mantine/core",
           "@tanstack/react-start/server",
         ],
-      must_not_reach: [server, browser, ui],
+      must_not_reach: [server, browser, ui, integration],
     }
   browser:
     {
-      may_depend_on: [shared, ui, integration],
+      may_depend_on: [shared, ui],
       forbid_external:
         [
           "node:*",
@@ -52,11 +52,11 @@ rules:
           nitro,
           "@tanstack/react-start/server",
         ],
-      must_not_reach: [server],
+      must_not_reach: [server, integration],
     }
   ui:
     {
-      may_depend_on: [shared, integration],
+      may_depend_on: [shared],
       forbid_external:
         [
           "node:*",
@@ -74,7 +74,7 @@ rules:
           nitro,
           "@tanstack/react-start/server",
         ],
-      must_not_reach: [server, browser],
+      must_not_reach: [server, browser, integration],
     }
   integration: { may_depend_on: [server, shared, browser, ui] }
 exclude: [".agents/**", ".claude/**", ".codex/**", "generators/**"]

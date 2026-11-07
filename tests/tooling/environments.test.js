@@ -56,6 +56,12 @@ await test("публичные входы и транзитивные грани
       unlinkSync("src/app/middle.ts");
     }
 
+    writeFileSync("src/app/middle.ts", 'export { readFileSync } from "node:fs";\n');
+    writeFileSync("src/app/probe.shared.ts", 'export { readFileSync } from "./middle.ts";\n');
+    run("easement.environments.yml", false, /reach|dependency/);
+    unlinkSync("src/app/probe.shared.ts");
+    unlinkSync("src/app/middle.ts");
+
     for (const entry of [
       "src/platform/index.public.server.ts",
       "src/platform/index.public.shared.ts",
