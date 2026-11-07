@@ -119,7 +119,6 @@ export interface AppLayoutProps {
   user?: {
     name: string;
     onLogout: () => void;
-    onLogoutAll: () => void;
     busy: boolean;
     settingsHref?: string;
   };
@@ -231,13 +230,6 @@ function Sidebar({
                 leftSection={<SignOutIcon size={18} />}
               >
                 Выйти
-              </Menu.Item>
-              <Menu.Item
-                onClick={user.onLogoutAll}
-                disabled={user.busy}
-                leftSection={<SignOutIcon size={18} />}
-              >
-                Выйти со всех устройств
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>

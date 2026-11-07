@@ -23,8 +23,7 @@ export function ApplicationNavigation({ children }: { children: AppLayoutProps["
   });
   const logout = useMutation({
     throwOnError: true,
-    mutationFn: (all: boolean) =>
-      all ? rpc.auth.logoutAll.call(undefined) : rpc.auth.logout.call(undefined),
+    mutationFn: () => rpc.auth.logout.call(undefined),
     onSuccess: () => {
       window.location.href = "/login";
     },
@@ -40,8 +39,7 @@ export function ApplicationNavigation({ children }: { children: AppLayoutProps["
           ? {
               name: user.fullName,
               busy: logout.isPending,
-              onLogout: () => logout.mutate(false),
-              onLogoutAll: () => logout.mutate(true),
+              onLogout: () => logout.mutate(),
             }
           : undefined
       }
