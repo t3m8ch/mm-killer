@@ -14,7 +14,7 @@
     "db:seed": "node scripts/seed.ts",
     "test:api": "vitest run",
     "db:migrate": "node scripts/migrate.ts",
-    "test:e2e": "playwright test --pass-with-no-tests",
+    "test:e2e": "playwright test",
     "boundaries": "easement check && easement check -c easement.environments.yml",
     "generate": "node scripts/generate.js",
     "test:guards": "node tests/tooling/verify-guards.js",
