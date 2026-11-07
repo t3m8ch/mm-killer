@@ -48,13 +48,13 @@ export function NavigationComposition({
   const { path, pending } = useRouterState({
     select: (state) => ({ path: state.location.pathname, pending: state.isLoading }),
   });
-  const active = matches.flatMap((match) => {
+  const activeNavigationRoutes = matches.flatMap((match) => {
     const source = routes.find((route) => route.routeId === match.routeId);
 
     return source ? [{ source, loaderData: match.loaderData }] : [];
   });
 
-  const routeQueries = active.flatMap(({ source, loaderData }) => {
+  const routeQueries = activeNavigationRoutes.flatMap(({ source, loaderData }) => {
     if (!source.query) {
       return [];
     }
@@ -68,13 +68,15 @@ export function NavigationComposition({
     routeQueries.map(({ routeId }, index) => [routeId, queryResults[index]?.data]),
   );
 
-  const data = active.map(({ source, loaderData }) => ({
+  const navigationRoutesWithData = activeNavigationRoutes.map(({ source, loaderData }) => ({
     source,
     data: queryDataByRouteId.get(source.routeId) ?? loaderData,
   }));
 
-  const breadcrumbs = data.flatMap((entry) => entry.source.breadcrumbs(entry.data));
-  const currentCourseId = data
+  const breadcrumbs = navigationRoutesWithData.flatMap((entry) =>
+    entry.source.breadcrumbs(entry.data),
+  );
+  const currentCourseId = navigationRoutesWithData
     .map((entry) => entry.source.courseId?.(entry.data))
     .findLast((id) => id !== undefined);
   const mode =
