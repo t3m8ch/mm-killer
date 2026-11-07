@@ -4,6 +4,12 @@ import { spawnSync } from "node:child_process";
 
 const probes = [
   {
+    file: "src/modules/fixture/guard-probe.shared.tsx",
+    command: ["oxlint"],
+    source: "export const value = 1;",
+    expected: "Файл модуля должен иметь суффикс",
+  },
+  {
     file: "src/modules/fixture/guard-probe.ts",
     command: ["oxlint"],
     source: "export function run() { const value = 1; return value; }",

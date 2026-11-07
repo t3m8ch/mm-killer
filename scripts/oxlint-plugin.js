@@ -56,7 +56,7 @@ export default {
         const filename = context.filename ?? context.getFilename();
 
         const checkEnvironment = (node) => {
-          if (!/\.(server|shared|ui|browser)\.tsx?$/.test(filename)) {
+          if (!/\.(?:shared\.ts|(?:server|ui|browser)\.tsx?)$/.test(filename)) {
             context.report({ node, messageId: "environment" });
           }
         };
