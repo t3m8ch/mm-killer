@@ -208,14 +208,14 @@ export default function generators(plop) {
       ]),
   });
   plop.setGenerator("screen", {
-    description: "Создать экран Mantine",
+    description: "Создать защищённый экран Mantine",
     prompts: [{ type: "input", name: "name", validate: valid }],
     actions: [
       {
         type: "add",
-        path: "src/routes/{{name}}.tsx",
+        path: "src/routes/_authenticated.{{name}}.tsx",
         template:
-          "import { createFileRoute } from '@tanstack/react-router';\nimport { Title } from '@mantine/core';\n\nexport const Route = createFileRoute('/{{name}}')({ component: () => <Title>{{name}}</Title> });\n",
+          "import { createFileRoute } from '@tanstack/react-router';\nimport { Title } from '@mantine/core';\n\nexport const Route = createFileRoute('/_authenticated/{{name}}')({ component: () => <Title>{{name}}</Title> });\n",
       },
     ],
   });
