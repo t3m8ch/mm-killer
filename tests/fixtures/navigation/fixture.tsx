@@ -7,7 +7,6 @@ import {
   Outlet,
   useRouterState,
   Link,
-  type AnyRouter,
 } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Button, Text, Title } from "@mantine/core";
@@ -127,7 +126,12 @@ function Page() {
   return (
     <>
       <Title>Тестовый экран</Title>
-      <Link<AnyRouter> to="/courses/1/attempts/9">Открыть diff</Link>
+      <Link<typeof router, string, typeof diff.fullPath>
+        to={diff.fullPath}
+        params={{ courseId: "1", attemptId: "9" }}
+      >
+        Открыть diff
+      </Link>
       <Button
         onClick={() => {
           renamed = true;
