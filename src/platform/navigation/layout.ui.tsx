@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Link, type AnyRouter } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Button, Drawer, Loader, Menu, Tooltip, useMantineColorScheme } from "@mantine/core";
 import { useMediaQuery, useMounted } from "@mantine/hooks";
 import {
@@ -25,9 +25,6 @@ import type {
 } from "./contract.shared.ts";
 import "./styles.css";
 
-// Описания навигации содержат готовые строковые URL, включая маршруты тестового стенда.
-const RouterLink = Link<AnyRouter>;
-
 const icons = {
   tasks: ListChecksIcon,
   attempts: ClockCounterClockwiseIcon,
@@ -40,7 +37,7 @@ function NavigationItem({ link, path }: { link: NavigationLink; path: string }) 
   const active = path === link.href;
 
   return (
-    <RouterLink
+    <Link
       activeOptions={{ exact: true }}
       to={link.href}
       className={`mm-nav-item${active ? " active" : ""}`}
@@ -48,7 +45,7 @@ function NavigationItem({ link, path }: { link: NavigationLink; path: string }) 
     >
       {Icon && <Icon size={18} aria-hidden="true" />}
       <span>{link.label}</span>
-    </RouterLink>
+    </Link>
   );
 }
 
@@ -150,11 +147,11 @@ function Sidebar({
   return (
     <div className="mm-sidebar">
       {!drawer && (
-        <RouterLink activeOptions={{ exact: true }} to="/" className="mm-brand">
+        <Link activeOptions={{ exact: true }} to="/" className="mm-brand">
           <strong>MergeMinds</strong>
-        </RouterLink>
+        </Link>
       )}
-      <RouterLink
+      <Link
         activeOptions={{ exact: true }}
         to="/"
         className={`mm-nav-item${path === "/" ? " active" : ""}`}
@@ -162,7 +159,7 @@ function Sidebar({
       >
         <BooksIcon size={18} />
         Мои курсы
-      </RouterLink>
+      </Link>
       <div className="mm-sidebar-scroll">
         <p className="mm-group-label">Курсы</p>
         {courses.map((course) => {
@@ -180,7 +177,7 @@ function Sidebar({
               >
                 {open ? <CaretDownIcon size={14} /> : <CaretRightIcon size={14} />}
               </button>
-              <RouterLink
+              <Link
                 activeOptions={{ exact: true }}
                 to={course.href}
                 className={`mm-course-name${currentCourseId === course.id ? " selected" : ""}`}
@@ -189,7 +186,7 @@ function Sidebar({
                   {course.emoji}
                 </span>
                 <span>{course.label}</span>
-              </RouterLink>
+              </Link>
             </div>
           );
 
@@ -223,7 +220,7 @@ function Sidebar({
             <Menu.Dropdown>
               {user.settingsHref && (
                 <Menu.Item
-                  component={RouterLink}
+                  component={Link}
                   activeOptions={{ exact: true }}
                   to={user.settingsHref}
                   leftSection={<GearSixIcon size={18} />}
@@ -323,13 +320,9 @@ export function AppLayout(props: AppLayoutProps) {
                         {crumb.label}
                       </span>
                     ) : (
-                      <RouterLink
-                        activeOptions={{ exact: true }}
-                        to={crumb.href}
-                        title={crumb.label}
-                      >
+                      <Link activeOptions={{ exact: true }} to={crumb.href} title={crumb.label}>
                         {crumb.label}
-                      </RouterLink>
+                      </Link>
                     )}
                   </li>
                 ))}
@@ -348,14 +341,14 @@ export function AppLayout(props: AppLayoutProps) {
         onClose={() => setDrawer(false)}
         size={300}
         title={
-          <RouterLink
+          <Link
             activeOptions={{ exact: true }}
             to="/"
             className="mm-drawer-brand"
             onClick={() => setDrawer(false)}
           >
             MergeMinds
-          </RouterLink>
+          </Link>
         }
         classNames={{
           content: "mm-drawer-surface",
