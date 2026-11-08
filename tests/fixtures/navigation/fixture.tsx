@@ -113,7 +113,7 @@ function Root() {
       <NavigationComposition
         routes={navigation}
         courses={courses}
-        renderCourse={(course, heading) => <Branch course={course} heading={heading} />}
+        renderCourseBranch={(course, heading) => <Branch course={course} heading={heading} />}
         user={{ name: "Анна Иванова", busy: false, onLogout: () => {} }}
       >
         <Outlet />

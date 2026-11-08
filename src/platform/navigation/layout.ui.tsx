@@ -116,7 +116,7 @@ export interface AppLayoutProps {
   pending?: boolean;
   courses: readonly NavigationCourse[];
   currentCourseId?: string;
-  renderCourse: (course: NavigationCourse, heading: ReactNode) => ReactNode;
+  renderCourseBranch: (course: NavigationCourse, heading: ReactNode) => ReactNode;
   user?: {
     name: string;
     onLogout: () => void;
@@ -129,7 +129,7 @@ function Sidebar({
   path,
   courses,
   currentCourseId,
-  renderCourse,
+  renderCourseBranch,
   user,
   drawer = false,
 }: AppLayoutProps & { drawer?: boolean }) {
@@ -192,7 +192,7 @@ function Sidebar({
 
           return (
             <div className="mm-course-group" key={course.id} id={id}>
-              {open ? renderCourse(course, heading) : heading}
+              {open ? renderCourseBranch(course, heading) : heading}
             </div>
           );
         })}

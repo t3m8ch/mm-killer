@@ -85,7 +85,7 @@ function ApplicationNavigation({ children }: { children: ReactNode }) {
     <NavigationComposition
       routes={navigationRoutes}
       courses={[]}
-      renderCourse={() => null}
+      renderCourseBranch={() => null}
       user={
         user
           ? {
