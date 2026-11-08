@@ -1,6 +1,6 @@
 import { useMatches, useRouterState, type AnyRouteMatch } from "@tanstack/react-router";
 import { useQueries, type UseQueryOptions } from "@tanstack/react-query";
-import { AppLayout, type AppLayoutProps } from "./navigation/layout.tsx";
+import { AppLayout, type AppLayoutProps } from "../platform/public.ui.ts";
 import type { Breadcrumb } from "../platform/public.shared.ts";
 
 declare module "@tanstack/react-router" {
