@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { Button, Drawer, Loader, Menu, Tooltip, useMantineColorScheme } from "@mantine/core";
+import { ActionIcon, Drawer, Loader, Menu, Tooltip, useMantineColorScheme } from "@mantine/core";
 import { useMediaQuery, useMounted } from "@mantine/hooks";
 import {
+  ArrowClockwiseIcon,
   BooksIcon,
   CaretDownIcon,
   CaretRightIcon,
@@ -16,6 +17,7 @@ import {
   SignOutIcon,
   SunIcon,
   UsersIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react";
 import type {
   Breadcrumb,
@@ -82,11 +84,20 @@ export function CourseBranch({
           </div>
         )}
         {state.status === "error" && (
-          <div role="alert">
-            <p>Не удалось загрузить раздел</p>
-            <Button variant="subtle" onClick={state.retry}>
-              Повторить
-            </Button>
+          <div className="mm-tree-error" role="alert">
+            <WarningCircleIcon className="mm-tree-error-icon" size={16} aria-hidden="true" />
+            <span>Не удалось загрузить раздел</span>
+            <Tooltip label="Повторить загрузку">
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                size="sm"
+                aria-label="Повторить загрузку раздела"
+                onClick={state.retry}
+              >
+                <ArrowClockwiseIcon size={16} aria-hidden="true" />
+              </ActionIcon>
+            </Tooltip>
           </div>
         )}
         {state.status === "ready" && (
