@@ -11,7 +11,7 @@ import {
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Button, Text, Title } from "@mantine/core";
 import { z } from "zod";
-import { CourseBranch, Layout } from "../../../src/platform/public.ui.ts";
+import { CourseBranch, Layout, Sidebar } from "../../../src/platform/public.ui.ts";
 import type { NavigationCourse } from "../../../src/platform/public.shared.ts";
 import { NavigationComposition, type RouteNavigation } from "../../../src/app/navigation";
 import type { ReactNode } from "react";
@@ -112,9 +112,14 @@ function Root() {
     <Layout>
       <NavigationComposition
         routes={navigation}
-        courses={courses}
-        renderCourseBranch={(course, heading) => <Branch course={course} heading={heading} />}
-        user={{ name: "Анна Иванова", busy: false, onLogout: () => {} }}
+        renderSidebar={(sidebarProps) => (
+          <Sidebar
+            {...sidebarProps}
+            courses={courses}
+            renderCourseBranch={(course, heading) => <Branch course={course} heading={heading} />}
+            user={{ name: "Анна Иванова", busy: false, onLogout: () => {} }}
+          />
+        )}
       >
         <Outlet />
       </NavigationComposition>
