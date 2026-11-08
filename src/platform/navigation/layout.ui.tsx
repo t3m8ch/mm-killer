@@ -66,15 +66,17 @@ export function CourseBranch({
     <div className="mm-course-content">
       <div className="mm-course-sticky-header">
         {heading}
-        <div className="mm-course-overview mm-nested">
-          <NavigationItem
-            path={path}
-            link={{ href: course.href, label: "Все задания", icon: "tasks" }}
-          />
-          {state.status === "ready" && state.refreshing && (
-            <Loader className="mm-tree-refresh" size={12} aria-label="Обновление раздела" />
-          )}
-        </div>
+        {state.status !== "error" && (
+          <div className="mm-course-overview mm-nested">
+            <NavigationItem
+              path={path}
+              link={{ href: course.href, label: "Все задания", icon: "tasks" }}
+            />
+            {state.status === "ready" && state.refreshing && (
+              <Loader className="mm-tree-refresh" size={12} aria-label="Обновление раздела" />
+            )}
+          </div>
+        )}
       </div>
       <div className="mm-nested">
         {state.status === "pending" && (
