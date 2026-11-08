@@ -17,10 +17,17 @@ await test("публичные входы и транзитивные грани
       }
     };
 
-    // Регистрация типов роутера разрешена, прямой импорт того же файла — нет.
+    // Новый файл регистрации и предметный UI не требуют новых исключений.
     const routerProbe = "src/platform/router-probe.ui.ts";
+    const moduleRouterProbe = "src/modules/fixture/router-probe.ui.ts";
+    const routeMetadata = "src/app/extra-route-metadata.ts";
 
+    writeFileSync(
+      routeMetadata,
+      'export {};\ndeclare module "@tanstack/react-router" { interface StaticDataRouteOption { fixtureMetadata?: string } }\n',
+    );
     writeFileSync(routerProbe, 'export { Link } from "@tanstack/react-router";\n');
+    writeFileSync(moduleRouterProbe, 'export { Link } from "@tanstack/react-router";\n');
     run("easement.yml", true);
     run("easement.environments.yml", true);
 
@@ -28,6 +35,8 @@ await test("публичные входы и транзитивные грани
     run("easement.yml", false, /dependency/);
     run("easement.environments.yml", false, /dependency|reach/);
     unlinkSync(routerProbe);
+    unlinkSync(moduleRouterProbe);
+    unlinkSync(routeMetadata);
 
     // Новый публичный вход автоматически доступен без изменения easement.yml.
     writeFileSync("src/modules/fixture/public.ui.ts", "export const value = 1;\n");

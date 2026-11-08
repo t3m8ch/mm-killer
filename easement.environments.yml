@@ -2,18 +2,8 @@ version: 1
 # Разрешить только неявные связи через регистрацию типов TanStack Router.
 # Прямые импорты файлов приложения и остальные транзитивные цепочки проверяются.
 accept_augmentations:
-  - consumers: [ui]
-    module: "@tanstack/react-router"
-    declaration: src/router.tsx
-    because: использовать тип зарегистрированного роутера в ссылках
-  - consumers: [ui]
-    module: "@tanstack/react-router"
-    declaration: src/app/navigation.tsx
-    because: использовать постоянные метаданные навигации маршрутов
-  - consumers: [ui]
-    module: "@tanstack/react-router"
-    declaration: src/routeTree.gen.ts
-    because: использовать сгенерированные типы маршрутов
+  - module: "@tanstack/react-router"
+    because: принять неявные связи через глобальную регистрацию типов TanStack Router
 components:
   server: { in: ["src/**/*.server.ts", "src/**/*.server.tsx"], optional: true }
   shared: { in: ["src/**/*.shared.ts"], optional: true }
