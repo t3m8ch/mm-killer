@@ -15,7 +15,7 @@ import { Text, Loader } from "@mantine/core";
 import type { ReactNode } from "react";
 import { NavigationComposition, type RouteNavigation } from "../app/navigation";
 import { rpc } from "../app/client";
-import { Layout } from "../platform/public.ui.ts";
+import { Layout, Sidebar } from "../platform/public.ui.ts";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: Root,
@@ -74,17 +74,22 @@ function ApplicationNavigation({ children }: { children: ReactNode }) {
   return (
     <NavigationComposition
       routes={navigationRoutes}
-      courses={[]}
-      renderCourseBranch={() => null}
-      user={
-        user
-          ? {
-              name: user.fullName,
-              busy: logout.isPending,
-              onLogout: () => logout.mutate(),
-            }
-          : undefined
-      }
+      renderSidebar={(sidebarProps) => (
+        <Sidebar
+          {...sidebarProps}
+          courses={[]}
+          renderCourseBranch={() => null}
+          user={
+            user
+              ? {
+                  name: user.fullName,
+                  busy: logout.isPending,
+                  onLogout: () => logout.mutate(),
+                }
+              : undefined
+          }
+        />
+      )}
     >
       {children}
     </NavigationComposition>
