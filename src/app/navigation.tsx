@@ -1,6 +1,7 @@
 import { useMatches, useRouterState, type AnyRouteMatch } from "@tanstack/react-router";
 import { useQueries, type UseQueryOptions } from "@tanstack/react-query";
-import { AppLayout, type AppLayoutProps } from "../platform/public.ui.ts";
+import type { ReactNode } from "react";
+import { AppLayout } from "../platform/public.ui.ts";
 import type { Breadcrumb } from "../platform/public.shared.ts";
 
 declare module "@tanstack/react-router" {
@@ -19,7 +20,7 @@ declare module "@tanstack/react-router" {
  * Если задана query, он подписывается на тот же запрос, который загрузил loader:
  * функции получают актуальные данные из кэша, а до их появления — loaderData.
  * Без query функции получают loaderData напрямую. AppLayout получает готовые
- * крошки и ID курса через props.
+ * крошки через props; ID курса передаётся в renderSidebar для сборки панели.
  *
  * При подключении предметных маршрутов сборка связывает их с чистыми функциями
  * крошек из публичных интерфейсов модулей. Эти функции работают с переданными
@@ -36,9 +37,15 @@ export interface RouteNavigation {
 export function NavigationComposition({
   routes,
   children,
-  ...props
-}: Omit<AppLayoutProps, "breadcrumbs" | "path" | "mode" | "pending" | "currentCourseId"> & {
+  renderSidebar,
+}: {
+  children: ReactNode;
   routes: readonly RouteNavigation[];
+  renderSidebar: (options: {
+    path: string;
+    currentCourseId?: string;
+    drawer: boolean;
+  }) => ReactNode;
 }) {
   const matches = useMatches();
   const { path, pending } = useRouterState({
@@ -57,12 +64,11 @@ export function NavigationComposition({
 
   return (
     <AppLayout
-      {...props}
       path={path}
       breadcrumbs={breadcrumbs}
-      currentCourseId={currentCourseId}
       mode={mode}
       pending={pending}
+      renderSidebar={({ drawer }) => renderSidebar({ path, currentCourseId, drawer })}
     >
       {children}
     </AppLayout>
