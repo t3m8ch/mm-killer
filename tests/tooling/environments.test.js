@@ -17,6 +17,18 @@ await test("публичные входы и транзитивные грани
       }
     };
 
+    // Регистрация типов роутера разрешена, прямой импорт того же файла — нет.
+    const routerProbe = "src/platform/router-probe.ui.ts";
+
+    writeFileSync(routerProbe, 'export { Link } from "@tanstack/react-router";\n');
+    run("easement.yml", true);
+    run("easement.environments.yml", true);
+
+    writeFileSync(routerProbe, 'export { getRouter } from "../router.tsx";\n');
+    run("easement.yml", false, /dependency/);
+    run("easement.environments.yml", false, /dependency|reach/);
+    unlinkSync(routerProbe);
+
     // Новый публичный вход автоматически доступен без изменения easement.yml.
     writeFileSync("src/modules/fixture/public.ui.ts", "export const value = 1;\n");
     writeFileSync("src/app/probe.ts", 'export { value } from "../modules/fixture/public.ui.ts";\n');
