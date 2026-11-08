@@ -383,6 +383,19 @@
 .mm-tree-loading .mantine-Loader-root {
   flex-shrink: 0;
 }
+.mm-tree-error {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 5px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--mm-secondary);
+}
+.mm-tree-error-icon {
+  color: var(--mantine-color-red-6);
+}
 .mm-course-content {
   position: relative;
 }
