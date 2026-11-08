@@ -14,7 +14,7 @@ declare module "@tanstack/react-router" {
  * Настройки навигации для одного маршрута: как получить из его данных крошки
  * для хедера и ID курса, ветку которого нужно раскрыть в сайдбаре.
  *
- * Сборка приложения создаёт такие записи в navigationRoutes (src/routes/__root.tsx)
+ * Сборка приложения создаёт такие записи в navigationRoutes (src/routes/_authenticated.tsx)
  * и передаёт их в NavigationComposition. Он сопоставляет routeId с активными
  * маршрутами из useMatches и вызывает breadcrumbs и, если задана, courseId.
  * Если задана query, он подписывается на тот же запрос, который загрузил loader:
