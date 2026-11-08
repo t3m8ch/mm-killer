@@ -29,7 +29,11 @@ test("вход и выход защищают страницу", async ({ page }
 
   expect(session).toMatchObject({ httpOnly: true, sameSite: "Lax", path: "/" });
 
+  await page.getByRole("button", { name: "Тема оформления" }).click();
+  await page.getByRole("menuitem", { name: "Тёмная" }).click();
+
   await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
   await expect(page.getByText("anna@example.test")).toBeVisible();
   await expect(page.getByRole("button", { name: "Меню аккаунта: Анна Иванова" })).toBeEnabled();
   expect(userReads).toEqual([]);
