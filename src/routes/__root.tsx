@@ -1,6 +1,6 @@
 import { createRootRouteWithContext, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
-import { Text, Loader } from "@mantine/core";
+import { ColorSchemeScript, Loader, mantineHtmlProps, Text } from "@mantine/core";
 import { Layout } from "../platform/public.ui.ts";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -11,9 +11,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 function Root() {
   return (
-    <html lang="ru">
+    <html lang="ru" {...mantineHtmlProps}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <ColorSchemeScript defaultColorScheme="light" />
         <HeadContent />
       </head>
       <body>

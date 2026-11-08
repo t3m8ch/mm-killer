@@ -102,7 +102,7 @@ test("выбранный курс раскрывается после завер
   await expect(sidebar.getByRole("button", { name: `Свернуть курс: ${name}` })).toBeVisible();
 });
 
-test("ссылки сохраняют тему при переходах и закрывают панель на текущей странице", async ({
+test("ссылки и перезагрузка сохраняют тему, повторный переход закрывает панель", async ({
   page,
 }) => {
   await page.goto("/courses/1/tasks/7");
@@ -130,4 +130,16 @@ test("ссылки сохраняют тему при переходах и за
     .getByRole("link", { name: /^Задание 7:/ })
     .click();
   await expect(page.getByRole("dialog")).toBeHidden();
+
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.getByRole("button", { name: "Тема оформления" }).click();
+  await page.getByRole("menuitem", { name: "Системная" }).click();
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+
+  await page.emulateMedia({ colorScheme: "light" });
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "light");
 });
