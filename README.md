@@ -5,7 +5,8 @@
 
 ## Локальный запуск
 
-Нужны Podman и [mise](https://mise.jdx.dev/getting-started.html).
+Нужны Podman, [mise](https://mise.jdx.dev/getting-started.html) и системный
+C/C++ toolchain для сборки Easement из исходников. Rust устанавливает mise.
 
 `compose.dev.yaml` поднимает только Postgres для локальной разработки.
 Само приложение запускается отдельно командой `pnpm dev`, как показано ниже.
@@ -80,9 +81,12 @@ Drizzle применяет миграции через штатный `drizzle-o
 системных инструментов — в `mise.toml`. Совместимость проверяется сборкой,
 проверкой типов и API-тестами на Postgres.
 
-[Easement](https://github.com/mokevnin/easement#readme) устанавливается через
-mise из GitHub и использует SCIP-индексатор `@sourcegraph/scip-typescript`
-из devDependencies. Команды pnpm добавляют `node_modules/.bin` в PATH.
+[Форк Easement](https://github.com/t3m8ch/easement) устанавливается через Cargo backend
+mise из закреплённого Git-коммита с `--locked`; версия Rust также задана в `mise.toml`.
+Одинаковая установка используется локально и в CI через `mise install`.
+Индексатор `@sourcegraph/scip-typescript` берётся без патчей из devDependencies;
+команды pnpm добавляют `node_modules/.bin` в PATH.
+Форк нужен для [узких исключений регистрации типов маршрутов](docs/development/architecture.md#регистрация-типов-маршрутов).
 Исключения knip учитывают запуск индексатора из easement и commitlint из hk;
 публичные точки входа модулей перечислены в `entry`. Зависимость `@orpc/contract`
 используется шаблонами генератора, поэтому также отмечена в исключениях knip.

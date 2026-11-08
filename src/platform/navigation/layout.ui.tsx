@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from "react";
 import { Link, type AnyRouter } from "@tanstack/react-router";
-import type { Breadcrumb } from "../../platform/public.shared.ts";
 import { Button, Drawer, Loader, Menu, Tooltip, useMantineColorScheme } from "@mantine/core";
 import { useMediaQuery, useMounted } from "@mantine/hooks";
 import {
@@ -18,7 +17,12 @@ import {
   SunIcon,
   UsersIcon,
 } from "@phosphor-icons/react";
-import type { CourseBranchState, NavigationCourse, NavigationLink } from "./contract.shared.ts";
+import type {
+  Breadcrumb,
+  CourseBranchState,
+  NavigationCourse,
+  NavigationLink,
+} from "./contract.shared.ts";
 import "./styles.css";
 
 // Описания навигации содержат готовые строковые URL, включая маршруты тестового стенда.
