@@ -9,9 +9,11 @@
     "src/app/client.ts",
     "tests/helpers/database.ts",
     "src/app/lifecycle.server.ts",
-    "src/app/server-entry.server.ts"
+    "src/app/server-entry.server.ts",
+    "tests/fixtures/navigation/*.config.ts",
+    "tests/fixtures/navigation/fixture.tsx"
   ],
-  "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,js}", "scripts/**/*.ts"],
+  "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,js}", "scripts/**/*.ts", "tests/**/*.tsx"],
   "ignoreDependencies": ["@commitlint/cli", "@sourcegraph/scip-typescript"],
   "ignoreBinaries": ["easement"]
 }

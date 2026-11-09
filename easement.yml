@@ -1,4 +1,9 @@
 version: 1
+# Разрешить только неявные связи через регистрацию типов TanStack Router.
+# Прямые импорты файлов приложения и остальные транзитивные цепочки проверяются.
+accept_augmentations:
+  - module: "@tanstack/react-router"
+    because: принять неявные связи через глобальную регистрацию типов TanStack Router
 components:
   # plop:components
   platform: { in: src/platform, public: ["src/platform/**/public.*"] }
@@ -19,6 +24,7 @@ components:
   app: { in: [src/app, src/routes, src/router.tsx] }
   generated: { in: src/routeTree.gen.ts }
   test_helpers: { in: tests/helpers, allow_importers: [tests] }
+  navigation_fixture: { in: tests/fixtures/navigation, priority: 20, optional: true }
   tests: { in: ["**/*.test.ts", tests/e2e, tests/tooling], priority: 10, optional: true }
   tooling: { in: ["*.ts", scripts], priority: -1 }
 rules:
@@ -57,6 +63,7 @@ rules:
       - git
       - notifications
       - test_helpers
+  navigation_fixture: { may_depend_on: [platform, app, generated] }
   tooling: { may_depend_on: [platform] }
 no_cycles: [platform, courses, invitations, tasks, attempts, reviews, git, notifications]
 exclude: [".agents/**", ".claude/**", ".codex/**", "generators/**"]

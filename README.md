@@ -5,7 +5,8 @@
 
 ## Локальный запуск
 
-Нужны Podman и [mise](https://mise.jdx.dev/getting-started.html).
+Нужны Podman, [mise](https://mise.jdx.dev/getting-started.html) и системный
+C/C++ toolchain для сборки Easement из исходников. Rust устанавливает mise.
 
 `compose.dev.yaml` поднимает только Postgres для локальной разработки.
 Само приложение запускается отдельно командой `pnpm dev`, как показано ниже.
@@ -80,9 +81,12 @@ Drizzle применяет миграции через штатный `drizzle-o
 системных инструментов — в `mise.toml`. Совместимость проверяется сборкой,
 проверкой типов и API-тестами на Postgres.
 
-[Easement](https://github.com/mokevnin/easement#readme) устанавливается через
-mise из GitHub и использует SCIP-индексатор `@sourcegraph/scip-typescript`
-из devDependencies. Команды pnpm добавляют `node_modules/.bin` в PATH.
+[Форк Easement](https://github.com/t3m8ch/easement) устанавливается через Cargo backend
+mise из закреплённого Git-коммита с `--locked`; версия Rust также задана в `mise.toml`.
+Одинаковая установка используется локально и в CI через `mise install`.
+Индексатор `@sourcegraph/scip-typescript` берётся без патчей из devDependencies;
+команды pnpm добавляют `node_modules/.bin` в PATH.
+Форк нужен для [узких исключений регистрации типов маршрутов](docs/development/architecture.md#регистрация-типов-маршрутов).
 Исключения knip учитывают запуск индексатора из easement и commitlint из hk;
 публичные точки входа модулей перечислены в `entry`. Зависимость `@orpc/contract`
 используется шаблонами генератора, поэтому также отмечена в исключениях knip.
@@ -136,8 +140,17 @@ Custom-процедура получает типизированную ошиб
 API-тесты работают с мигрированной БД-шаблоном, отдельной БД воркера и откатом
 транзакции на тест. Гонки используют отдельную БД и независимые соединения.
 Часы передаются через контекст. Мутации оборачиваются транзакционной middleware.
-Основные сценарии проверяются через публичный API без HTTP. Конфигурация Playwright
-подготовлена, но предметных e2e-тестов пока нет. `pnpm test:e2e` допускает пустой набор
-через `--pass-with-no-tests`; флаг нужно убрать при добавлении первого предметного сценария.
+Основные сценарии проверяются через публичный API без HTTP (`pnpm test:api`).
+
+`pnpm test:browser` запускает браузерные интеграционные проверки UI и сборки
+навигации в отдельном тестовом приложении без Postgres. Сценарии лежат в
+`tests/browser`, стенд — в `tests/fixtures/navigation`, конфигурация запуска —
+`playwright.browser.config.ts`.
+
+`pnpm test:e2e` проверяет вход, сессию, перезагрузку и выход через настоящее
+приложение. Сценарии лежат в `tests/e2e`, конфигурация — `playwright.config.ts`.
+Перед запуском нужны доступный Postgres, миграции и seed. Оба Playwright-набора
+запускаются в CI после установки Chromium и поднимают собственные серверы;
+занятый порт приводит к ошибке. Пустой набор E2E также считается ошибкой.
 
 [Архитектура](docs/development/architecture.md) · [Словарь](GLOSSARY.md)

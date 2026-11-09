@@ -26,6 +26,18 @@ Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. Documentatio
 
 Вливать PR через rebase merge (`gh pr merge --rebase`).
 
+## Implementation reports
+
+В итоговом сообщении после реализации тикета описывать ошибки и предупреждения,
+о которых сообщал туллинг: линтеры, проверки типов, тесты, сборка, Easement,
+Git hooks и CI. Включать проблемы, исправленные в процессе работы; повторяющиеся
+диагностики группировать. Для каждой группы кратко указать, на что пожаловался
+инструмент, установленную причину и способ исправления или обхода. Различать
+проблемы кода, конфигурации, окружения и самого инструмента; предположения явно
+обозначать. Отмечать подавление или ослабление проверок и оставшиеся ограничения.
+Если проблем не было, сообщить об этом одной фразой. Этот отчёт помогает владельцу
+проекта замечать неверное поведение инструментов и решать, когда их доработать.
+
 ## Commits
 
 Use [Conventional Commits](https://www.conventionalcommits.org/). The type, optional scope and `!` are in English; the description and body are in Russian, starting lowercase, in the infinitive, without a trailing period.

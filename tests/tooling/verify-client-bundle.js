@@ -98,7 +98,7 @@ const probes = [
 ];
 
 withFixture(() => {
-  const route = "src/routes/index.tsx";
+  const route = "src/routes/_authenticated.index.tsx";
   const original = readFileSync(route, "utf8");
   const env = { ...process.env };
 
@@ -115,7 +115,7 @@ withFixture(() => {
 import { createFileRoute } from "@tanstack/react-router";
 import { Title } from "@mantine/core";
 ${probe.imports}
-export const Route = createFileRoute("/")({ ${probe.hooks ?? ""} component: () => <Title>{${probe.expression}}</Title> });
+export const Route = createFileRoute("/_authenticated/")({ ${probe.hooks ?? ""} component: () => <Title>{${probe.expression}}</Title> });
 `,
       );
 
