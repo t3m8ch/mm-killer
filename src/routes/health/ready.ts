@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { pool } from "../../app/database.server.ts";
+import { getDatabase } from "../../app/database.server.ts";
 
 export const Route = createFileRoute("/health/ready")({
   server: {
     handlers: {
       GET: async () => {
         try {
-          await pool.query("SELECT 1");
+          await getDatabase().pool.query("SELECT 1");
 
           return Response.json({ status: "ready" });
         } catch {
