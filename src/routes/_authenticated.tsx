@@ -3,6 +3,7 @@ import { ORPCError } from "@orpc/client";
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 import { NavigationComposition, type RouteNavigation } from "../app/navigation";
 import { rpc } from "../app/client";
+import { demoCourses } from "../app/demo-courses";
 import { Sidebar } from "../platform/public.ui.ts";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -22,6 +23,11 @@ export const Route = createFileRoute("/_authenticated")({
 
 const navigationRoutes: readonly RouteNavigation[] = [
   { routeId: "/_authenticated", breadcrumbs: () => [{ label: "Мои курсы", href: "/" }] },
+  ...demoCourses.map((course) => ({
+    routeId: `/_authenticated${course.href}`,
+    breadcrumbs: () => [{ label: course.label, href: course.href }],
+    courseId: () => course.id,
+  })),
 ];
 
 function AuthenticatedLayout() {
@@ -40,8 +46,8 @@ function AuthenticatedLayout() {
       renderSidebar={(sidebarProps) => (
         <Sidebar
           {...sidebarProps}
-          courses={[]}
-          renderCourseBranch={() => null}
+          courses={demoCourses}
+          renderCourseBranch={(_course, heading) => heading}
           user={{
             name: user.fullName,
             busy: logout.isPending,

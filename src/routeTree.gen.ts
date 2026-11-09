@@ -15,6 +15,8 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.
 import { Route as HealthLiveRouteImport } from './routes/health/live'
 import { Route as HealthReadyRouteImport } from './routes/health/ready'
 import { Route as RpcSplatRouteImport } from './routes/rpc/$'
+import { Route as AuthenticatedCoursesJavascriptRouteImport } from './routes/_authenticated.courses.javascript'
+import { Route as AuthenticatedCoursesSqlRouteImport } from './routes/_authenticated.courses.sql'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -45,6 +47,17 @@ const RpcSplatRoute = RpcSplatRouteImport.update({
   path: '/rpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedCoursesJavascriptRoute =
+  AuthenticatedCoursesJavascriptRouteImport.update({
+    id: '/courses/javascript',
+    path: '/courses/javascript',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedCoursesSqlRoute = AuthenticatedCoursesSqlRouteImport.update({
+  id: '/courses/sql',
+  path: '/courses/sql',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -52,6 +65,8 @@ export interface FileRoutesByFullPath {
   '/health/live': typeof HealthLiveRoute
   '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
+  '/courses/javascript': typeof AuthenticatedCoursesJavascriptRoute
+  '/courses/sql': typeof AuthenticatedCoursesSqlRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -59,6 +74,8 @@ export interface FileRoutesByTo {
   '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
   '/': typeof AuthenticatedIndexRoute
+  '/courses/javascript': typeof AuthenticatedCoursesJavascriptRoute
+  '/courses/sql': typeof AuthenticatedCoursesSqlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +85,28 @@ export interface FileRoutesById {
   '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/courses/javascript': typeof AuthenticatedCoursesJavascriptRoute
+  '/_authenticated/courses/sql': typeof AuthenticatedCoursesSqlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/health/live' | '/health/ready' | '/rpc/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/health/live'
+    | '/health/ready'
+    | '/rpc/$'
+    | '/courses/javascript'
+    | '/courses/sql'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/health/live' | '/health/ready' | '/rpc/$' | '/'
+  to:
+    | '/login'
+    | '/health/live'
+    | '/health/ready'
+    | '/rpc/$'
+    | '/'
+    | '/courses/javascript'
+    | '/courses/sql'
   id:
     | '__root__'
     | '/_authenticated'
@@ -82,6 +115,8 @@ export interface FileRouteTypes {
     | '/health/ready'
     | '/rpc/$'
     | '/_authenticated/'
+    | '/_authenticated/courses/javascript'
+    | '/_authenticated/courses/sql'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -136,15 +171,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/courses/javascript': {
+      id: '/_authenticated/courses/javascript'
+      path: '/courses/javascript'
+      fullPath: '/courses/javascript'
+      preLoaderRoute: typeof AuthenticatedCoursesJavascriptRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/courses/sql': {
+      id: '/_authenticated/courses/sql'
+      path: '/courses/sql'
+      fullPath: '/courses/sql'
+      preLoaderRoute: typeof AuthenticatedCoursesSqlRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCoursesJavascriptRoute: typeof AuthenticatedCoursesJavascriptRoute
+  AuthenticatedCoursesSqlRoute: typeof AuthenticatedCoursesSqlRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCoursesJavascriptRoute: AuthenticatedCoursesJavascriptRoute,
+  AuthenticatedCoursesSqlRoute: AuthenticatedCoursesSqlRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
