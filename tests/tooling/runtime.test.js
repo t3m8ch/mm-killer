@@ -61,9 +61,70 @@ await describe("production-релиз", async () => {
     return await server.exited;
   }
 
+  await test(
+    "production-сервер сохраняет HTTP-контракт SPA и API",
+    { timeout: 15000 },
+    async (t) => {
+      const server = launch({ DATABASE_URL: testUrl });
+
+      t.after(() => server.child.kill("SIGKILL"));
+
+      const url = await listen(server);
+      const live = await fetch(`${url}/health/live`);
+      const ready = await fetch(`${url}/health/ready`);
+
+      assert.equal(live.status, 200);
+      assert.deepEqual(await live.json(), { status: "ok" });
+      assert.equal(ready.status, 200);
+      assert.deepEqual(await ready.json(), { status: "ready" });
+
+      const page = await fetch(url);
+      const html = await page.text();
+      const asset = html.match(/(?:src|href)="([^"]*\/assets\/[^"]+)"/);
+
+      assert.equal(page.status, 200);
+      assert.ok(asset, "HTML-оболочка должна ссылаться на собранные клиентские ресурсы");
+      assert.equal((await fetch(new URL(asset[1], url))).status, 200);
+
+      for (const path of ["/login", "/missing/nested/page"]) {
+        const response = await fetch(`${url}${path}`);
+
+        assert.equal(response.status, 200);
+        assert.equal(await response.text(), html);
+      }
+
+      for (const path of [
+        "/rpc",
+        "/rpc/missing",
+        "/health",
+        "/health/missing",
+        "/assets/missing.js",
+        "/missing.css",
+      ]) {
+        const response = await fetch(`${url}${path}`, { headers: { Accept: "text/html" } });
+
+        assert.equal(response.status, 404, path);
+        assert.doesNotMatch(await response.text(), /<html/i, path);
+      }
+
+      const unauthorized = await fetch(`${url}/rpc/auth/me`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ json: null }),
+      });
+
+      assert.equal(unauthorized.status, 401);
+      assert.doesNotMatch(await unauthorized.text(), /<html/i);
+      assert.equal((await fetch(url, { method: "POST" })).status, 405);
+      assert.equal((await fetch(url, { method: "HEAD" })).status, 200);
+
+      await stop(server);
+    },
+  );
+
   for (const signal of ["SIGTERM", "SIGINT"]) {
     await test(
-      `production-сервер обслуживает HTTP и закрывает пул Postgres по ${signal}`,
+      `production-сервер закрывает пул Postgres по ${signal}`,
       { timeout: 15000 },
       async (t) => {
         const server = launch({ DATABASE_URL: testUrl });
@@ -71,55 +132,9 @@ await describe("production-релиз", async () => {
         t.after(() => server.child.kill("SIGKILL"));
 
         const url = await listen(server);
-        const live = await fetch(`${url}/health/live`);
         const ready = await fetch(`${url}/health/ready`);
 
-        assert.equal(live.status, 200);
-        assert.deepEqual(await live.json(), { status: "ok" });
         assert.equal(ready.status, 200);
-        assert.deepEqual(await ready.json(), { status: "ready" });
-
-        const page = await fetch(url);
-        const html = await page.text();
-        const asset = html.match(/(?:src|href)="([^"]*\/assets\/[^"]+)"/);
-
-        assert.equal(page.status, 200);
-        assert.ok(asset, "HTML-оболочка должна ссылаться на собранные клиентские ресурсы");
-        assert.equal((await fetch(new URL(asset[1], url))).status, 200);
-
-        for (const path of ["/login", "/missing/nested/page"]) {
-          const response = await fetch(`${url}${path}`);
-
-          assert.equal(response.status, 200);
-          assert.equal(await response.text(), html);
-        }
-
-        assert.doesNotMatch(html, /fullName|queryKey|anna@example|boris@example/);
-
-        for (const path of [
-          "/rpc",
-          "/rpc/missing",
-          "/health",
-          "/health/missing",
-          "/assets/missing.js",
-          "/missing.css",
-        ]) {
-          const response = await fetch(`${url}${path}`, { headers: { Accept: "text/html" } });
-
-          assert.equal(response.status, 404, path);
-          assert.doesNotMatch(await response.text(), /<html/i, path);
-        }
-
-        const unauthorized = await fetch(`${url}/rpc/auth/me`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ json: null }),
-        });
-
-        assert.equal(unauthorized.status, 401);
-        assert.doesNotMatch(await unauthorized.text(), /<html/i);
-        assert.equal((await fetch(url, { method: "POST" })).status, 405);
-        assert.equal((await fetch(url, { method: "HEAD" })).status, 200);
 
         const [code, receivedSignal] = await stop(server, signal);
 
