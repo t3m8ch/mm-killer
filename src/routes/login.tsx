@@ -1,4 +1,3 @@
-import { useMounted } from "@mantine/hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 import { Title, Stack, Button, Text, Container } from "@mantine/core";
@@ -11,8 +10,6 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
-  const ready = useMounted();
-
   const { data: users } = useSuspenseQuery(rpc.auth.users.queryOptions());
   const login = useMutation({
     throwOnError: true,
@@ -30,7 +27,7 @@ function Login() {
         {users.map((user) => (
           <Button
             key={String(user.id)}
-            disabled={!ready || login.isPending}
+            disabled={login.isPending}
             onClick={() => login.mutate({ userId: user.id })}
           >
             {user.fullName}

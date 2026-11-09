@@ -1,14 +1,18 @@
 import { connect, readConfig, createLogger } from "../platform/public.server.ts";
 
 declare global {
-  var mergeMindsDatabase: ReturnType<typeof connect> | undefined;
+  var mergeMindsDatabase:
+    | (ReturnType<typeof connect> & { logger: ReturnType<typeof createLogger> })
+    | undefined;
 }
 
-const config = readConfig();
+export function getDatabase() {
+  if (!globalThis.mergeMindsDatabase) {
+    const config = readConfig();
+    const logger = createLogger(config.LOG_LEVEL);
 
-export const logger = createLogger(config.LOG_LEVEL);
+    globalThis.mergeMindsDatabase = { ...connect(config.DATABASE_URL, logger), logger };
+  }
 
-// Nitro и SSR собираются отдельно; оба используют один пул в процессе.
-const connection = (globalThis.mergeMindsDatabase ??= connect(config.DATABASE_URL, logger));
-
-export const { db, pool } = connection;
+  return globalThis.mergeMindsDatabase;
+}

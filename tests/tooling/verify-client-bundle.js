@@ -12,15 +12,10 @@ const probes = [
     allowed: true,
   },
   {
-    name: "SSR публичного UI",
+    name: "публичный UI оболочки",
     imports: 'import { Layout } from "../platform/public.ui.ts";',
-    expression: "<Layout>SSR</Layout>",
+    expression: "<Layout>Оболочка</Layout>",
     allowed: true,
-  },
-  {
-    name: "browser-only в SSR",
-    imports: 'import { browser } from "../app/probe.browser.ts";',
-    expression: "browser",
   },
   {
     name: "публичный серверный вход",
@@ -33,7 +28,7 @@ const probes = [
     expression: '<button onClick={() => import("../platform/public.server.ts")}>Загрузить</button>',
   },
   {
-    name: "изоморфный RPC-клиент",
+    name: "клиентский RPC",
     imports: 'import { rpc } from "../app/client";',
     expression: "String(Boolean(rpc))",
     allowed: true,
@@ -48,7 +43,14 @@ const probes = [
     imports: 'import { secret } from "../app/bundle-probe.server";',
     expression: "secret()",
   },
-  { name: "обычный клиент", imports: "", expression: '"MergeMinds"', allowed: true },
+  {
+    name: "страница без серверного исполнения компонента и загрузчиков",
+    hooks:
+      "beforeLoad: () => { void window.location.pathname }, loader: () => window.location.pathname,",
+    imports: "",
+    expression: "window.location.pathname",
+    allowed: true,
+  },
   { name: "pg", imports: 'import pg from "pg";', expression: "String(pg.Pool)" },
   { name: "Drizzle", imports: 'import { sql } from "drizzle-orm";', expression: "String(sql)" },
   {
@@ -73,8 +75,8 @@ const probes = [
   },
   {
     name: "модуль БД",
-    imports: 'import { db } from "../app/database.server.ts";',
-    expression: "String(db)",
+    imports: 'import { getDatabase } from "../app/database.server.ts";',
+    expression: "String(getDatabase)",
   },
   {
     name: "реэкспорт",
@@ -96,7 +98,6 @@ const probes = [
 ];
 
 withFixture(() => {
-  writeFileSync("src/app/probe.browser.ts", 'export const browser = "browser";\n');
   const route = "src/routes/_authenticated.index.tsx";
   const original = readFileSync(route, "utf8");
   const env = { ...process.env };
@@ -114,7 +115,7 @@ withFixture(() => {
 import { createFileRoute } from "@tanstack/react-router";
 import { Title } from "@mantine/core";
 ${probe.imports}
-export const Route = createFileRoute("/_authenticated/")({ component: () => <Title>{${probe.expression}}</Title> });
+export const Route = createFileRoute("/_authenticated/")({ ${probe.hooks ?? ""} component: () => <Title>{${probe.expression}}</Title> });
 `,
       );
 
