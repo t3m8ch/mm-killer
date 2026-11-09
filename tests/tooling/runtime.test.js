@@ -84,8 +84,42 @@ await describe("production-релиз", async () => {
         const asset = html.match(/(?:src|href)="([^"]*\/assets\/[^"]+)"/);
 
         assert.equal(page.status, 200);
-        assert.ok(asset, "SSR должен ссылаться на собранные клиентские ресурсы");
+        assert.ok(asset, "HTML-оболочка должна ссылаться на собранные клиентские ресурсы");
         assert.equal((await fetch(new URL(asset[1], url))).status, 200);
+
+        for (const path of ["/login", "/missing/nested/page"]) {
+          const response = await fetch(`${url}${path}`);
+
+          assert.equal(response.status, 200);
+          assert.equal(await response.text(), html);
+        }
+
+        assert.doesNotMatch(html, /fullName|queryKey|anna@example|boris@example/);
+
+        for (const path of [
+          "/rpc",
+          "/rpc/missing",
+          "/health",
+          "/health/missing",
+          "/assets/missing.js",
+          "/missing.css",
+        ]) {
+          const response = await fetch(`${url}${path}`, { headers: { Accept: "text/html" } });
+
+          assert.equal(response.status, 404, path);
+          assert.doesNotMatch(await response.text(), /<html/i, path);
+        }
+
+        const unauthorized = await fetch(`${url}/rpc/auth/me`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ json: null }),
+        });
+
+        assert.equal(unauthorized.status, 401);
+        assert.doesNotMatch(await unauthorized.text(), /<html/i);
+        assert.equal((await fetch(url, { method: "POST" })).status, 405);
+        assert.equal((await fetch(url, { method: "HEAD" })).status, 200);
 
         const [code, receivedSignal] = await stop(server, signal);
 

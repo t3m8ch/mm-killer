@@ -4,6 +4,8 @@ import { Text, Loader } from "@mantine/core";
 import { Layout } from "../platform/public.ui.ts";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  ssr: false,
+  shellComponent: Shell,
   component: Root,
   pendingComponent: () => <Loader />,
   errorComponent: () => <Text role="alert">Не удалось загрузить страницу</Text>,
@@ -13,16 +15,20 @@ function Root() {
   const { queryClient } = Route.useRouteContext();
 
   return (
+    <QueryClientProvider client={queryClient}>
+      <Outlet />
+    </QueryClientProvider>
+  );
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
     <html lang="ru">
       <head>
         <HeadContent />
       </head>
       <body>
-        <QueryClientProvider client={queryClient}>
-          <Layout>
-            <Outlet />
-          </Layout>
-        </QueryClientProvider>
+        <Layout>{children}</Layout>
         <Scripts />
       </body>
     </html>

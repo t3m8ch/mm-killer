@@ -1,4 +1,3 @@
-import { useMounted } from "@mantine/hooks";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ORPCError } from "@orpc/client";
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
@@ -21,7 +20,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const ready = useMounted();
   const { data: user } = useSuspenseQuery(rpc.auth.me.queryOptions());
   const logout = useMutation({
     throwOnError: true,
@@ -43,10 +41,10 @@ function Home() {
       <Title>MergeMinds</Title>
       <Text>{user.fullName}</Text>
       <Text>{user.email}</Text>
-      <Button disabled={!ready || logout.isPending} onClick={() => logout.mutate(undefined)}>
+      <Button disabled={logout.isPending} onClick={() => logout.mutate(undefined)}>
         Выйти
       </Button>
-      <Button disabled={!ready || logoutAll.isPending} onClick={() => logoutAll.mutate(undefined)}>
+      <Button disabled={logoutAll.isPending} onClick={() => logoutAll.mutate(undefined)}>
         Выйти со всех устройств
       </Button>
     </Stack>
