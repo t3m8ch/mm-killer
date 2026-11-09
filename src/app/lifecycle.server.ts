@@ -2,8 +2,8 @@ import { definePlugin } from "nitro";
 import { getDatabase } from "./database.server.ts";
 
 export default definePlugin((app) => {
-  // Start запускает preview для общей оболочки без runtime-конфигурации.
-  if (process.env.TSS_PRERENDERING === "true") {
+  // Nitro создаёт статическую оболочку без runtime-конфигурации.
+  if (import.meta.prerender) {
     return;
   }
 
