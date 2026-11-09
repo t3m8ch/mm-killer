@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ActionIcon, Drawer, Loader, Menu, Tooltip, useMantineColorScheme } from "@mantine/core";
-import { useMediaQuery, useMounted } from "@mantine/hooks";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   ArrowClockwiseIcon,
   CaretRightIcon,
@@ -128,7 +128,6 @@ export interface AppLayoutProps {
 }
 
 function ThemeMenu() {
-  const ready = useMounted();
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const options = [
     { value: "light", label: "Светлая", icon: SunIcon },
@@ -140,7 +139,7 @@ function ThemeMenu() {
     <Menu position="bottom-end">
       <Menu.Target>
         <Tooltip label="Тема оформления">
-          <button disabled={!ready} className="mm-theme-button" aria-label="Тема оформления">
+          <button className="mm-theme-button" aria-label="Тема оформления">
             <SunIcon size={18} />
           </button>
         </Tooltip>
@@ -163,7 +162,6 @@ function ThemeMenu() {
 
 export function AppLayout(props: AppLayoutProps) {
   const { path, mode = "normal", breadcrumbs, children, pending, renderSidebar } = props;
-  const ready = useMounted();
   const mobile = useMediaQuery("(max-width: 720px)");
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer] = useState(false);
@@ -185,7 +183,6 @@ export function AppLayout(props: AppLayoutProps) {
           <header className="mm-header">
             <button
               className="mm-panel-toggle"
-              disabled={!ready}
               aria-label="Переключить навигацию"
               aria-expanded={drawer || (!collapsed && mode !== "diff" && !mobile)}
               onClick={() =>

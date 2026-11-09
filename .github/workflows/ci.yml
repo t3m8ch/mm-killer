@@ -38,5 +38,5 @@ jobs:
       - run: pnpm test:bundle
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:browser
-      - run: pnpm test:e2e
+      - run: PLAYWRIGHT_PRODUCTION=true pnpm test:e2e
       - run: lychee --no-progress README.md docs/**/*.md

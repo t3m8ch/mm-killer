@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu } from "@mantine/core";
-import { useMounted } from "@mantine/hooks";
 import {
   BooksIcon,
   CaretDownIcon,
@@ -10,6 +9,7 @@ import {
   SignOutIcon,
 } from "@phosphor-icons/react";
 import type { NavigationCourse } from "./contract.shared.ts";
+import { Brand } from "../brand.ui.tsx";
 import "./styles.css";
 
 export interface SidebarProps {
@@ -34,7 +34,6 @@ export function Sidebar({
   user,
   drawer = false,
 }: SidebarProps) {
-  const ready = useMounted();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [previousLocation, setPreviousLocation] = useState({ path, currentCourseId });
 
@@ -49,7 +48,7 @@ export function Sidebar({
     <div className="mm-sidebar">
       {!drawer && (
         <Link activeOptions={{ exact: true }} to="/" className="mm-brand">
-          <strong>MergeMinds</strong>
+          <Brand compact />
         </Link>
       )}
       <Link
@@ -70,7 +69,6 @@ export function Sidebar({
             <div className="mm-course-heading">
               <button
                 className="mm-course-toggle"
-                disabled={!ready}
                 aria-label={`${open ? "Свернуть" : "Раскрыть"} курс: ${course.label}`}
                 aria-expanded={open}
                 aria-controls={id}
@@ -102,11 +100,7 @@ export function Sidebar({
         <div className="mm-account">
           <Menu position="top-start" width="target" offset={8}>
             <Menu.Target>
-              <button
-                disabled={!ready}
-                className="mm-user"
-                aria-label={`Меню аккаунта: ${user.name}`}
-              >
+              <button className="mm-user" aria-label={`Меню аккаунта: ${user.name}`}>
                 <span className="mm-avatar" aria-hidden="true">
                   {user.name
                     .split(" ")
