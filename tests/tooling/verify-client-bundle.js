@@ -44,7 +44,9 @@ const probes = [
     expression: "secret()",
   },
   {
-    name: "страница с browser-only рендерингом",
+    name: "страница без серверного исполнения компонента и загрузчиков",
+    hooks:
+      "beforeLoad: () => { void window.location.pathname }, loader: () => window.location.pathname,",
     imports: "",
     expression: "window.location.pathname",
     allowed: true,
@@ -113,7 +115,7 @@ withFixture(() => {
 import { createFileRoute } from "@tanstack/react-router";
 import { Title } from "@mantine/core";
 ${probe.imports}
-export const Route = createFileRoute("/")({ beforeLoad: () => { void window.location.pathname }, loader: () => window.location.pathname, component: () => <Title>{${probe.expression}}</Title> });
+export const Route = createFileRoute("/")({ ${probe.hooks ?? ""} component: () => <Title>{${probe.expression}}</Title> });
 `,
       );
 
