@@ -1,0 +1,37 @@
+.mm-brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  color: #27313d;
+}
+.mm-brand-mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  color: #345bb4;
+  background: #e7edf9;
+}
+.mm-brand-compact {
+  gap: 10px;
+  font-size: 18px;
+  letter-spacing: -0.4px;
+}
+.mm-brand-compact .mm-brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+[data-mantine-color-scheme="dark"] .mm-brand-lockup {
+  color: #e2e7ee;
+}
+[data-mantine-color-scheme="dark"] .mm-brand-mark {
+  color: #a6c4ff;
+  background: #2a3d60;
+}
