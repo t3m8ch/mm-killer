@@ -27,7 +27,7 @@ function Login() {
         {users.map((user) => (
           <Button
             key={String(user.id)}
-            disabled={!ready || login.isPending}
+            disabled={login.isPending}
             onClick={() => login.mutate({ userId: user.id })}
           >
             {user.fullName}
