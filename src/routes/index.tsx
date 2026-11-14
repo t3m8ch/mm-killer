@@ -2,12 +2,12 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { ORPCError } from "@orpc/client";
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 import { Title, Stack, Button, Text } from "@mantine/core";
-import { rpc } from "../app/client";
+import { authRpc } from "../platform/public.ui.ts";
 
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     try {
-      await context.queryClient.ensureQueryData(rpc.auth.me.queryOptions());
+      await context.queryClient.ensureQueryData(authRpc.me.queryOptions());
     } catch (error) {
       if (error instanceof ORPCError && error.code === "UNAUTHORIZED") {
         throw redirect({ to: "/login" });
@@ -20,17 +20,17 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { data: user } = useSuspenseQuery(rpc.auth.me.queryOptions());
+  const { data: user } = useSuspenseQuery(authRpc.me.queryOptions());
   const logout = useMutation({
     throwOnError: true,
-    mutationFn: () => rpc.auth.logout.call(undefined),
+    mutationFn: () => authRpc.logout.call(undefined),
     onSuccess: () => {
       window.location.href = "/login";
     },
   });
   const logoutAll = useMutation({
     throwOnError: true,
-    mutationFn: () => rpc.auth.logoutAll.call(undefined),
+    mutationFn: () => authRpc.logoutAll.call(undefined),
     onSuccess: () => {
       window.location.href = "/login";
     },
