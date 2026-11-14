@@ -21,6 +21,23 @@ for (const options of [
         }
       }
 
+      // Проверить типы общего клиента, включая новую процедуру модуля.
+      writeFileSync(
+        "src/app/client-probe.ts",
+        `import { rpc } from "./client.ts";
+
+const id = 9007199254740993n;
+
+void rpc.auth.me.call();
+void rpc.courseNotes.get.call({ id });
+void rpc.courseNotes.publish.call({});
+// @ts-expect-error ID в контракте — bigint, не строка.
+void rpc.courseNotes.get.call({ id: "1" });
+// @ts-expect-error Процедуры нет в контракте.
+void rpc.courseNotes.missing.call();
+`,
+      );
+
       // Проверить PostgreSQL и API на значениях выше Number.MAX_SAFE_INTEGER.
       const folder = readdirSync("migrations").find((name) =>
         name.endsWith("_create_course_notes"),

@@ -1,0 +1,7 @@
+import { authContract } from "../platform/public.shared.ts";
+// plop:imports
+
+export const contract = {
+  auth: authContract,
+  // plop:contracts
+};

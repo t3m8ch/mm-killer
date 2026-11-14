@@ -57,6 +57,7 @@ export default function generators(plop) {
 
     for (const [file, markers] of Object.entries({
       "src/app/api.server.ts": ["// plop:imports", "// plop:api"],
+      "src/app/contract.shared.ts": ["// plop:imports", "// plop:contracts"],
       "easement.yml": [
         "# plop:components",
         "# plop:rules",
@@ -97,8 +98,11 @@ export default function generators(plop) {
       throw new Error("Имя модуля конфликтует с именами в сгенерированном коде");
     }
 
-    if (hasProperty("src/app/api.server.ts", property)) {
-      throw new Error("Имя модуля уже занято в API");
+    if (
+      hasProperty("src/app/api.server.ts", property) ||
+      hasProperty("src/app/contract.shared.ts", property)
+    ) {
+      throw new Error("Имя модуля уже занято в API или контракте");
     }
 
     answers.audit = Boolean(answers.updatedAt || answers.updatedBy);
@@ -157,6 +161,21 @@ export default function generators(plop) {
         })),
       )
       .concat([
+        {
+          type: "append",
+          unique: false,
+          path: "src/app/contract.shared.ts",
+          pattern: "// plop:imports",
+          template:
+            "import { contract as {{camelCase name}} } from '../modules/{{name}}/public.shared.ts';",
+        },
+        {
+          type: "append",
+          unique: false,
+          path: "src/app/contract.shared.ts",
+          pattern: "// plop:contracts",
+          template: "  {{camelCase name}},",
+        },
         {
           type: "append",
           unique: false,
