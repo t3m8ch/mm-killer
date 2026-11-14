@@ -1,10 +1,10 @@
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
-import type { RouterClient } from "@orpc/server";
+import type { ContractRouterClient } from "@orpc/contract";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import type { api } from "./api.server.ts";
+import type { contract } from "./contract.shared.ts";
 
-const client: RouterClient<typeof api> = createORPCClient(
+const client: ContractRouterClient<typeof contract> = createORPCClient(
   new RPCLink({ url: () => `${window.location.origin}/rpc` }),
 );
 
