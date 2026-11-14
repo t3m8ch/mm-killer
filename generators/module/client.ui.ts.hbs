@@ -1,0 +1,4 @@
+import { createRpcClient } from "../../platform/public.ui.ts";
+import type { contract } from "./contract.shared.ts";
+
+export const {{camelCase name}}Rpc = createRpcClient<typeof contract>("{{camelCase name}}");

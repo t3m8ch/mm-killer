@@ -21,20 +21,19 @@ for (const options of [
         }
       }
 
-      // Проверить типы общего клиента, включая новую процедуру модуля.
+      // Клиент доступен внутри своего модуля, без обратного импорта app.
       writeFileSync(
-        "src/app/client-probe.ts",
-        `import { rpc } from "./client.ts";
+        "src/modules/course-notes/client-probe.ui.ts",
+        `import { courseNotesRpc } from "./public.ui.ts";
 
 const id = 9007199254740993n;
 
-void rpc.auth.me.call();
-void rpc.courseNotes.get.call({ id });
-void rpc.courseNotes.publish.call({});
+void courseNotesRpc.get.call({ id });
+void courseNotesRpc.publish.call({});
 // @ts-expect-error ID в контракте — bigint, не строка.
-void rpc.courseNotes.get.call({ id: "1" });
+void courseNotesRpc.get.call({ id: "1" });
 // @ts-expect-error Процедуры нет в контракте.
-void rpc.courseNotes.missing.call();
+void courseNotesRpc.missing.call();
 `,
       );
 
@@ -64,13 +63,15 @@ void rpc.courseNotes.missing.call();
         },
         // Типы нового маршрута обновляет Vite при запуске приложения.
         { command: "oxlint", args: ["--threads", "2", "src"] },
+        { command: "easement", args: ["check"] },
+        { command: "easement", args: ["check", "-c", "easement.environments.yml"] },
         { command: "vitest", args: ["run"] },
       ]) {
-        const result = spawnSync(
-          command === "node" ? process.execPath : resolve(`node_modules/.bin/${command}`),
-          args,
-          { stdio: "inherit" },
-        );
+        const executable =
+          command === "easement" ? command : resolve(`node_modules/.bin/${command}`);
+        const result = spawnSync(command === "node" ? process.execPath : executable, args, {
+          stdio: "inherit",
+        });
 
         if (result.status !== 0) {
           throw new Error(`Не прошла проверка сгенерированного модуля: ${command}`);

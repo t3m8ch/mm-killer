@@ -29,8 +29,8 @@ const probes = [
   },
   {
     name: "клиентский RPC",
-    imports: 'import { rpc } from "../app/client";',
-    expression: "String(Boolean(rpc))",
+    imports: 'import { authRpc } from "../platform/public.ui.ts";',
+    expression: "String(Boolean(authRpc))",
     allowed: true,
   },
   {

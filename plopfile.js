@@ -152,6 +152,8 @@ export default function generators(plop) {
           "schema.server.ts",
           "public.server.ts",
           "public.shared.ts",
+          "client.ui.ts",
+          "public.ui.ts",
           "api.test.ts",
         ].map((file) => ({
           type: "add",

@@ -6,7 +6,6 @@
     "src/platform/public.*",
     "scripts/*.ts",
     "scripts/*.js",
-    "src/app/client.ts",
     "tests/helpers/database.ts",
     "src/app/lifecycle.server.ts",
     "src/app/server-entry.server.ts"
