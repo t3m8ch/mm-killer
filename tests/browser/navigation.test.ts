@@ -147,7 +147,17 @@ test("ссылки и перезагрузка сохраняют тему, по
 test("медленный переход сохраняет согласованную навигацию и блокирует старую страницу", async ({
   page,
 }) => {
-  await page.goto("/courses/1/tasks/7");
+  let releaseCourse!: () => void;
+  const courseReleased = new Promise<void>((resolve) => {
+    releaseCourse = resolve;
+  });
+
+  await page.route("**/__fixture__/courses/2/ready", async (route) => {
+    await courseReleased;
+    await route.fulfill({ status: 204 });
+  });
+  await page.goto("/courses/1/tasks/7?holdCourse=2");
+
   const sidebar = page.getByRole("complementary");
   const main = page.locator("main");
   const breadcrumbs = page.getByRole("navigation", { name: "Хлебные крошки" });
@@ -186,6 +196,8 @@ test("медленный переход сохраняет согласован�
       );
     }),
   ).toBe(false);
+
+  releaseCourse();
 
   await expect(main).toHaveAttribute("aria-busy", "false");
   await expect(main.locator("[inert]")).toHaveCount(0);
