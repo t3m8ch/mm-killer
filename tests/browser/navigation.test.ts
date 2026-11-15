@@ -88,6 +88,18 @@ test("мобильная панель показывает профиль и з�
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
+test("мобильная панель закрывается крестиком", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/courses/1/tasks/7");
+  await page.getByRole("button", { name: "Переключить навигацию" }).click();
+  const drawer = page.getByRole("dialog");
+
+  await expect(drawer).toBeVisible();
+  await drawer.getByRole("button", { name: "Закрыть навигацию" }).click();
+
+  await expect(drawer).toBeHidden();
+});
+
 test("выбранный курс раскрывается после завершения загрузки перехода", async ({ page }) => {
   await page.goto("/courses/1/tasks/7");
   const sidebar = page.getByRole("complementary");

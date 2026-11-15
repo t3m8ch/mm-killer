@@ -218,6 +218,7 @@ export function AppLayout(props: AppLayoutProps) {
         </div>
       </div>
       <Drawer
+        closeButtonProps={{ "aria-label": "Закрыть навигацию" }}
         opened={drawer}
         onClose={() => setDrawer(false)}
         size={300}
