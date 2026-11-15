@@ -1,0 +1,207 @@
+.mm-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 22px;
+  font-size: 17px;
+  letter-spacing: -0.4px;
+}
+.mm-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  color: var(--mm-secondary) !important;
+  line-height: 1.35;
+  margin: 2px 0;
+}
+.mm-nav-item:hover,
+.mm-course-name:hover {
+  background: var(--mm-hover);
+}
+.mm-nav-item.active {
+  background: var(--mm-active);
+  color: var(--mm-accent) !important;
+  font-weight: 600;
+}
+.mm-group-label {
+  color: var(--mm-muted);
+  font-size: 12px;
+  margin: 24px 10px 8px;
+}
+.mm-course-name {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 5px;
+  line-height: 1.4;
+  font-size: 13px;
+}
+.mm-course-name.selected {
+  color: var(--mm-text);
+  font-weight: 600;
+}
+.mm-nested {
+  padding-left: 20px;
+  margin-left: 18px;
+  border-left: 1px solid var(--mm-tree-line);
+}
+.mm-account {
+  border-top: 1px solid var(--mm-line);
+  padding-top: 8px;
+}
+.mm-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mm-text);
+  text-align: left;
+  font-size: 13px;
+}
+.mm-user:hover,
+.mm-user[aria-expanded="true"] {
+  background: var(--mm-hover);
+}
+.mm-user-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mm-user-caret {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--mm-muted);
+}
+.mm-avatar {
+  flex-shrink: 0;
+  width: 29px;
+  height: 29px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--mm-avatar-bg);
+  color: var(--mm-avatar-text);
+  font-size: 10px;
+}
+.mm-course-heading {
+  display: flex;
+  align-items: flex-start;
+}
+.mm-course-heading .mm-course-name {
+  flex: 1;
+  min-width: 0;
+  padding-left: 3px;
+  gap: 10px;
+}
+.mm-course-toggle {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mm-muted);
+  border-radius: 4px;
+}
+.mm-course-toggle:hover {
+  background: var(--mm-hover);
+  color: var(--mm-accent);
+}
+.mm-task-links {
+  margin: 0 0 10px 17px;
+  padding-left: 6px;
+  border-left: 1px solid var(--mm-tree-line);
+}
+.mm-task-links .mm-nav-item {
+  font-size: 12px;
+  gap: 3px;
+  padding: 7px 5px;
+}
+.mm-tree-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  font-size: 12px;
+  color: var(--mm-muted);
+}
+.mm-tree-loading .mantine-Loader-root {
+  flex-shrink: 0;
+}
+.mm-tree-error {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 5px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--mm-secondary);
+}
+.mm-tree-error-icon {
+  color: var(--mantine-color-red-6);
+}
+.mm-course-content {
+  position: relative;
+}
+.mm-course-overview > .mm-nav-item {
+  padding-right: 30px;
+}
+.mm-tree-refresh {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+  display: flex;
+  pointer-events: none;
+}
+.mm-course-emoji {
+  flex: 0 0 18px;
+  width: 18px;
+  text-align: center;
+  font:
+    16px/1.15 "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Noto Color Emoji",
+    sans-serif;
+}
+.mm-course-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  padding: 6px 0 2px;
+  background: var(--mm-sidebar-surface);
+  border-top: 1px solid var(--mm-line);
+}
+.mm-course-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--mm-sidebar-surface);
+}
+.mm-course-overview {
+  position: relative;
+  padding-top: 1px;
+  padding-bottom: 1px;
+}
+.mm-course-content > .mm-nested {
+  display: flow-root;
+}
+.mm-sidebar .mm-nested {
+  margin-left: 11px;
+  padding-left: 10px;
+}
+.mm-nav-item svg {
+  flex-shrink: 0;
+}
