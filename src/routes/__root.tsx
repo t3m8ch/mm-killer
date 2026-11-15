@@ -27,7 +27,7 @@ function Shell({ children }: { children: React.ReactNode }) {
     <html lang="ru" {...mantineHtmlProps}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <ColorSchemeScript defaultColorScheme="light" />
+        <ColorSchemeScript defaultColorScheme="auto" />
         <HeadContent />
       </head>
       <body>

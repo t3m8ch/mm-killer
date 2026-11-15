@@ -151,6 +151,20 @@ test("повторный переход на текущую страницу з�
 });
 
 for (const colorScheme of ["dark", "light"] as const) {
+  test(`при первом открытии тема следует настройкам устройства: ${colorScheme}`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/courses/1/tasks/7");
+
+    await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", colorScheme);
+
+    const oppositeScheme = colorScheme === "dark" ? "light" : "dark";
+
+    await page.emulateMedia({ colorScheme: oppositeScheme });
+    await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", oppositeScheme);
+  });
+
   test(`системная тема сохраняется и реагирует на настройки устройства: ${colorScheme}`, async ({
     page,
   }) => {
