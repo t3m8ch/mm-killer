@@ -100,7 +100,7 @@ test("мобильная панель закрывается крестиком"
   await expect(drawer).toBeHidden();
 });
 
-test("выбранный курс раскрывается после завершения загрузки перехода", async ({ page }) => {
+test("переход в курс раскрывает ранее свёрнутую пользователем ветку", async ({ page }) => {
   await page.goto("/courses/1/tasks/7");
   const sidebar = page.getByRole("complementary");
   const name = "Командный проект: разработка и сопровождение программного продукта";
