@@ -22,12 +22,18 @@ const schema = z.object({
   name: z.string(),
   tasks: z.array(z.object({ id: z.string(), name: z.string() })),
 });
+const heldCourseId = new URLSearchParams(window.location.search).get("holdCourse");
 let renamed = false;
 const courseQuery = (id: string) => ({
   queryKey: ["course", id],
   staleTime: 30_000,
   queryFn: async () => {
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    if (heldCourseId === id) {
+      // Браузерный тест удерживает этот запрос до завершения проверок перехода.
+      await fetch(`/__fixture__/courses/${id}/ready`);
+    } else {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+    }
 
     return {
       id,
