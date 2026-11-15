@@ -1,6 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../helpers/network";
 
-test("вход и выход защищают страницу", async ({ page }) => {
+test("вход и выход защищают страницу", async ({ page, holdRequest }) => {
   const anonymousDocument = await page.request.get("/");
   const anonymousHtml = await anonymousDocument.text();
 
@@ -9,7 +9,16 @@ test("вход и выход защищают страницу", async ({ page }
 
   await page.goto("/");
   await expect(page).toHaveURL(/\/login$/);
+  const login = await holdRequest("**/rpc/auth/login");
+
   await page.getByRole("button", { name: "Анна Иванова" }).click();
+  await login.requested;
+
+  await expect(page.getByRole("button", { name: "Анна Иванова" })).toBeDisabled();
+  await expect(page).toHaveURL(/\/login$/);
+  expect((await page.context().cookies()).some((cookie) => cookie.name === "session")).toBe(false);
+
+  login.release();
   await expect(page.getByText("anna@example.test")).toBeVisible();
 
   const authenticatedDocument = await page.request.get("/");
@@ -29,7 +38,16 @@ test("вход и выход защищают страницу", async ({ page }
   await page.reload();
   await expect(page.getByText("anna@example.test")).toBeVisible();
 
+  const logout = await holdRequest("**/rpc/auth/logout");
+
   await page.getByRole("button", { name: "Выйти", exact: true }).click();
+  await logout.requested;
+
+  await expect(page.getByRole("button", { name: "Выйти", exact: true })).toBeDisabled();
+  await expect(page).toHaveURL(/\/$/);
+  expect((await page.context().cookies()).some((cookie) => cookie.name === "session")).toBe(true);
+
+  logout.release();
   await expect(page).toHaveURL(/\/login$/);
   expect((await page.context().cookies()).some((cookie) => cookie.name === "session")).toBe(false);
 
