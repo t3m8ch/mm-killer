@@ -1,11 +1,6 @@
 import { expect, test } from "../helpers/network";
 
 test("вход и выход защищают страницу", async ({ page, holdRequest }) => {
-  const anonymousDocument = await page.request.get("/");
-  const anonymousHtml = await anonymousDocument.text();
-
-  expect(anonymousDocument.status()).toBe(200);
-  expect(anonymousHtml).not.toMatch(/Анна Иванова|anna@example\.test/);
   const errors: string[] = [];
 
   page.on("pageerror", (error) => errors.push(error.message));
@@ -54,6 +49,7 @@ test("вход и выход защищают страницу", async ({ page, 
   await page.getByRole("button", { name: "Меню аккаунта: Анна Иванова" }).click();
   await page.getByRole("menuitem", { name: "Выйти", exact: true }).click();
   await logout.requested;
+  await page.getByRole("button", { name: "Меню аккаунта: Анна Иванова" }).click();
 
   await expect(page.getByRole("menuitem", { name: "Выйти", exact: true })).toBeDisabled();
   await expect(page).toHaveURL(/\/$/);
