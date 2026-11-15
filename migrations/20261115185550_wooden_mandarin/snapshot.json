@@ -1,0 +1,50 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "ed7b670d-be08-4d4c-86cf-6896e5174090",
+  "prevIds": ["d0ba9339-ef04-46d3-bbc2-a1922ae1bde9"],
+  "footprints": [
+    {
+      "statementType": "create_index",
+      "statementTarget": ["index", "public", "course_memberships", "course_single_owner"],
+      "writes": [
+        "s|idx|public.course_single_owner",
+        "n|idx|public.course_single_owner",
+        "e|idx|public.course_single_owner",
+        "n|rel|public.course_single_owner"
+      ],
+      "reads": [
+        "n|tbl|public.course_memberships",
+        "n|sch|public",
+        "n|col|public.course_memberships.course_id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "course_single_owner",
+        "nameExplicit": true,
+        "columns": [
+          {
+            "value": "course_id",
+            "isExpression": false,
+            "asc": true,
+            "nullsFirst": false,
+            "opclass": null
+          }
+        ],
+        "isUnique": true,
+        "where": "\"role\" = 'owner'",
+        "with": "",
+        "method": "btree",
+        "concurrently": false,
+        "entityType": "indexes"
+      }
+    }
+  ]
+}

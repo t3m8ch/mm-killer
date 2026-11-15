@@ -10,6 +10,15 @@ export async function memberOf(context: Context, courseId: bigint) {
     throw new ORPCError("UNAUTHORIZED");
   }
 
+  const [course] = await context.db
+    .select({ id: courses.id })
+    .from(courses)
+    .where(eq(courses.id, courseId));
+
+  if (!course) {
+    throw new ORPCError("NOT_FOUND");
+  }
+
   const [member] = await context.db
     .select()
     .from(memberships)

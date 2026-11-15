@@ -1,4 +1,13 @@
-import { pgTable, bigint, text, unique, primaryKey, check, foreignKey } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  bigint,
+  text,
+  unique,
+  primaryKey,
+  check,
+  foreignKey,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 // DDL-выражения ограничений не выполняют запросов и не пишут чужие таблицы.
 // oxlint-disable-next-line project/module-boundaries
 import { sql } from "drizzle-orm";
@@ -42,6 +51,9 @@ export const memberships = pgTable(
   },
   (t) => [
     primaryKey({ columns: [t.courseId, t.userId] }),
+    uniqueIndex("course_single_owner")
+      .on(t.courseId)
+      .where(sql`${t.role} = 'owner'`),
     foreignKey({ columns: [t.courseId, t.groupId], foreignColumns: [groups.courseId, groups.id] }),
     check(
       "membership_role_group",

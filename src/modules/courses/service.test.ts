@@ -198,3 +198,43 @@ it("конкурентное вступление уникально и согл
     await database.close();
   }
 });
+
+it("удаление подгруппы и подключённые действия откатываются вместе", () =>
+  rollbackTest(async (context) => {
+    const { createCoursesApi } = await import("./public.server.ts");
+
+    await seedUsers(context.db, context.now());
+    const [owner] = await createRouterClient(authApi, { context }).users();
+    const client = createRouterClient(coursesApi, { context: { ...context, user: owner } });
+    const course = await client.create({ name: "Атомарность", description: "" });
+    const group = await client.createGroup({ courseId: course.id, name: "Вторая" });
+
+    const failure = new Error("Ошибка связанного действия");
+    const failing = createRouterClient(
+      createCoursesApi(async () => {
+        throw failure;
+      }),
+      { context: { ...context, user: owner } },
+    );
+
+    await expect(failing.deleteGroup({ courseId: course.id, groupId: group.id })).rejects.toThrow(
+      "Ошибка связанного действия",
+    );
+    expect(await client.groups({ courseId: course.id })).toHaveLength(2);
+    await expect(
+      client.setTeacher({ courseId: course.id, userId: 9223372036854775807n, enabled: true }),
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
+  }));
+
+it("отсутствующий курс возвращает 404, а анонимный запрос — 401", () =>
+  rollbackTest(async (context) => {
+    await seedUsers(context.db, context.now());
+    const [owner] = await createRouterClient(authApi, { context }).users();
+    const client = createRouterClient(coursesApi, { context: { ...context, user: owner } });
+    const anonymous = createRouterClient(coursesApi, { context });
+
+    await expect(client.get({ courseId: 9223372036854775807n })).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+    await expect(anonymous.list()).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  }));

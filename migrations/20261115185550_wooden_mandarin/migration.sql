@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "course_single_owner" ON "course_memberships" ("course_id") WHERE "role" = 'owner';
