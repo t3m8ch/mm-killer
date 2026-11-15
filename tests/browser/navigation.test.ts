@@ -30,7 +30,7 @@ test("diff без отступа, Drawer и возвращение обычно�
   await expect(page.getByRole("complementary")).toBeHidden();
 
   await expect(page.getByRole("navigation", { name: "Хлебные крошки" })).toContainText(
-    "PythonЗадание 7Попытка #9",
+    "PythonЗадание 7: длинное название для проверки прокруткиПопытка #9",
   );
   expect((await page.locator("main").boundingBox())?.x).toBe(0);
 
@@ -142,4 +142,116 @@ test("ссылки и перезагрузка сохраняют тему, по
 
   await page.emulateMedia({ colorScheme: "light" });
   await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "light");
+});
+
+test("медленный переход сохраняет согласованную навигацию и блокирует старую страницу", async ({
+  page,
+}) => {
+  await page.goto("/courses/1/tasks/7");
+  const sidebar = page.getByRole("complementary");
+  const main = page.locator("main");
+  const breadcrumbs = page.getByRole("navigation", { name: "Хлебные крошки" });
+
+  await sidebar
+    .getByRole("link", {
+      name: "Командный проект: разработка и сопровождение программного продукта",
+      exact: true,
+    })
+    .click();
+
+  await expect(main).toHaveAttribute("aria-busy", "true");
+  await expect(main.locator("[inert]")).toHaveCount(1);
+  await expect(breadcrumbs).toContainText("Python");
+  await expect(sidebar.getByRole("link", { name: /^Задание 7:/ })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await expect(sidebar.getByRole("link", { name: "Python", exact: true })).toHaveClass(/selected/);
+
+  const action = main.getByRole("button", { name: "Действие страницы", includeHidden: true });
+
+  expect(
+    await action.evaluate((element) => {
+      element.focus();
+
+      return document.activeElement === element;
+    }),
+  ).toBe(false);
+  expect(
+    await action.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+
+      return element.contains(
+        document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2),
+      );
+    }),
+  ).toBe(false);
+
+  await expect(main).toHaveAttribute("aria-busy", "false");
+  await expect(main.locator("[inert]")).toHaveCount(0);
+  await expect(breadcrumbs).toContainText("Командный проект");
+  await expect(sidebar.getByRole("link", { name: /^Задание 7:/ }).first()).not.toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await action.focus();
+  await expect(action).toBeFocused();
+});
+
+test("крошки попыток используют загруженные курс, задание и попытку", async ({ page }) => {
+  for (const record of [
+    { courseId: "1", attemptId: "9", taskId: "7", courseName: "Python" },
+    { courseId: "2", attemptId: "12", taskId: "23", courseName: "Командный проект" },
+  ]) {
+    await page.goto(`/courses/${record.courseId}/attempts/${record.attemptId}`);
+    const breadcrumbs = page.getByRole("navigation", { name: "Хлебные крошки" });
+
+    await expect(breadcrumbs).toContainText(record.courseName);
+    await expect(
+      breadcrumbs.getByRole("link", { name: new RegExp(`^Задание ${record.taskId}:`) }),
+    ).toHaveAttribute("href", `/courses/${record.courseId}/tasks/${record.taskId}`);
+    await expect(breadcrumbs.locator('[aria-current="page"]')).toHaveText(
+      `Попытка #${record.attemptId}`,
+    );
+  }
+});
+
+test("оболочка не меняет оформление ссылок, кнопок и заголовков страницы", async ({ page }) => {
+  await page.goto("/courses/1/tasks/7");
+
+  for (const selector of ["main h1", 'main a[href="#content"]', "main button"]) {
+    const styles = await page
+      .locator(selector)
+      .first()
+      .evaluate((element) => {
+        const reference = element.cloneNode(true);
+
+        if (!(reference instanceof HTMLElement)) {
+          throw new Error("Ожидался HTML-элемент");
+        }
+
+        document.body.append(reference);
+        const properties = [
+          "color",
+          "text-decoration-line",
+          "font-size",
+          "font-weight",
+          "line-height",
+          "letter-spacing",
+          "margin-top",
+          "margin-bottom",
+          "cursor",
+        ];
+        const read = (target: Element) =>
+          properties.map((property) => getComputedStyle(target).getPropertyValue(property));
+        const actual = read(element);
+        const expected = read(reference);
+
+        reference.remove();
+
+        return { actual, expected };
+      });
+
+    expect(styles.actual, selector).toEqual(styles.expected);
+  }
 });

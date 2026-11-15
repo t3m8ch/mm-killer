@@ -43,6 +43,49 @@ const courseQuery = (id: string) => ({
   },
 });
 
+const taskSchema = z.object({ courseId: z.string(), id: z.string(), name: z.string() });
+const attemptSchema = z.object({ courseId: z.string(), id: z.string(), taskId: z.string() });
+const attemptRecords = [
+  { courseId: "1", id: "9", taskId: "7" },
+  { courseId: "2", id: "12", taskId: "23" },
+];
+const taskQuery = (courseId: string, id: string) => ({
+  queryKey: ["task", courseId, id],
+  staleTime: 30_000,
+  queryFn: async () => {
+    const course = await client.ensureQueryData(courseQuery(courseId));
+    const task = course.tasks.find((item) => item.id === id);
+
+    if (!task) {
+      throw new Error("Задание не найдено");
+    }
+
+    return { ...task, courseId };
+  },
+});
+const attemptQuery = (courseId: string, id: string) => ({
+  queryKey: ["attempt", courseId, id],
+  staleTime: 30_000,
+  queryFn: async () => {
+    const attempt = attemptRecords.find((item) => item.courseId === courseId && item.id === id);
+
+    if (!attempt) {
+      throw new Error("Попытка не найдена");
+    }
+
+    const task = await client.ensureQueryData(taskQuery(courseId, attempt.taskId));
+
+    return { ...attempt, task };
+  },
+});
+const loadedAttemptSchema = attemptSchema.extend({ task: taskSchema });
+
+function taskBreadcrumbs(data: unknown) {
+  const task = taskSchema.parse(data);
+
+  return [{ label: task.name, href: `/courses/${task.courseId}/tasks/${task.id}` }];
+}
+
 function courseBreadcrumbs(data: unknown) {
   const course = schema.parse(data);
 
@@ -59,20 +102,37 @@ const navigation: RouteNavigation[] = [
   },
   {
     routeId: "/courses/$courseId/tasks/$taskId",
-    breadcrumbs: () => [{ label: "Задание 7", href: "/courses/1/tasks/7" }],
+    breadcrumbs: taskBreadcrumbs,
+    query: (data) => {
+      const task = taskSchema.parse(data);
+
+      return taskQuery(task.courseId, task.id);
+    },
   },
   {
     routeId: "/courses/$courseId/attempts/$attemptId",
-    breadcrumbs: () => [
-      { label: "Задание 7", href: "/courses/1/tasks/7" },
-      { label: "Попытка #9", href: "/courses/1/attempts/9" },
-    ],
+    breadcrumbs: (data) => {
+      const attempt = loadedAttemptSchema.parse(data);
+
+      return [
+        ...taskBreadcrumbs(attempt.task),
+        {
+          label: `Попытка #${attempt.id}`,
+          href: `/courses/${attempt.courseId}/attempts/${attempt.id}`,
+        },
+      ];
+    },
+    query: (data) => {
+      const attempt = loadedAttemptSchema.parse(data);
+
+      return attemptQuery(attempt.courseId, attempt.id);
+    },
   },
 ];
 
 function Branch({ course, heading }: { course: NavigationCourse; heading: ReactNode }) {
   const query = useQuery(courseQuery(course.id));
-  const path = useRouterState({ select: (state) => state.location.pathname });
+  const path = useRouterState({ select: (state) => state.matches.at(-1)?.pathname ?? "/" });
 
   return (
     <CourseBranch
@@ -145,6 +205,8 @@ function Page() {
       >
         Обновить название
       </Button>
+      <a href="#content">Ссылка страницы</a>
+      <button type="button">Действие страницы</button>
       <Text>Содержимое страницы</Text>
     </>
   );
@@ -160,11 +222,17 @@ const course = createRoute({
   component: Outlet,
 });
 const overview = createRoute({ getParentRoute: () => course, path: "/", component: Page });
-const task = createRoute({ getParentRoute: () => course, path: "/tasks/$taskId", component: Page });
+const task = createRoute({
+  getParentRoute: () => course,
+  path: "/tasks/$taskId",
+  loader: ({ params }) => client.ensureQueryData(taskQuery(params.courseId, params.taskId)),
+  component: Page,
+});
 const attempts = createRoute({ getParentRoute: () => course, path: "/attempts", component: Page });
 const diff = createRoute({
   getParentRoute: () => course,
   path: "/attempts/$attemptId",
+  loader: ({ params }) => client.ensureQueryData(attemptQuery(params.courseId, params.attemptId)),
   staticData: { navigationMode: "diff" },
   component: Page,
 });
