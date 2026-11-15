@@ -70,18 +70,12 @@ test("название из общего кэша обновляет крошк�
   ).toBeVisible();
 });
 
-test("мобильная панель, профиль, тема и Escape", async ({ page }) => {
+test("мобильная панель показывает профиль и закрывается по Escape", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
   await page.goto("/courses/1/tasks/7");
 
   await expect(page.getByRole("complementary")).toBeHidden();
-
-  await page.getByRole("button", { name: "Тема оформления" }).click();
-
-  await page.getByRole("menuitem", { name: "Тёмная" }).click();
-
-  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
 
   await page.getByRole("button", { name: "Переключить навигацию" }).click();
 
@@ -107,16 +101,14 @@ test("выбранный курс раскрывается после завер
   await expect(sidebar.getByRole("button", { name: `Свернуть курс: ${name}` })).toBeVisible();
 });
 
-test("ссылки и перезагрузка сохраняют тему, повторный переход закрывает панель", async ({
-  page,
-}) => {
+test("тёмная тема сохраняется при переходах и перезагрузке", async ({ page }) => {
   await page.goto("/courses/1/tasks/7");
   await page.getByRole("button", { name: "Тема оформления" }).click();
   await page.getByRole("menuitem", { name: "Тёмная" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
 
   await page.getByRole("link", { name: "Открыть diff", exact: true }).click();
   await expect(page).toHaveURL(/attempts\/9$/);
-  await expect(page.getByRole("complementary")).toBeHidden();
   await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
 
   await page.getByRole("button", { name: "Переключить навигацию" }).click();
@@ -125,23 +117,39 @@ test("ссылки и перезагрузка сохраняют тему, по
     .getByRole("link", { name: /^Задание 7:/ })
     .click();
   await expect(page).toHaveURL(/tasks\/7$/);
-  await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
 
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+});
+
+test("повторный переход на текущую страницу закрывает мобильный Drawer", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/courses/1/tasks/7");
   await page.getByRole("button", { name: "Переключить навигацию" }).click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+
   await page
     .getByRole("dialog")
     .getByRole("link", { name: /^Задание 7:/ })
     .click();
+
+  await expect(page).toHaveURL(/tasks\/7$/);
   await expect(page.getByRole("dialog")).toBeHidden();
+});
 
-  await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
-
+test("системная тема сохраняется и реагирует на настройки устройства", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/courses/1/tasks/7");
+  // Сначала выбрать явную тему, чтобы проверка не зависела от режима по умолчанию.
+  await page.getByRole("button", { name: "Тема оформления" }).click();
+  await page.getByRole("menuitem", { name: "Светлая" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "light");
+
   await page.getByRole("button", { name: "Тема оформления" }).click();
   await page.getByRole("menuitem", { name: "Системная" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
 
