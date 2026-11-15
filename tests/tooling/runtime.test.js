@@ -1,11 +1,10 @@
 import { test, after, describe } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { once } from "node:events";
+import { once, on } from "node:events";
 import { mkdtempSync, cpSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { setTimeout } from "node:timers/promises";
 import { Pool } from "pg";
 
 await describe("production-релиз", async () => {
@@ -25,7 +24,7 @@ await describe("production-релиз", async () => {
     delete env.NITRO_PORT;
 
     const child = spawn(process.execPath, [entry], { cwd: release, env });
-    const exited = once(child, "exit");
+    const exited = once(child, "close");
     let output = "";
     let stdout = "";
 
@@ -41,18 +40,25 @@ await describe("production-релиз", async () => {
   }
 
   async function listen(server) {
-    for (let attempt = 0; attempt < 200; attempt++) {
-      const match = server.output().match(/http:\/\/127\.0\.0\.1:(\d+)/);
+    const closed = new AbortController();
+    const signal = AbortSignal.any([closed.signal, AbortSignal.timeout(5000)]);
+    const onClose = () => closed.abort(new Error("Процесс завершился до готовности"));
 
-      if (match) {
-        return match[0];
+    server.child.once("close", onClose);
+
+    try {
+      for await (const _chunk of on(server.child.stdout, "data", { signal })) {
+        const match = server.stdout().match(/http:\/\/127\.0\.0\.1:(\d+)/);
+
+        if (match) {
+          return match[0];
+        }
       }
-
-      assert.equal(server.child.exitCode, null, server.output());
-      await setTimeout(25);
+    } catch (cause) {
+      throw new Error(`Сервер не начал слушать порт: ${server.output()}`, { cause });
+    } finally {
+      server.child.off("close", onClose);
     }
-
-    throw new Error(`Сервер не начал слушать порт: ${server.output()}`);
   }
 
   async function stop(server, signal = "SIGTERM") {

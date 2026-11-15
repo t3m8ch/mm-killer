@@ -1,5 +1,6 @@
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { it, expect, vi } from "vitest";
+import { once } from "node:events";
+import { it, expect } from "vitest";
 import { isolatedDatabase } from "./database";
 import { connect, createLogger } from "../../src/platform/public.server.ts";
 
@@ -52,10 +53,14 @@ it("пул из connect() выполняет следующий запрос п�
   try {
     const { rows } = await connection.pool.query<{ pid: number }>("SELECT pg_backend_pid() AS pid");
 
-    await admin.pool.query("SELECT pg_terminate_backend($1)", [rows[0].pid]);
-    await vi.waitFor(() => {
-      expect(messages.join(" ")).toContain("terminating connection");
-    });
+    const idleError = once(connection.pool, "error", { signal: AbortSignal.timeout(5000) });
+
+    await Promise.all([
+      idleError,
+      admin.pool.query("SELECT pg_terminate_backend($1)", [rows[0].pid]),
+    ]);
+
+    expect(messages.join(" ")).toContain("terminating connection");
     const result = await connection.pool.query("SELECT 1 AS value");
 
     expect(result.rows).toEqual([{ value: 1 }]);
