@@ -1,7 +1,9 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../helpers/network";
 
-test("прямое открытие, дерево и независимая загрузка веток", async ({ page }) => {
-  await page.goto("/courses/1/tasks/7");
+test("прямое открытие, дерево и независимая загрузка веток", async ({ page, holdRequest }) => {
+  const course = await holdRequest("**/__fixture__/courses/2/ready", { status: 204 });
+
+  await page.goto("/courses/1/tasks/7?holdCourse=2");
   const sidebar = page.getByRole("complementary");
 
   await expect(sidebar.getByRole("button", { name: "Свернуть курс: Python" })).toBeVisible();
@@ -13,15 +15,18 @@ test("прямое открытие, дерево и независимая за
 
   await sidebar.getByRole("button", { name: /^Раскрыть курс:/ }).click();
 
+  await course.requested;
   await expect(sidebar.getByRole("status")).toContainText("Загрузка раздела");
 
   await expect(sidebar.getByRole("link", { name: "Python", exact: true })).toBeVisible();
+
+  course.release();
 
   await expect(sidebar.getByRole("link", { name: /^Задание 30:/ })).toHaveCount(2);
 
   await sidebar.getByRole("button", { name: "Свернуть курс: Python" }).click();
 
-  await expect(page).toHaveURL(/tasks\/7$/);
+  await expect(page).toHaveURL(/tasks\/7\?holdCourse=2$/);
 });
 
 test("diff без отступа, Drawer и возвращение обычной панели", async ({ page }) => {
@@ -146,16 +151,10 @@ test("ссылки и перезагрузка сохраняют тему, по
 
 test("медленный переход сохраняет согласованную навигацию и блокирует старую страницу", async ({
   page,
+  holdRequest,
 }) => {
-  let releaseCourse!: () => void;
-  const courseReleased = new Promise<void>((resolve) => {
-    releaseCourse = resolve;
-  });
+  const course = await holdRequest("**/__fixture__/courses/2/ready", { status: 204 });
 
-  await page.route("**/__fixture__/courses/2/ready", async (route) => {
-    await courseReleased;
-    await route.fulfill({ status: 204 });
-  });
   await page.goto("/courses/1/tasks/7?holdCourse=2");
 
   const sidebar = page.getByRole("complementary");
@@ -169,6 +168,7 @@ test("медленный переход сохраняет согласован�
     })
     .click();
 
+  await course.requested;
   await expect(main).toHaveAttribute("aria-busy", "true");
   await expect(main.locator("[inert]")).toHaveCount(1);
   await expect(breadcrumbs).toContainText("Python");
@@ -197,7 +197,7 @@ test("медленный переход сохраняет согласован�
     }),
   ).toBe(false);
 
-  releaseCourse();
+  course.release();
 
   await expect(main).toHaveAttribute("aria-busy", "false");
   await expect(main.locator("[inert]")).toHaveCount(0);
