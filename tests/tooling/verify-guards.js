@@ -35,12 +35,6 @@ const probes = [
     expected: "max-unseparated-statements",
   },
   {
-    file: "src/modules/fixture/guard-probe.tsx",
-    command: ["oxlint"],
-    source: 'export const Probe = () => <div className="bad" style={{color:"red"}} />;',
-    expected: "module-boundaries",
-  },
-  {
     file: "src/modules/fixture/guard-probe.ts",
     command: ["oxlint"],
     source: 'import { sql } from "drizzle-orm"; export const query = sql`DELETE FROM other_table`;',

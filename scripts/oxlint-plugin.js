@@ -47,7 +47,6 @@ export default {
         type: "problem",
         schema: [],
         messages: {
-          ui: "Использовать Mantine без собственного CSS, className и style",
           environment: "Файл модуля должен иметь суффикс .server, .shared, .ui или .browser",
           sql: "Записывать только свои таблицы через Drizzle; сырой SQL оставлять платформе и миграциям",
         },
@@ -71,16 +70,7 @@ export default {
 
         return {
           Program: checkEnvironment,
-          JSXAttribute(node) {
-            if (["className", "style"].includes(node.name.name)) {
-              context.report({ node, messageId: "ui" });
-            }
-          },
           ImportDeclaration(node) {
-            if (/\.(css|scss|sass|less)$/.test(node.source.value)) {
-              context.report({ node, messageId: "ui" });
-            }
-
             if (
               node.source.value === "drizzle-orm" &&
               node.specifiers.some((item) => item.imported?.name === "sql")

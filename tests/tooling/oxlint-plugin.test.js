@@ -1,18 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const statements = (count, separator = "\n") => Array(count).fill("work();").join(separator);
 
-function lint(source, rule = "project/max-unseparated-statements") {
+function lint(source, rule = "project/max-unseparated-statements", filename = "probe.ts") {
   const directory = mkdtempSync(join(tmpdir(), "mm-lint-"));
 
   try {
     const config = join(directory, ".oxlintrc.json");
-    const file = join(directory, "probe.ts");
+    const file = join(directory, filename);
 
     writeFileSync(
       config,
@@ -22,6 +22,7 @@ function lint(source, rule = "project/max-unseparated-statements") {
         rules: { [rule]: rule === "curly" ? ["error", "all"] : "error" },
       }),
     );
+    mkdirSync(resolve(file, ".."), { recursive: true });
     writeFileSync(file, source);
 
     const result = spawnSync(
@@ -99,4 +100,38 @@ await test("запрещает вложенный тернарник", () => {
 
 await test("разрешает один тернарник", () => {
   assert.deepEqual(lint("const value = ready ? first : second;", "no-nested-ternary"), []);
+});
+
+for (const [name, source, violations] of [
+  [
+    "разрешает className и style в предметном UI",
+    'export const Probe = () => <div className="local" style={{ color: "red" }} />;',
+    0,
+  ],
+  ...["css", "scss", "sass", "less"].map((extension) => [
+    `разрешает импорт ${extension} в предметном UI`,
+    `import "./styles.${extension}";`,
+    0,
+  ]),
+  ["сохраняет запрет raw SQL", 'import { sql } from "drizzle-orm";', 1],
+  ["сохраняет запрет прямого драйвера", 'import "pg";', 1],
+  ["сохраняет запрет execute", "database.execute();", 1],
+]) {
+  await test(name, () => {
+    const diagnostics = lint(source, "project/module-boundaries", "src/modules/probe/view.ui.tsx");
+
+    assert.equal(diagnostics.length, violations, JSON.stringify(diagnostics));
+    assert.ok(diagnostics.every((item) => item.code === "project(module-boundaries)"));
+  });
+}
+
+await test("сохраняет проверку суффикса среды предметного модуля", () => {
+  const diagnostics = lint(
+    "export const value = 1;",
+    "project/module-boundaries",
+    "src/modules/probe/view.ts",
+  );
+
+  assert.equal(diagnostics.length, 1, JSON.stringify(diagnostics));
+  assert.match(diagnostics[0].message, /суффикс/);
 });

@@ -88,8 +88,7 @@ mise из GitHub и использует SCIP-индексатор `@sourcegraph
 используется шаблонами генератора, поэтому также отмечена в исключениях knip.
 
 [Плагин oxlint](https://oxc.rs/docs/guide/usage/linter/js-plugins.html) запрещает
-в предметных модулях `className`, `style`, импорт CSS, raw SQL, прямой драйвер
-Postgres и низкоуровневые `query`/`execute`. Схемы остаются внутренними файлами
+в предметных модулях raw SQL, прямой драйвер Postgres и низкоуровневые `query`/`execute`. Схемы остаются внутренними файлами
 модулей; easement запрещает их импорт через границу модуля.
 
 Для установленного Drizzle подключение передаётся как `drizzle({ client: pool })`;
