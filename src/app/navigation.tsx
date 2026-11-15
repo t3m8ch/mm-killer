@@ -49,7 +49,10 @@ export function NavigationComposition({
 }) {
   const matches = useMatches();
   const { path, pending } = useRouterState({
-    select: (state) => ({ path: state.location.pathname, pending: state.isLoading }),
+    select: (state) => ({
+      path: state.matches.at(-1)?.pathname ?? state.location.pathname,
+      pending: state.isLoading,
+    }),
   });
 
   const navigationRoutesWithData = useNavigationRouteData(matches, routes);
