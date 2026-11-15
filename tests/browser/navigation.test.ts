@@ -113,7 +113,7 @@ test("переход в курс раскрывает ранее свёрнут�
   await expect(sidebar.getByRole("button", { name: `Свернуть курс: ${name}` })).toBeVisible();
 });
 
-test("тёмная тема сохраняется при переходах и перезагрузке", async ({ page }) => {
+test("тёмная тема сохраняется при переходах между страницами и перезагрузке", async ({ page }) => {
   await page.goto("/courses/1/tasks/7");
   await page.getByRole("button", { name: "Тема оформления" }).click();
   await page.getByRole("menuitem", { name: "Тёмная" }).click();
