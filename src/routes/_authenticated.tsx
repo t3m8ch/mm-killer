@@ -2,13 +2,12 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { ORPCError } from "@orpc/client";
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 import { NavigationComposition, type RouteNavigation } from "../app/navigation";
-import { rpc } from "../app/client";
-import { Sidebar } from "../platform/public.ui.ts";
+import { authRpc, Sidebar } from "../platform/public.ui.ts";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ context }) => {
     try {
-      await context.queryClient.query({ ...rpc.auth.me.queryOptions(), retry: false });
+      await context.queryClient.query({ ...authRpc.me.queryOptions(), retry: false });
     } catch (error) {
       if (error instanceof ORPCError && error.code === "UNAUTHORIZED") {
         throw redirect({ to: "/login" });
@@ -25,10 +24,10 @@ const navigationRoutes: readonly RouteNavigation[] = [
 ];
 
 function AuthenticatedLayout() {
-  const { data: user } = useSuspenseQuery(rpc.auth.me.queryOptions());
+  const { data: user } = useSuspenseQuery(authRpc.me.queryOptions());
   const logout = useMutation({
     throwOnError: true,
-    mutationFn: () => rpc.auth.logout.call(undefined),
+    mutationFn: () => authRpc.logout.call(undefined),
     onSuccess: () => {
       window.location.href = "/login";
     },

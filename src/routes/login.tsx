@@ -1,19 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 import { Title, Stack, Button, Text, Container } from "@mantine/core";
-import { rpc } from "../app/client";
+import { authRpc } from "../platform/public.ui.ts";
 
 export const Route = createFileRoute("/login")({
   staticData: { navigationMode: "public" },
-  loader: ({ context }) => context.queryClient.ensureQueryData(rpc.auth.users.queryOptions()),
+  loader: ({ context }) => context.queryClient.ensureQueryData(authRpc.users.queryOptions()),
   component: Login,
 });
 
 function Login() {
-  const { data: users } = useSuspenseQuery(rpc.auth.users.queryOptions());
+  const { data: users } = useSuspenseQuery(authRpc.users.queryOptions());
   const login = useMutation({
     throwOnError: true,
-    mutationFn: (input: { userId: bigint }) => rpc.auth.login.call(input),
+    mutationFn: (input: { userId: bigint }) => authRpc.login.call(input),
     onSuccess: () => {
       window.location.href = "/";
     },
