@@ -213,7 +213,7 @@ export function AppLayout(props: AppLayoutProps) {
             <ThemeMenu />
           </header>
           <main className={mode === "diff" ? "mm-diff-page" : "mm-page"} aria-busy={pending}>
-            <div inert={pending || undefined}>{children}</div>
+            <div inert={pending}>{children}</div>
           </main>
         </div>
       </div>
