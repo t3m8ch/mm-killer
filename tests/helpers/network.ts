@@ -1,70 +1,60 @@
-import { test as base, expect, type Page, type Route } from "@playwright/test";
+import { test as base, expect, type Route } from "@playwright/test";
 
-/** Удерживает запрос до release(); teardown освобождает его и удаляет перехват. */
-async function holdRequest(page: Page, url: string, respond?: { status: number }) {
-  let release!: () => void;
-  let entered!: () => void;
-  const released = new Promise<void>((resolve) => {
-    release = resolve;
-  });
-  const requested = new Promise<void>((resolve) => {
-    entered = resolve;
-  });
-  const active = new Set<Promise<void>>();
-  const respondTo = async (route: Route) => {
-    entered();
-    await released;
+type HoldRequest = (
+  url: string,
+  respond?: { status: number },
+) => Promise<{ requested: Promise<void>; release: () => void }>;
 
-    if (respond) {
-      await route.fulfill(respond);
-    } else {
-      await route.continue();
-    }
-  };
-
-  const handler = (route: Route) => {
-    const response = respondTo(route);
-
-    active.add(response);
-    void response.then(
-      () => active.delete(response),
-      () => active.delete(response),
-    );
-
-    return response;
-  };
-
-  await page.route(url, handler);
-
-  return {
-    requested,
-    release,
-    dispose: async () => {
-      release();
-      await page.unroute(url, handler);
-      await Promise.all(active);
-    },
-  };
-}
-
-export const test = base.extend<{
-  holdRequest: (url: string, respond?: { status: number }) => ReturnType<typeof holdRequest>;
-}>({
+export const test = base.extend<{ holdRequest: HoldRequest }>({
   holdRequest: async ({ page }, use) => {
-    const gates: Awaited<ReturnType<typeof holdRequest>>[] = [];
+    const releases: (() => void)[] = [];
+    const interceptors: { url: string; handler: (route: Route) => Promise<void> }[] = [];
+    const active = new Set<Promise<void>>();
 
     try {
       await use(async (url, respond) => {
-        const gate = await holdRequest(page, url, respond);
+        let release!: () => void;
+        let markRequested!: () => void;
+        const released = new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        const requested = new Promise<void>((resolve) => {
+          markRequested = resolve;
+        });
+        const respondTo = async (route: Route) => {
+          markRequested();
+          await released;
 
-        gates.push(gate);
+          if (respond) {
+            await route.fulfill(respond);
+          } else {
+            await route.continue();
+          }
+        };
 
-        return gate;
+        const handler = (route: Route) => {
+          const response = respondTo(route);
+
+          active.add(response);
+          void response.then(
+            () => active.delete(response),
+            () => active.delete(response),
+          );
+
+          return response;
+        };
+
+        await page.route(url, handler);
+        releases.push(release);
+        interceptors.push({ url, handler });
+
+        return { requested, release };
       });
     } finally {
-      // Освободить все запросы до ожидания завершения обработчиков.
-      gates.forEach((gate) => gate.release());
-      await Promise.all(gates.map((gate) => gate.dispose()));
+      // Сначала отпустить все запросы, затем убрать только наши перехваты.
+      releases.forEach((release) => release());
+      await Promise.all(interceptors.map(({ url, handler }) => page.unroute(url, handler)));
+      await Promise.all(active);
     }
   },
 });
