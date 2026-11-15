@@ -1,8 +1,9 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { ORPCError } from "@orpc/client";
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
-import { NavigationComposition, type RouteNavigation } from "../app/navigation";
-import { authRpc, Sidebar } from "../platform/public.ui.ts";
+import { NavigationComposition, routeNavigation } from "../app/navigation";
+import { AppSidebar } from "../app/sidebar";
+import { authRpc } from "../platform/public.ui.ts";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async ({ context }) => {
@@ -19,8 +20,8 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
 
-const navigationRoutes: readonly RouteNavigation[] = [
-  { routeId: "/_authenticated", breadcrumbs: () => [{ label: "Мои курсы", href: "/" }] },
+const navigationRoutes = [
+  routeNavigation(Route, { breadcrumbs: () => [{ label: "Мои курсы", href: "/" }] }),
 ];
 
 function AuthenticatedLayout() {
@@ -37,7 +38,7 @@ function AuthenticatedLayout() {
     <NavigationComposition
       routes={navigationRoutes}
       renderSidebar={(sidebarProps) => (
-        <Sidebar
+        <AppSidebar
           {...sidebarProps}
           courses={[]}
           renderCourseBranch={() => null}

@@ -1,4 +1,9 @@
-import { useMatches, useRouterState, type AnyRouteMatch } from "@tanstack/react-router";
+import {
+  useMatches,
+  useRouterState,
+  type AnyRoute,
+  type AnyRouteMatch,
+} from "@tanstack/react-router";
 import { useQueries, type UseQueryOptions } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { AppLayout } from "../platform/public.ui.ts";
@@ -10,28 +15,40 @@ declare module "@tanstack/react-router" {
   }
 }
 
-/**
- * Настройки навигации для одного маршрута: как получить из его данных крошки
- * для хедера и ID курса, ветку которого нужно раскрыть в сайдбаре.
- *
- * Сборка приложения создаёт такие записи в navigationRoutes (src/routes/_authenticated.tsx)
- * и передаёт их в NavigationComposition. Он сопоставляет routeId с активными
- * маршрутами из useMatches и вызывает breadcrumbs и, если задана, courseId.
- * Если задана query, он подписывается на тот же запрос, который загрузил loader:
- * функции получают актуальные данные из кэша, а до их появления — loaderData.
- * Без query функции получают loaderData напрямую. AppLayout получает готовые
- * крошки через props; ID курса передаётся в renderSidebar для сборки панели.
- *
- * При подключении предметных маршрутов сборка связывает их с чистыми функциями
- * крошек из публичных интерфейсов модулей. Эти функции работают с переданными
- * данными, не загружают их и не рисуют UI. Пример записей для курсов, заданий
- * и попыток находится в tests/fixtures/navigation/fixture.tsx.
- */
-export interface RouteNavigation {
+/** Запись реестра с типами, скрытыми только внутри сборки навигации. */
+interface RouteNavigation {
   routeId: string;
   breadcrumbs: (data: unknown) => readonly Breadcrumb[];
   query?: (loaderData: unknown) => Pick<UseQueryOptions, "queryKey" | "queryFn" | "staleTime">;
   courseId?: (data: unknown) => string;
+}
+
+/** Данные callbacks и Query выводятся из loader конкретного маршрута. */
+export function routeNavigation<TRoute extends AnyRoute>(
+  route: TRoute,
+  options: {
+    breadcrumbs: (data: NoInfer<TRoute["types"]["loaderData"]>) => readonly Breadcrumb[];
+    query?: (data: NoInfer<TRoute["types"]["loaderData"]>) => Pick<
+      UseQueryOptions<NoInfer<TRoute["types"]["loaderData"]>>,
+      "queryKey" | "queryFn"
+    > & {
+      staleTime?: number;
+    };
+    courseId?: (data: NoInfer<TRoute["types"]["loaderData"]>) => string;
+  },
+): RouteNavigation {
+  type Data = TRoute["types"]["loaderData"];
+  const { breadcrumbs, query, courseId } = options;
+
+  return {
+    // Router назначает ID при сборке дерева, после создания записей реестра.
+    get routeId() {
+      return route.id;
+    },
+    breadcrumbs: (data) => breadcrumbs(data as Data),
+    query: query ? (data) => query(data as Data) : undefined,
+    courseId: courseId ? (data) => courseId(data as Data) : undefined,
+  };
 }
 
 export function NavigationComposition({

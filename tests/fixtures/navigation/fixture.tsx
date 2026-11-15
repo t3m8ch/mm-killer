@@ -10,18 +10,14 @@ import {
 } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Button, Text, Title } from "@mantine/core";
-import { z } from "zod";
-import { CourseBranch, Layout, Sidebar } from "../../../src/platform/public.ui.ts";
-import type { NavigationCourse } from "../../../src/platform/public.shared.ts";
-import { NavigationComposition, type RouteNavigation } from "../../../src/app/navigation";
+import { Layout } from "../../../src/platform/public.ui.ts";
+import { AppSidebar } from "../../../src/app/sidebar";
+import { CourseBranch } from "../../../src/app/course-branch";
+import type { NavigationCourse } from "../../../src/app/navigation-types";
+import { NavigationComposition, routeNavigation } from "../../../src/app/navigation";
 import type { ReactNode } from "react";
 
 const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-const schema = z.object({
-  id: z.string(),
-  name: z.string(),
-  tasks: z.array(z.object({ id: z.string(), name: z.string() })),
-});
 const heldCourseId = new URLSearchParams(window.location.search).get("holdCourse");
 let renamed = false;
 const courseQuery = (id: string) => ({
@@ -49,8 +45,6 @@ const courseQuery = (id: string) => ({
   },
 });
 
-const taskSchema = z.object({ courseId: z.string(), id: z.string(), name: z.string() });
-const attemptSchema = z.object({ courseId: z.string(), id: z.string(), taskId: z.string() });
 const attemptRecords = [
   { courseId: "1", id: "9", taskId: "7" },
   { courseId: "2", id: "12", taskId: "23" },
@@ -84,57 +78,14 @@ const attemptQuery = (courseId: string, id: string) => ({
     return { ...attempt, task };
   },
 });
-const loadedAttemptSchema = attemptSchema.extend({ task: taskSchema });
 
-function taskBreadcrumbs(data: unknown) {
-  const task = taskSchema.parse(data);
-
+function taskBreadcrumbs(task: Awaited<ReturnType<ReturnType<typeof taskQuery>["queryFn"]>>) {
   return [{ label: task.name, href: `/courses/${task.courseId}/tasks/${task.id}` }];
 }
 
-function courseBreadcrumbs(data: unknown) {
-  const course = schema.parse(data);
-
+function courseBreadcrumbs(course: Awaited<ReturnType<ReturnType<typeof courseQuery>["queryFn"]>>) {
   return [{ label: course.name, href: `/courses/${course.id}` }];
 }
-
-const navigation: RouteNavigation[] = [
-  { routeId: "__root__", breadcrumbs: () => [{ label: "Мои курсы", href: "/" }] },
-  {
-    routeId: "/courses/$courseId",
-    breadcrumbs: courseBreadcrumbs,
-    query: (data) => courseQuery(schema.parse(data).id),
-    courseId: (data) => schema.parse(data).id,
-  },
-  {
-    routeId: "/courses/$courseId/tasks/$taskId",
-    breadcrumbs: taskBreadcrumbs,
-    query: (data) => {
-      const task = taskSchema.parse(data);
-
-      return taskQuery(task.courseId, task.id);
-    },
-  },
-  {
-    routeId: "/courses/$courseId/attempts/$attemptId",
-    breadcrumbs: (data) => {
-      const attempt = loadedAttemptSchema.parse(data);
-
-      return [
-        ...taskBreadcrumbs(attempt.task),
-        {
-          label: `Попытка #${attempt.id}`,
-          href: `/courses/${attempt.courseId}/attempts/${attempt.id}`,
-        },
-      ];
-    },
-    query: (data) => {
-      const attempt = loadedAttemptSchema.parse(data);
-
-      return attemptQuery(attempt.courseId, attempt.id);
-    },
-  },
-];
 
 function Branch({ course, heading }: { course: NavigationCourse; heading: ReactNode }) {
   const query = useQuery(courseQuery(course.id));
@@ -179,7 +130,7 @@ function Root() {
       <NavigationComposition
         routes={navigation}
         renderSidebar={(sidebarProps) => (
-          <Sidebar
+          <AppSidebar
             {...sidebarProps}
             courses={courses}
             renderCourseBranch={(course, heading) => <Branch course={course} heading={heading} />}
@@ -242,6 +193,29 @@ const diff = createRoute({
   staticData: { navigationMode: "diff" },
   component: Page,
 });
+const navigation = [
+  routeNavigation(root, { breadcrumbs: () => [{ label: "Мои курсы", href: "/" }] }),
+  routeNavigation(course, {
+    breadcrumbs: courseBreadcrumbs,
+    query: (data) => courseQuery(data.id),
+    courseId: (data) => data.id,
+  }),
+  routeNavigation(task, {
+    breadcrumbs: taskBreadcrumbs,
+    query: (data) => taskQuery(data.courseId, data.id),
+  }),
+  routeNavigation(diff, {
+    breadcrumbs: (attempt) => [
+      ...taskBreadcrumbs(attempt.task),
+      {
+        label: `Попытка #${attempt.id}`,
+        href: `/courses/${attempt.courseId}/attempts/${attempt.id}`,
+      },
+    ],
+    query: (attempt) => attemptQuery(attempt.courseId, attempt.id),
+  }),
+];
+
 const router = createRouter({
   routeTree: root.addChildren([home, course.addChildren([overview, task, attempts, diff])]),
 });
