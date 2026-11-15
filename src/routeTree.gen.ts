@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as HealthLiveRouteImport } from './routes/health/live'
 import { Route as HealthReadyRouteImport } from './routes/health/ready'
 import { Route as RpcSplatRouteImport } from './routes/rpc/$'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
+  id: '/courses/$courseId',
+  path: '/courses/$courseId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HealthLiveRoute = HealthLiveRouteImport.update({
@@ -44,6 +50,7 @@ const RpcSplatRoute = RpcSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
   '/health/live': typeof HealthLiveRoute
   '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
   '/health/live': typeof HealthLiveRoute
   '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
@@ -59,21 +67,42 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
   '/health/live': typeof HealthLiveRoute
   '/health/ready': typeof HealthReadyRoute
   '/rpc/$': typeof RpcSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/health/live' | '/health/ready' | '/rpc/$'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/courses/$courseId'
+    | '/health/live'
+    | '/health/ready'
+    | '/rpc/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/health/live' | '/health/ready' | '/rpc/$'
-  id: '__root__' | '/' | '/login' | '/health/live' | '/health/ready' | '/rpc/$'
+  to:
+    | '/'
+    | '/login'
+    | '/courses/$courseId'
+    | '/health/live'
+    | '/health/ready'
+    | '/rpc/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/courses/$courseId'
+    | '/health/live'
+    | '/health/ready'
+    | '/rpc/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
   HealthLiveRoute: typeof HealthLiveRoute
   HealthReadyRoute: typeof HealthReadyRoute
   RpcSplatRoute: typeof RpcSplatRoute
@@ -93,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses/$courseId': {
+      id: '/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof CoursesCourseIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/health/live': {
@@ -122,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  CoursesCourseIdRoute: CoursesCourseIdRoute,
   HealthLiveRoute: HealthLiveRoute,
   HealthReadyRoute: HealthReadyRoute,
   RpcSplatRoute: RpcSplatRoute,

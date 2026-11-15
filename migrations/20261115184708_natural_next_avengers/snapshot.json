@@ -1,0 +1,457 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "c12a3e8b-90b4-4d89-a70b-6d046f95b889",
+  "prevIds": ["dffb0dc3-8b3b-48f4-acf6-7d60b5142981"],
+  "footprints": [
+    {
+      "statementType": "create_table",
+      "statementTarget": ["table", "public", "courses"],
+      "writes": [
+        "s|tbl|public.courses",
+        "n|tbl|public.courses",
+        "e|tbl|public.courses",
+        "n|rel|public.courses",
+        "n|type|public.courses",
+        "n|rel|public.courses_pkey"
+      ],
+      "reads": ["n|sch|public"]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": ["table", "public", "course_groups"],
+      "writes": [
+        "s|tbl|public.course_groups",
+        "n|tbl|public.course_groups",
+        "e|tbl|public.course_groups",
+        "n|rel|public.course_groups",
+        "n|type|public.course_groups",
+        "n|rel|public.course_groups_pkey",
+        "n|rel|public.course_groups_course_id_name_unique",
+        "n|rel|public.course_groups_course_id_id_unique"
+      ],
+      "reads": ["n|sch|public"]
+    },
+    {
+      "statementType": "create_table",
+      "statementTarget": ["table", "public", "course_memberships"],
+      "writes": [
+        "s|tbl|public.course_memberships",
+        "n|tbl|public.course_memberships",
+        "e|tbl|public.course_memberships",
+        "n|rel|public.course_memberships",
+        "n|type|public.course_memberships",
+        "n|rel|public.course_memberships_pkey"
+      ],
+      "reads": ["n|sch|public"]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": ["table", "public", "course_groups"],
+      "writes": [
+        "s|fk|public.course_groups.course_groups_course_id_courses_id_fkey",
+        "n|fk|public.course_groups.course_groups_course_id_courses_id_fkey",
+        "e|fk|public.course_groups.course_groups_course_id_courses_id_fkey",
+        "n|con|public.course_groups.course_groups_course_id_courses_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.course_groups",
+        "n|sch|public",
+        "n|tbl|public.courses",
+        "n|sch|public",
+        "n|col|public.course_groups.course_id",
+        "n|col|public.courses.id",
+        "e|uniqueness|public.courses.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": ["table", "public", "course_memberships"],
+      "writes": [
+        "s|fk|public.course_memberships.course_memberships_course_id_courses_id_fkey",
+        "n|fk|public.course_memberships.course_memberships_course_id_courses_id_fkey",
+        "e|fk|public.course_memberships.course_memberships_course_id_courses_id_fkey",
+        "n|con|public.course_memberships.course_memberships_course_id_courses_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.course_memberships",
+        "n|sch|public",
+        "n|tbl|public.courses",
+        "n|sch|public",
+        "n|col|public.course_memberships.course_id",
+        "n|col|public.courses.id",
+        "e|uniqueness|public.courses.id"
+      ]
+    },
+    {
+      "statementType": "create_fk",
+      "statementTarget": ["table", "public", "course_memberships"],
+      "writes": [
+        "s|fk|public.course_memberships.course_memberships_7lg5j71y2Aes_fkey",
+        "n|fk|public.course_memberships.course_memberships_7lg5j71y2Aes_fkey",
+        "e|fk|public.course_memberships.course_memberships_7lg5j71y2Aes_fkey",
+        "n|con|public.course_memberships.course_memberships_7lg5j71y2Aes_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.course_memberships",
+        "n|sch|public",
+        "n|tbl|public.course_groups",
+        "n|sch|public",
+        "n|col|public.course_memberships.course_id",
+        "n|col|public.course_memberships.group_id",
+        "n|col|public.course_groups.course_id",
+        "n|col|public.course_groups.id",
+        "e|uniqueness|public.course_groups.course_id.id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "courses",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "course_groups",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "name": "course_memberships",
+        "isRlsEnabled": false,
+        "entityType": "tables"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "courses",
+        "name": "id",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": {
+          "type": "always",
+          "name": "courses_id_seq",
+          "increment": "1",
+          "startWith": "1",
+          "minValue": "1",
+          "maxValue": "9223372036854775807",
+          "cache": 1,
+          "cycle": false
+        },
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "courses",
+        "name": "name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "courses",
+        "name": "description",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "courses",
+        "name": "state",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": "'draft'",
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_groups",
+        "name": "id",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": {
+          "type": "always",
+          "name": "course_groups_id_seq",
+          "increment": "1",
+          "startWith": "1",
+          "minValue": "1",
+          "maxValue": "9223372036854775807",
+          "cache": 1,
+          "cycle": false
+        },
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_groups",
+        "name": "course_id",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_groups",
+        "name": "name",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "course_id",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "user_id",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "role",
+        "type": "text",
+        "typeSchema": null,
+        "notNull": true,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "group_id",
+        "type": "bigint",
+        "typeSchema": null,
+        "notNull": false,
+        "dimensions": 0,
+        "default": null,
+        "generated": null,
+        "identity": null,
+        "entityType": "columns"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_groups",
+        "name": "course_groups_course_id_courses_id_fkey",
+        "nameExplicit": false,
+        "columns": ["course_id"],
+        "schemaTo": "public",
+        "tableTo": "courses",
+        "columnsTo": ["id"],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "course_memberships_course_id_courses_id_fkey",
+        "nameExplicit": false,
+        "columns": ["course_id"],
+        "schemaTo": "public",
+        "tableTo": "courses",
+        "columnsTo": ["id"],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "course_memberships_7lg5j71y2Aes_fkey",
+        "nameExplicit": false,
+        "columns": ["course_id", "group_id"],
+        "schemaTo": "public",
+        "tableTo": "course_groups",
+        "columnsTo": ["course_id", "id"],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "course_memberships_pkey",
+        "columns": ["course_id", "user_id"],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "courses",
+        "name": "courses_pkey",
+        "columns": ["id"],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_groups",
+        "name": "course_groups_pkey",
+        "columns": ["id"],
+        "nameExplicit": false,
+        "entityType": "pks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_groups",
+        "name": "course_groups_course_id_name_unique",
+        "nameExplicit": false,
+        "columns": ["course_id", "name"],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_groups",
+        "name": "course_groups_course_id_id_unique",
+        "nameExplicit": false,
+        "columns": ["course_id", "id"],
+        "nullsNotDistinct": false,
+        "entityType": "uniques"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "courses",
+        "name": "course_state",
+        "value": "\"state\" in ('draft', 'open')",
+        "entityType": "checks"
+      }
+    },
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "membership_role_group",
+        "value": "(\"role\" = 'student' and \"group_id\" is not null) or (\"role\" in ('owner', 'teacher') and \"group_id\" is null)",
+        "entityType": "checks"
+      }
+    }
+  ]
+}

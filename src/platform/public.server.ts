@@ -8,3 +8,5 @@ export { createLogger } from "./logger.server.ts";
 export { authApi, seedUsers, resolveUser } from "./auth/service.server.ts";
 export type { User } from "./auth/service.server.ts";
 export { authed } from "./rpc.server.ts";
+
+export { users } from "./auth/schema.server.ts";

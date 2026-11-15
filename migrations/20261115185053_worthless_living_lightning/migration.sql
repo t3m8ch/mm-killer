@@ -1,0 +1,1 @@
+ALTER TABLE "course_memberships" ADD CONSTRAINT "course_memberships_user_id_users_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id");

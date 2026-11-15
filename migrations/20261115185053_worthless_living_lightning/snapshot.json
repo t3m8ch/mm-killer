@@ -1,0 +1,46 @@
+{
+  "type": "diff",
+  "version": "9",
+  "dialect": "postgres",
+  "id": "d0ba9339-ef04-46d3-bbc2-a1922ae1bde9",
+  "prevIds": ["c12a3e8b-90b4-4d89-a70b-6d046f95b889"],
+  "footprints": [
+    {
+      "statementType": "create_fk",
+      "statementTarget": ["table", "public", "course_memberships"],
+      "writes": [
+        "s|fk|public.course_memberships.course_memberships_user_id_users_id_fkey",
+        "n|fk|public.course_memberships.course_memberships_user_id_users_id_fkey",
+        "e|fk|public.course_memberships.course_memberships_user_id_users_id_fkey",
+        "n|con|public.course_memberships.course_memberships_user_id_users_id_fkey"
+      ],
+      "reads": [
+        "n|tbl|public.course_memberships",
+        "n|sch|public",
+        "n|tbl|public.users",
+        "n|sch|public",
+        "n|col|public.course_memberships.user_id",
+        "n|col|public.users.id",
+        "e|uniqueness|public.users.id"
+      ]
+    }
+  ],
+  "deltas": [
+    {
+      "op": "create",
+      "row": {
+        "schema": "public",
+        "table": "course_memberships",
+        "name": "course_memberships_user_id_users_id_fkey",
+        "nameExplicit": false,
+        "columns": ["user_id"],
+        "schemaTo": "public",
+        "tableTo": "users",
+        "columnsTo": ["id"],
+        "onUpdate": "NO ACTION",
+        "onDelete": "NO ACTION",
+        "entityType": "fks"
+      }
+    }
+  ]
+}

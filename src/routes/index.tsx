@@ -4,10 +4,13 @@ import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
 import { Title, Stack, Button, Text } from "@mantine/core";
 import { authRpc } from "../platform/public.ui.ts";
 
+import { CourseList, coursesRpc } from "../modules/courses/public.ui.ts";
+
 export const Route = createFileRoute("/")({
   loader: async ({ context }) => {
     try {
       await context.queryClient.ensureQueryData(authRpc.me.queryOptions());
+      await context.queryClient.ensureQueryData(coursesRpc.list.queryOptions());
     } catch (error) {
       if (error instanceof ORPCError && error.code === "UNAUTHORIZED") {
         throw redirect({ to: "/login" });
@@ -39,6 +42,7 @@ function Home() {
   return (
     <Stack>
       <Title>MergeMinds</Title>
+      <CourseList />
       <Text>{user.fullName}</Text>
       <Text>{user.email}</Text>
       <Button disabled={logout.isPending} onClick={() => logout.mutate(undefined)}>

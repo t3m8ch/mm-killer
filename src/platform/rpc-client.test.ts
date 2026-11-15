@@ -69,3 +69,17 @@ it("клиенты модулей разделяют кэш и сохраняю�
     queryClient.clear();
   }
 });
+
+it("общий QueryClient кэширует входы с bigint без потери точности", async () => {
+  const { createQueryClient } = await import("./public.ui.ts");
+  const client = createQueryClient();
+
+  try {
+    client.setQueryData(["courses", { id: 9007199254740993n }], "Первый");
+    client.setQueryData(["courses", { id: 9007199254740992n }], "Второй");
+    expect(client.getQueryData(["courses", { id: 9007199254740993n }])).toBe("Первый");
+    expect(client.getQueryData(["courses", { id: 9007199254740992n }])).toBe("Второй");
+  } finally {
+    client.clear();
+  }
+});
