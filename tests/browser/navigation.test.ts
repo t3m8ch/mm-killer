@@ -150,24 +150,31 @@ test("повторный переход на текущую страницу з�
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
-test("системная тема сохраняется и реагирует на настройки устройства", async ({ page }) => {
-  await page.emulateMedia({ colorScheme: "dark" });
-  await page.goto("/courses/1/tasks/7");
-  // Сначала выбрать явную тему, чтобы проверка не зависела от режима по умолчанию.
-  await page.getByRole("button", { name: "Тема оформления" }).click();
-  await page.getByRole("menuitem", { name: "Светлая" }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "light");
+for (const colorScheme of ["dark", "light"] as const) {
+  test(`системная тема сохраняется и реагирует на настройки устройства: ${colorScheme}`, async ({
+    page,
+  }) => {
+    const oppositeScheme = colorScheme === "dark" ? "light" : "dark";
+    const explicitTheme = colorScheme === "dark" ? "Светлая" : "Тёмная";
 
-  await page.getByRole("button", { name: "Тема оформления" }).click();
-  await page.getByRole("menuitem", { name: "Системная" }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+    await page.emulateMedia({ colorScheme });
+    await page.goto("/courses/1/tasks/7");
+    // Сначала выбрать противоположную явную тему, чтобы проверить переход на системную.
+    await page.getByRole("button", { name: "Тема оформления" }).click();
+    await page.getByRole("menuitem", { name: explicitTheme }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", oppositeScheme);
 
-  await page.reload();
-  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "dark");
+    await page.getByRole("button", { name: "Тема оформления" }).click();
+    await page.getByRole("menuitem", { name: "Системная" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", colorScheme);
 
-  await page.emulateMedia({ colorScheme: "light" });
-  await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", "light");
-});
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", colorScheme);
+
+    await page.emulateMedia({ colorScheme: oppositeScheme });
+    await expect(page.locator("html")).toHaveAttribute("data-mantine-color-scheme", oppositeScheme);
+  });
+}
 
 test("медленный переход сохраняет согласованную навигацию и блокирует старую страницу", async ({
   page,
