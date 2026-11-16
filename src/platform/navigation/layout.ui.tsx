@@ -10,17 +10,17 @@ import {
   SidebarSimpleIcon,
   SunIcon,
 } from "@phosphor-icons/react";
-import type { Breadcrumb } from "./contract.shared.ts";
+import type { Breadcrumb } from "../public.shared.ts";
 import "./styles.css";
 
-export interface AppLayoutProps {
+export type AppLayoutProps = {
   children: ReactNode;
   path: string;
   breadcrumbs: readonly Breadcrumb[];
   mode?: "normal" | "diff";
   pending?: boolean;
   renderSidebar: (options: { drawer: boolean }) => ReactNode;
-}
+};
 
 function ThemeMenu() {
   const { colorScheme, setColorScheme } = useMantineColorScheme();

@@ -2,11 +2,11 @@ import type { ReactNode } from "react";
 import "./styles.css";
 
 /** Каркас панели: закреплённые области и прокручиваемое содержимое. */
-export interface SidebarProps {
+export type SidebarProps = {
   header?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
-}
+};
 
 export function Sidebar({ header, children, footer }: SidebarProps) {
   return (

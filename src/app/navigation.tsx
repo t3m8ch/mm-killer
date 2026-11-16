@@ -10,18 +10,19 @@ import { AppLayout } from "../platform/public.ui.ts";
 import type { Breadcrumb } from "../platform/public.shared.ts";
 
 declare module "@tanstack/react-router" {
+  // oxlint-disable-next-line typescript/consistent-type-definitions -- module augmentation: слияние с типами TanStack Router
   interface StaticDataRouteOption {
     navigationMode?: "normal" | "diff" | "public";
   }
 }
 
 /** Запись реестра с типами, скрытыми только внутри сборки навигации. */
-interface RouteNavigation {
+type RouteNavigation = {
   routeId: string;
   breadcrumbs: (data: unknown) => readonly Breadcrumb[];
   query?: (loaderData: unknown) => Pick<UseQueryOptions, "queryKey" | "queryFn" | "staleTime">;
   courseId?: (data: unknown) => string;
-}
+};
 
 /** Данные callbacks и Query выводятся из loader конкретного маршрута. */
 export function routeNavigation<TRoute extends AnyRoute>(
@@ -97,10 +98,10 @@ export function NavigationComposition({
 
 type NavigationMatch = Pick<AnyRouteMatch, "routeId" | "loaderData" | "staticData">;
 
-interface NavigationRouteData {
+type NavigationRouteData = {
   source: RouteNavigation;
   data: unknown;
-}
+};
 
 function useNavigationRouteData(
   matches: readonly NavigationMatch[],

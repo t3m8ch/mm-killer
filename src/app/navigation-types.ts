@@ -1,13 +1,13 @@
 import type { Breadcrumb } from "../platform/public.shared.ts";
 
-export interface NavigationLink extends Breadcrumb {
+export type NavigationLink = Breadcrumb & {
   icon?: "tasks" | "attempts" | "members" | "settings";
-}
+};
 
-export interface NavigationCourse extends Breadcrumb {
+export type NavigationCourse = Breadcrumb & {
   id: string;
   emoji: string;
-}
+};
 
 export type CourseBranchState =
   | { status: "pending" }
