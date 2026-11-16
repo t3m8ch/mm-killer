@@ -30,7 +30,7 @@ jobs:
       - run: mise run check
       - run: pnpm test:guards
       - run: pnpm test
-      - run: TEST_DATABASE_URL=postgres://unavailable:unavailable@127.0.0.1:1/unavailable pnpm test:unit
+      - run: pnpm test:unit
       - run: pnpm test:integration
       - run: pnpm db:migrate
       - run: pnpm db:seed
