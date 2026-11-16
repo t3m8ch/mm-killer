@@ -154,7 +154,7 @@ export default function generators(plop) {
           "public.shared.ts",
           "client.ui.ts",
           "public.ui.ts",
-          "api.test.ts",
+          "api.integration.test.ts",
         ].map((file) => ({
           type: "add",
           path: `src/modules/{{name}}/${file}`,

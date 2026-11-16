@@ -2,7 +2,8 @@ import { createRouterClient } from "@orpc/server";
 import { expect, it } from "vitest";
 import { authApi, seedUsers, resolveUser } from "../public.server.ts";
 import type { Context } from "../public.server.ts";
-import { rollbackTest, clock } from "../../../tests/helpers/database";
+import { rollbackTest } from "../../../tests/helpers/database";
+import { clock } from "../../../tests/helpers/clock";
 
 function clientFor(context: Context, session = { token: "" }) {
   const client = createRouterClient(authApi, {

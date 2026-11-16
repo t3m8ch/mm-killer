@@ -62,7 +62,7 @@ const probes = [
   {
     file: "src/modules/fixture/guard-probe.ts",
     command: ["easement", "check"],
-    source: 'export { clock } from "../../../tests/helpers/database";',
+    source: 'export { clock } from "../../../tests/helpers/clock";',
     expected: "dependency",
   },
   {

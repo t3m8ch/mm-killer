@@ -1,19 +1,9 @@
 import { afterAll } from "vitest";
 import { connect } from "../../src/platform/public.server.ts";
 import type { Context } from "../../src/platform/public.server.ts";
+import { clock } from "./clock";
 
 const baseUrl = () => process.env.TEST_DATABASE_URL ?? "postgres://mm:mm@127.0.0.1:54329/mm";
-
-export function clock(initial = "2026-11-04T12:00:00.000Z") {
-  let value = new Date(initial);
-
-  return {
-    now: () => new Date(value),
-    set: (next: string) => {
-      value = new Date(next);
-    },
-  };
-}
 
 export async function isolatedDatabase(label: string) {
   const url = new URL(baseUrl());
