@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "prototype:courses": "mise exec -- vite --host 0.0.0.0 --port 4315 --strictPort --open /prototype/courses",
     "build": "vite build",
     "test": "node --test tests/tooling/oxlint-plugin.test.js tests/tooling/environments.test.js tests/tooling/vitest-projects.test.js tests/tooling/type-style.test.js && node tests/tooling/test-generated.js",
     "lint": "oxlint",

@@ -1,0 +1,92 @@
+/* Локальные стили прототипа: строки списка, адаптивная компоновка и dev-переключатель.
+   Формы, таблицы, поповеры и модалки используют штатный Mantine. */
+.cp-page {
+  max-width: 1080px;
+  padding-bottom: 96px;
+}
+.cp-course-row {
+  padding: 16px 8px;
+  border-bottom: 1px solid var(--mm-line);
+}
+.cp-course-row:hover {
+  background: var(--mm-sidebar-bg);
+}
+.cp-course-row:focus-visible {
+  outline: 2px solid var(--mm-accent);
+}
+.cp-editor {
+  border: 1px solid var(--mm-line);
+  border-top: 0;
+  border-radius: 0 0 4px 4px;
+}
+.cp-markdown {
+  max-width: 75ch;
+}
+.cp-markdown h2,
+.cp-markdown h3 {
+  margin-bottom: 12px;
+}
+.cp-markdown h2 {
+  font-size: 22px;
+}
+.cp-markdown h3 {
+  font-size: 18px;
+}
+.cp-markdown ul {
+  margin: 4px 0;
+  padding-left: 24px;
+}
+.cp-bulk {
+  background: var(--mantine-color-blue-light);
+  border-radius: var(--mantine-radius-sm);
+}
+.cp-members-split {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 24px;
+}
+.cp-group-rail {
+  border-right: 1px solid var(--mm-line);
+  padding-right: 16px;
+}
+.cp-state {
+  color: var(--mm-secondary);
+  font-size: 12px;
+  border-top: 1px solid var(--mm-line);
+  padding-top: 16px;
+}
+.cp-state summary {
+  cursor: pointer;
+}
+.cp-state pre {
+  max-height: 360px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.cp-switcher {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #27313d;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 32px;
+  z-index: 100;
+  box-shadow: var(--mantine-shadow-md);
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .cp-members-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .cp-group-rail {
+    border-right: 0;
+    padding-right: 0;
+  }
+  .cp-switcher {
+    max-width: calc(100vw - 20px);
+  }
+}
