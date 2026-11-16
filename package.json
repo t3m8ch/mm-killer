@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "test": "node --test tests/tooling/oxlint-plugin.test.js tests/tooling/environments.test.js tests/tooling/vitest-projects.test.js && node tests/tooling/test-generated.js",
+    "test": "node --test tests/tooling/oxlint-plugin.test.js tests/tooling/environments.test.js tests/tooling/vitest-projects.test.js tests/tooling/type-style.test.js && node tests/tooling/test-generated.js",
     "lint": "oxlint",
     "typecheck": "oxlint --type-aware --type-check",
     "format": "oxfmt --ignore-path .gitignore --ignore-path .oxfmtignore",

@@ -12,7 +12,7 @@ import type { NavigationCourse } from "./navigation-types";
 import { Brand, Sidebar } from "../platform/public.ui.ts";
 import "./sidebar.css";
 
-export interface AppSidebarProps {
+export type AppSidebarProps = {
   path: string;
   courses: readonly NavigationCourse[];
   currentCourseId?: string;
@@ -24,7 +24,7 @@ export interface AppSidebarProps {
     settingsHref?: string;
   };
   drawer?: boolean;
-}
+};
 
 export function AppSidebar({
   path,
