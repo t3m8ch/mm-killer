@@ -66,16 +66,54 @@
 }
 .cp-switcher {
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #27313d;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 32px;
+  top: 68px;
+  right: 16px;
   z-index: 100;
+  padding: 4px 8px;
+  border: 1px solid var(--mm-line);
+  border-radius: var(--mantine-radius-sm);
+  background: var(--mm-surface);
+  box-shadow: var(--mantine-shadow-xs);
+}
+.cp-page {
+  padding-top: 36px;
+}
+.cp-editor-toolbar {
+  border-top: 1px solid var(--mm-line);
+}
+.cp-group-tab {
+  border: 1px solid var(--mm-line);
+  border-radius: var(--mantine-radius-sm);
+  padding-right: 6px;
+}
+.cp-group-tab.active {
+  border-color: var(--mantine-color-blue-5);
+  background: var(--mantine-color-blue-light);
+}
+.cp-student-row {
+  cursor: pointer;
+}
+.cp-bulk {
+  position: fixed;
+  bottom: 16px;
+  left: max(316px, calc((100vw - 1080px + 300px) / 2));
+  right: 32px;
+  z-index: 90;
+  background: var(--mm-surface);
+  border: 1px solid var(--mm-line);
   box-shadow: var(--mantine-shadow-md);
-  white-space: nowrap;
+}
+.cp-markdown ol {
+  margin: 4px 0;
+  padding-left: 24px;
+}
+@media (max-width: 720px) {
+  .cp-bulk {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    gap: 8px;
+  }
 }
 @media (max-width: 900px) {
   .cp-members-split {

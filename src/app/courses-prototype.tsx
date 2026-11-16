@@ -23,6 +23,7 @@ import {
   TextInput,
   Title,
   UnstyledButton,
+  Tooltip,
 } from "@mantine/core";
 import {
   ArrowLeftIcon,
@@ -30,6 +31,14 @@ import {
   MagnifyingGlassIcon,
   PlusIcon,
   DotsThreeIcon,
+  PencilSimpleIcon,
+  TrashIcon,
+  SmileyIcon,
+  ListBulletsIcon,
+  ListNumbersIcon,
+  TextBIcon,
+  TextItalicIcon,
+  TextHIcon,
 } from "@phosphor-icons/react";
 import { AppLayout } from "../platform/public.ui.ts";
 import { AppSidebar } from "./sidebar";
@@ -126,7 +135,9 @@ function EmojiPicker({
   onPick,
   frequent,
   remember,
+  compact = false,
 }: {
+  compact?: boolean;
   children: ReactNode;
   onPick: (emoji: string) => void;
   frequent: Record<string, number>;
@@ -135,7 +146,9 @@ function EmojiPicker({
   const [opened, setOpened] = useState(false);
   const [query, setQuery] = useState("");
   const recent = Object.keys(frequent).sort((a, b) => frequent[b] - frequent[a]);
-  const defaultEmojis = recent.length ? recent.map((symbol) => [symbol, ""]) : emojis.slice(0, 12);
+  const defaultEmojis = [
+    ...new Set([...recent, ...emojis.slice(0, 12).map(([symbol]) => symbol)]),
+  ].map((symbol) => [symbol, ""]);
   const matches = query
     ? emojis.filter(([symbol, words]) => (symbol + words).includes(query.toLowerCase()))
     : defaultEmojis;
@@ -143,9 +156,16 @@ function EmojiPicker({
   return (
     <Popover opened={opened} onChange={setOpened} width={290} position="bottom-start" shadow="md">
       <Popover.Target>
-        <Button variant="default" aria-label="Выбрать эмодзи" onClick={() => setOpened(!opened)}>
+        <ActionIcon
+          variant={compact ? "subtle" : "default"}
+          color="gray"
+          size={compact ? 30 : 36}
+          aria-label={compact ? "Вставить эмодзи" : "Выбрать эмодзи"}
+          title={compact ? "Вставить эмодзи" : "Выбрать эмодзи"}
+          onClick={() => setOpened(!opened)}
+        >
           {children}
-        </Button>
+        </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>
         <Stack gap="sm">
@@ -181,9 +201,6 @@ function EmojiPicker({
             !emojis.some(([symbol, words]) => (symbol + words).includes(query.toLowerCase())) && (
               <Text size="sm">Эмодзи не найдены</Text>
             )}
-          <Text size="xs" c="dimmed">
-            Демо-набор. История хранится до перезагрузки.
-          </Text>
         </Stack>
       </Popover.Dropdown>
     </Popover>
@@ -205,46 +222,51 @@ function inline(text: string): ReactNode[] {
 }
 
 function Markdown({ source }: { source: string }) {
-  // React экранирует текст; HTML намеренно не интерпретируется. Только демо-подмножество Markdown.
-  return (
-    <div className="cp-markdown">
-      {source.split("\n").map((line, i) => {
-        if (line.startsWith("### ")) {
-          return (
-            <Title order={3} key={i}>
-              {inline(line.slice(4))}
-            </Title>
-          );
-        }
+  const lines = source.split("\n");
+  const blocks: ReactNode[] = [];
 
-        if (line.startsWith("## ")) {
-          return (
-            <Title order={2} key={i}>
-              {inline(line.slice(3))}
-            </Title>
-          );
-        }
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const ordered = /^\d+\. /.test(line);
 
-        if (line.startsWith("# ")) {
-          return (
-            <Title order={1} key={i}>
-              {inline(line.slice(2))}
-            </Title>
-          );
-        }
+    if (ordered || line.startsWith("- ")) {
+      const pattern = ordered ? /^\d+\. / : /^- /;
+      const items: ReactNode[] = [];
 
-        if (line.startsWith("- ")) {
-          return (
-            <ul key={i}>
-              <li>{inline(line.slice(2))}</li>
-            </ul>
-          );
-        }
+      while (i < lines.length && pattern.test(lines[i])) {
+        items.push(<li key={i}>{inline(lines[i].replace(pattern, ""))}</li>);
+        i++;
+      }
 
-        return line ? <Text key={i}>{inline(line)}</Text> : <Box h={10} key={i} />;
-      })}
-    </div>
-  );
+      i--;
+      blocks.push(ordered ? <ol key={i}>{items}</ol> : <ul key={i}>{items}</ul>);
+      continue;
+    }
+
+    if (line.startsWith("### ")) {
+      blocks.push(
+        <Title order={3} key={i}>
+          {inline(line.slice(4))}
+        </Title>,
+      );
+    } else if (line.startsWith("## ")) {
+      blocks.push(
+        <Title order={2} key={i}>
+          {inline(line.slice(3))}
+        </Title>,
+      );
+    } else if (line.startsWith("# ")) {
+      blocks.push(
+        <Title order={1} key={i}>
+          {inline(line.slice(2))}
+        </Title>,
+      );
+    } else {
+      blocks.push(line ? <Text key={i}>{inline(line)}</Text> : <Box h={10} key={i} />);
+    }
+  }
+
+  return <div className="cp-markdown">{blocks}</div>;
 }
 
 function CourseForm({
@@ -275,6 +297,10 @@ function CourseForm({
       description.slice(0, start) + before + selected + after + description.slice(end),
     );
     setTab("write");
+    selection.current = {
+      start: start + before.length,
+      end: start + before.length + selected.length,
+    };
     requestAnimationFrame(() => {
       editor.current?.focus();
       editor.current?.setSelectionRange(
@@ -320,51 +346,6 @@ function CourseForm({
             </Tabs.List>
             <Tabs.Panel value="write">
               <Box className="cp-editor">
-                <Group gap={4} p="xs">
-                  <Button
-                    variant="subtle"
-                    color="gray"
-                    size="compact-sm"
-                    aria-label="Жирный"
-                    onClick={() => insert("**", "**")}
-                  >
-                    <b>Ж</b>
-                  </Button>
-                  <Button
-                    variant="subtle"
-                    color="gray"
-                    size="compact-sm"
-                    aria-label="Курсив"
-                    onClick={() => insert("*", "*")}
-                  >
-                    <i>К</i>
-                  </Button>
-                  <Button
-                    variant="subtle"
-                    color="gray"
-                    size="compact-sm"
-                    aria-label="Заголовок"
-                    onClick={() => insert("\n## ")}
-                  >
-                    H₂
-                  </Button>
-                  <Button
-                    variant="subtle"
-                    color="gray"
-                    size="compact-sm"
-                    aria-label="Список"
-                    onClick={() => insert("\n- ")}
-                  >
-                    Список
-                  </Button>
-                  <EmojiPicker
-                    frequent={frequent}
-                    remember={remember}
-                    onPick={(value) => insert(value)}
-                  >
-                    ☺
-                  </EmojiPicker>
-                </Group>
                 <Textarea
                   ref={editor}
                   aria-label="Текст описания"
@@ -381,6 +362,47 @@ function CourseForm({
                   }}
                   onChange={(e) => setDescription(e.currentTarget.value)}
                 />
+                <Group justify="space-between" p="xs" className="cp-editor-toolbar">
+                  <Group gap={2}>
+                    {[
+                      { label: "Жирный", icon: TextBIcon, before: "**", after: "**" },
+                      { label: "Курсив", icon: TextItalicIcon, before: "*", after: "*" },
+                      { label: "Заголовок", icon: TextHIcon, before: "\n## ", after: "" },
+                      {
+                        label: "Маркированный список",
+                        icon: ListBulletsIcon,
+                        before: "\n- ",
+                        after: "",
+                      },
+                      {
+                        label: "Нумерованный список",
+                        icon: ListNumbersIcon,
+                        before: "\n1. ",
+                        after: "",
+                      },
+                    ].map(({ label, icon: Icon, before, after }) => (
+                      <Tooltip label={label} key={label}>
+                        <ActionIcon
+                          variant="subtle"
+                          color="gray"
+                          size={30}
+                          aria-label={label}
+                          onClick={() => insert(before, after)}
+                        >
+                          <Icon size={19} />
+                        </ActionIcon>
+                      </Tooltip>
+                    ))}
+                  </Group>
+                  <EmojiPicker
+                    compact
+                    frequent={frequent}
+                    remember={remember}
+                    onPick={(value) => insert(value)}
+                  >
+                    <SmileyIcon size={20} />
+                  </EmojiPicker>
+                </Group>
               </Box>
             </Tabs.Panel>
             <Tabs.Panel value="preview">
@@ -389,9 +411,6 @@ function CourseForm({
               </Box>
             </Tabs.Panel>
           </Tabs>
-          <Text size="xs" c="dimmed">
-            Markdown: заголовки, выделение и списки. Без вложений.
-          </Text>
         </Stack>
         <Group>
           <Button type="submit">{course ? "Сохранить изменения" : "Создать курс"}</Button>
@@ -399,14 +418,6 @@ function CourseForm({
             Отмена
           </Button>
         </Group>
-        {!course && (
-          <Text size="sm" c="dimmed">
-            Вы станете владельцем. Курс будет в подготовке; создастся подгруппа по умолчанию.
-          </Text>
-        )}
-        <Text size="xs" c="dimmed">
-          Прототип не задаёт production-ограничения длины и обязательности полей.
-        </Text>
       </Stack>
     </form>
   );
@@ -444,45 +455,144 @@ function Members({
     setDialog(next);
   };
 
-  const groupControls = (
-    <Group gap="xs">
-      <Button
-        variant="default"
-        size="xs"
-        leftSection={<PlusIcon />}
-        onClick={() => openDialog("create")}
-      >
-        Подгруппа
-      </Button>
-      <Menu>
-        <Menu.Target>
-          <ActionIcon variant="default" aria-label="Действия с подгруппой">
-            <DotsThreeIcon />
-          </ActionIcon>
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Label>{group === "all" ? "Сначала выберите подгруппу" : group}</Menu.Label>
-          <Menu.Item disabled={group === "all"} onClick={() => openDialog("rename", group)}>
-            Переименовать
-          </Menu.Item>
-          <Menu.Item
-            color="red"
-            disabled={
-              group === "all" ||
-              course.students.some((s) => s.group === group) ||
-              course.groups.length === 1
-            }
+  const dialogForm = (kind: string, initial = "") => (
+    <Popover
+      opened={dialog === kind}
+      onChange={(opened) => {
+        if (!opened) {
+          setDialog(null);
+        }
+      }}
+      position="bottom-start"
+      width={300}
+      shadow="md"
+    >
+      <Popover.Target>
+        {kind.startsWith("rename:") ? (
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            color="gray"
+            aria-label={`Переименовать ${initial}`}
             onClick={() => {
-              update({ ...course, groups: course.groups.filter((g) => g !== group) });
-              chooseGroup("all");
-              notify("Пустая подгруппа удалена");
+              chooseGroup(initial);
+              openDialog(kind, initial);
             }}
           >
-            Удалить пустую подгруппу
-          </Menu.Item>
-          <Menu.Label>Удаляется только пустая и не последняя</Menu.Label>
-        </Menu.Dropdown>
-      </Menu>
+            <PencilSimpleIcon size={14} />
+          </ActionIcon>
+        ) : (
+          <Button
+            variant="default"
+            size="xs"
+            leftSection={<PlusIcon size={14} />}
+            onClick={() => openDialog(kind)}
+          >
+            {kind === "teacher" ? "Добавить преподавателя" : "Подгруппа"}
+          </Button>
+        )}
+      </Popover.Target>
+      <Popover.Dropdown>
+        <Stack>
+          <TextInput
+            label={dialog === "teacher" ? "ФИО" : "Название подгруппы"}
+            value={value}
+            onChange={(e) => setValue(e.currentTarget.value)}
+            error={error}
+          />
+          <Button
+            onClick={() => {
+              const name = value.trim();
+
+              if (!name) {
+                setError("Введите название или ФИО");
+
+                return;
+              }
+
+              if (
+                dialog !== "teacher" &&
+                course.groups.some(
+                  (g) =>
+                    g.toLocaleLowerCase() === name.toLocaleLowerCase() &&
+                    !(dialog?.startsWith("rename:") && g === group),
+                )
+              ) {
+                setError("Подгруппа с таким названием уже есть");
+
+                return;
+              }
+
+              if (dialog === "teacher") {
+                update({ ...course, teachers: [...new Set([...course.teachers, name])] });
+              }
+
+              if (dialog === "create") {
+                update({ ...course, groups: [...course.groups, name] });
+              }
+
+              if (dialog?.startsWith("rename:")) {
+                update({
+                  ...course,
+                  groups: course.groups.map((g) => (g === group ? name : g)),
+                  students: course.students.map((s) =>
+                    s.group === group ? { ...s, group: name } : s,
+                  ),
+                });
+                chooseGroup(name);
+              }
+
+              setDialog(null);
+              notify("Состав курса обновлён");
+            }}
+          >
+            Сохранить
+          </Button>
+        </Stack>
+      </Popover.Dropdown>
+    </Popover>
+  );
+  const groupControls = dialogForm("create");
+  const groupTabs = (
+    <Group gap="xs" mb="md" className="cp-group-tabs">
+      <Button
+        variant={group === "all" ? "light" : "default"}
+        size="sm"
+        onClick={() => chooseGroup("all")}
+      >
+        Все подгруппы
+      </Button>
+      {course.groups.map((g) => (
+        <Group key={g} gap={2} className={`cp-group-tab${group === g ? " active" : ""}`}>
+          <Button
+            variant="transparent"
+            color={group === g ? "blue" : "gray"}
+            size="sm"
+            onClick={() => chooseGroup(g)}
+          >
+            {g}
+          </Button>
+          {dialogForm(`rename:${g}`, g)}
+          {!course.students.some((student) => student.group === g) && course.groups.length > 1 && (
+            <Tooltip label={`Удалить ${g}`}>
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                size="sm"
+                aria-label={`Удалить ${g}`}
+                onClick={() => {
+                  update({ ...course, groups: course.groups.filter((name) => name !== g) });
+                  if (group === g) {
+                    chooseGroup("all");
+                  }
+                }}
+              >
+                <TrashIcon size={14} />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </Group>
+      ))}
     </Group>
   );
   const table = (rows: Student[]) => (
@@ -518,6 +628,21 @@ function Members({
           {rows.map((student) => (
             <Table.Tr
               key={student.id}
+              className="cp-student-row"
+              onClick={(event) => {
+                if (
+                  event.target instanceof Element &&
+                  event.target.closest("button,input,label,a,[role=menu]")
+                ) {
+                  return;
+                }
+
+                setSelected((old) =>
+                  old.includes(student.id)
+                    ? old.filter((id) => id !== student.id)
+                    : [...old, student.id],
+                );
+              }}
               bg={selected.includes(student.id) ? "var(--mantine-color-blue-light)" : undefined}
             >
               <Table.Td>
@@ -569,15 +694,8 @@ function Members({
       <Group justify="space-between">
         <div>
           <Title order={3}>Преподаватели</Title>
-          <Text size="sm" c="dimmed">
-            Владелец управляет составом; преподаватели работают со студентами.
-          </Text>
         </div>
-        {role === "owner" && (
-          <Button variant="default" size="xs" onClick={() => openDialog("teacher")}>
-            Добавить преподавателя
-          </Button>
-        )}
+        {role === "owner" && dialogForm("teacher")}
       </Group>
       <Stack gap={8}>
         {course.teachers.map((name, index) => (
@@ -635,59 +753,9 @@ function Members({
             ))}
           </Stack>
         ) : (
-          <Select
-            mb="md"
-            w={250}
-            aria-label="Подгруппа"
-            value={group}
-            onChange={(next) => chooseGroup(next ?? "all")}
-            data={[
-              { value: "all", label: "Все подгруппы" },
-              ...course.groups.map((g) => ({ value: g, label: g })),
-            ]}
-          />
+          groupTabs
         )}
         <Stack gap="sm" miw={0}>
-          {selected.length > 0 && (
-            <Group className="cp-bulk" p="sm">
-              <Text size="sm" fw={500}>
-                Выбрано: {selected.length}
-              </Text>
-              <Select
-                w={180}
-                placeholder="В подгруппу…"
-                aria-label="Целевая подгруппа"
-                value={target}
-                onChange={setTarget}
-                data={course.groups}
-              />
-              <Button
-                size="sm"
-                disabled={!target}
-                onClick={() => {
-                  if (!target) {
-                    return;
-                  }
-
-                  update({
-                    ...course,
-                    students: course.students.map((s) =>
-                      selected.includes(s.id) ? { ...s, group: target } : s,
-                    ),
-                  });
-                  notify(
-                    `Переведено студентов: ${selected.length}. Учебные данные не изменены (демо).`,
-                  );
-                  setSelected([]);
-                }}
-              >
-                Перевести
-              </Button>
-              <Button variant="subtle" size="sm" onClick={() => setSelected([])}>
-                Сбросить
-              </Button>
-            </Group>
-          )}
           {variant === "C" && group === "all" ? (
             course.groups.map((g) => (
               <Stack key={g} gap="xs">
@@ -720,12 +788,47 @@ function Members({
           )}
         </Stack>
       </Box>
-      {course.removed.length > 0 && (
-        <Alert color="gray" title="Демонстрация восстановления доступа">
-          <Text size="sm">
-            Исключённые студенты: {course.removed.map((s) => s.name).join(", ")}. В прототипе
-            учебных данных нет; их сохранность должна проверяться на сервере.
+      {selected.length > 0 && (
+        <Group className="cp-bulk" p="sm">
+          <Text size="sm" fw={500}>
+            Выбрано: {selected.length}
           </Text>
+          <Select
+            w={180}
+            placeholder="В подгруппу…"
+            aria-label="Целевая подгруппа"
+            value={target}
+            onChange={setTarget}
+            data={course.groups}
+          />
+          <Button
+            size="sm"
+            disabled={!target}
+            onClick={() => {
+              if (!target) {
+                return;
+              }
+
+              update({
+                ...course,
+                students: course.students.map((s) =>
+                  selected.includes(s.id) ? { ...s, group: target } : s,
+                ),
+              });
+              notify(`Переведено студентов: ${selected.length}`);
+              setSelected([]);
+            }}
+          >
+            Перевести
+          </Button>
+          <Button variant="subtle" size="sm" onClick={() => setSelected([])}>
+            Сбросить
+          </Button>
+        </Group>
+      )}
+      {course.removed.length > 0 && (
+        <Alert color="gray" title="Исключённые студенты">
+          <Text size="sm">{course.removed.map((s) => s.name).join(", ")}</Text>
           <Button
             mt="sm"
             variant="default"
@@ -739,84 +842,21 @@ function Members({
                 ],
                 removed: [],
               });
-              notify("Участие восстановлено (демо повторного вступления)");
+              notify("Участие восстановлено");
             }}
           >
             Восстановить участие
           </Button>
         </Alert>
       )}
-      <Modal
-        opened={dialog !== null}
-        onClose={() => setDialog(null)}
-        title={dialog === "teacher" ? "Добавить преподавателя" : "Подгруппа"}
-      >
-        <Stack>
-          <TextInput
-            label={dialog === "teacher" ? "ФИО" : "Название подгруппы"}
-            value={value}
-            onChange={(e) => setValue(e.currentTarget.value)}
-            error={error}
-          />
-          <Button
-            onClick={() => {
-              const name = value.trim();
 
-              if (!name) {
-                setError("Введите название или ФИО для демонстрации");
-
-                return;
-              }
-
-              if (
-                dialog !== "teacher" &&
-                course.groups.some(
-                  (g) =>
-                    g.toLocaleLowerCase() === name.toLocaleLowerCase() &&
-                    !(dialog === "rename" && g === group),
-                )
-              ) {
-                setError("Подгруппа с таким названием уже есть");
-
-                return;
-              }
-
-              if (dialog === "teacher") {
-                update({ ...course, teachers: [...new Set([...course.teachers, name])] });
-              }
-
-              if (dialog === "create") {
-                update({ ...course, groups: [...course.groups, name] });
-              }
-
-              if (dialog === "rename") {
-                update({
-                  ...course,
-                  groups: course.groups.map((g) => (g === group ? name : g)),
-                  students: course.students.map((s) =>
-                    s.group === group ? { ...s, group: name } : s,
-                  ),
-                });
-                chooseGroup(name);
-              }
-
-              setDialog(null);
-              notify("Состав курса обновлён");
-            }}
-          >
-            Сохранить
-          </Button>
-        </Stack>
-      </Modal>
       <Modal opened={remove !== null} onClose={() => setRemove(null)} title="Исключить студента?">
         <Stack>
           <Text>
             {remove?.name} потеряет доступ к курсу. Учебные данные должны сохраниться для повторного
             вступления.
           </Text>
-          <Text size="xs" c="dimmed">
-            Это демонстрация интерфейса, не проверка хранения данных.
-          </Text>
+
           <Group>
             <Button variant="default" onClick={() => setRemove(null)}>
               Отмена
@@ -833,7 +873,7 @@ function Members({
                 }
 
                 setRemove(null);
-                notify("Студент исключён из курса (демо)");
+                notify("Студент исключён из курса");
               }}
             >
               Исключить
@@ -855,7 +895,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
 
   const course = courses.find((c) => c.id === search.course);
   const variantNames: Record<string, string> = {
-    A: "Таблица и фильтр",
+    A: "Таблица и кнопки подгрупп",
     B: "Подгруппы сбоку",
     C: "Секции подгрупп",
   };
@@ -991,37 +1031,6 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
       )}
     >
       <Stack gap="xl" className="cp-page">
-        <Group justify="space-between" gap="sm">
-          <Text size="xs" c="dimmed">
-            Прототип #5 · изменения только в памяти
-          </Text>
-          <Group gap="sm">
-            <Select
-              aria-label="Демонстрационная роль"
-              size="xs"
-              w={150}
-              value={role}
-              onChange={(value) => setRole(value ?? "owner")}
-              data={[
-                { value: "owner", label: "Владелец" },
-                { value: "teacher", label: "Преподаватель" },
-                { value: "student", label: "Студент" },
-              ]}
-            />
-            <Button
-              variant="subtle"
-              color="gray"
-              size="compact-xs"
-              onClick={() => {
-                setCourses(structuredClone(seed));
-                setMessage("");
-                navigate({ course: 0, view: "list" });
-              }}
-            >
-              Сбросить демо
-            </Button>
-          </Group>
-        </Group>
         {message && (
           <Alert withCloseButton onClose={() => setMessage("")} color="blue" role="status">
             {message}
@@ -1032,9 +1041,6 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
             <Group justify="space-between">
               <div>
                 <Title order={2}>Мои курсы</Title>
-                <Text size="sm" c="dimmed" mt={4}>
-                  Курсы, которые вы ведёте или изучаете
-                </Text>
               </div>
               <Button
                 leftSection={<PlusIcon size={16} />}
@@ -1090,15 +1096,6 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                   : "У вас пока нет курсов. Создайте первый курс."}
               </Text>
             )}
-            <Button
-              variant="subtle"
-              color="gray"
-              size="compact-xs"
-              w="fit-content"
-              onClick={() => setCourses([])}
-            >
-              Демо: пустой список
-            </Button>
           </Stack>
         )}
         {search.view === "create" && (
@@ -1223,35 +1220,91 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
             )}
           </Stack>
         )}
-        <details className="cp-state">
-          <summary>
-            Состояние прототипа · {search.variant} / {variantNames[search.variant]}
-          </summary>
-          <pre>{JSON.stringify(state, null, 2)}</pre>
-        </details>
       </Stack>
       {import.meta.env.DEV && (
-        <Group className="cp-switcher" gap="sm" wrap="nowrap">
-          <ActionIcon
-            variant="transparent"
-            color="white"
-            aria-label="Предыдущий вариант"
-            onClick={() => switchVariant(-1)}
-          >
-            <ArrowLeftIcon size={18} />
-          </ActionIcon>
-          <Text size="sm">
-            {search.variant} · {variantNames[search.variant]}
-          </Text>
-          <ActionIcon
-            variant="transparent"
-            color="white"
-            aria-label="Следующий вариант"
-            onClick={() => switchVariant(1)}
-          >
-            <ArrowRightIcon size={18} />
-          </ActionIcon>
-        </Group>
+        <Box className="cp-switcher">
+          <Group justify="space-between" gap="xs">
+            <Text size="xs" fw={600}>
+              Прототип #5
+            </Text>
+            <Group gap={4}>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                aria-label="Предыдущий вариант"
+                onClick={() => switchVariant(-1)}
+              >
+                <ArrowLeftIcon size={16} />
+              </ActionIcon>
+              <Text size="xs">{search.variant}</Text>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                aria-label="Следующий вариант"
+                onClick={() => switchVariant(1)}
+              >
+                <ArrowRightIcon size={16} />
+              </ActionIcon>
+              <Popover position="bottom-end" width={370} shadow="md">
+                <Popover.Target>
+                  <Button variant="subtle" color="gray" size="compact-xs">
+                    Демо
+                  </Button>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <Stack gap="sm">
+                    <Group justify="space-between" gap="sm">
+                      <Text size="xs" c="dimmed">
+                        Прототип #5 · изменения только в памяти
+                      </Text>
+                      <Group gap="sm">
+                        <Select
+                          aria-label="Демонстрационная роль"
+                          size="xs"
+                          w={150}
+                          value={role}
+                          onChange={(value) => setRole(value ?? "owner")}
+                          data={[
+                            { value: "owner", label: "Владелец" },
+                            { value: "teacher", label: "Преподаватель" },
+                            { value: "student", label: "Студент" },
+                          ]}
+                        />
+                        <Button
+                          variant="subtle"
+                          color="gray"
+                          size="compact-xs"
+                          onClick={() => {
+                            setCourses(structuredClone(seed));
+                            setMessage("");
+                            navigate({ course: 0, view: "list" });
+                          }}
+                        >
+                          Сбросить демо
+                        </Button>
+                      </Group>
+                    </Group>
+                    <Button
+                      variant="subtle"
+                      color="gray"
+                      size="compact-xs"
+                      w="fit-content"
+                      onClick={() => setCourses([])}
+                    >
+                      Демо: пустой список
+                    </Button>{" "}
+                    <details className="cp-state">
+                      <summary>
+                        Состояние прототипа · {search.variant} / {variantNames[search.variant]}
+                      </summary>
+                      <pre>{JSON.stringify(state, null, 2)}</pre>
+                    </details>
+                  </Stack>
+                </Popover.Dropdown>
+              </Popover>
+            </Group>
+          </Group>
+        </Box>
       )}
       <Modal opened={confirmOpen} onClose={() => setConfirmOpen(false)} title="Открыть курс?">
         <Stack>
