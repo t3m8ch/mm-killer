@@ -128,3 +128,8 @@
     max-width: calc(100vw - 20px);
   }
 }
+
+/* Обёртка перехватывает demo-навигацию, но не ограничивает sticky сайдбар. */
+.cp-sidebar-events {
+  display: contents;
+}

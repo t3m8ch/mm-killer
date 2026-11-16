@@ -966,6 +966,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
       ]}
       renderSidebar={({ drawer }) => (
         <div
+          className="cp-sidebar-events"
           onClickCapture={(e) => {
             if (!(e.target instanceof Element)) {
               return;
