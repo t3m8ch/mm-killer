@@ -10,9 +10,8 @@
 
 ## Контракты и сборка
 
-Файлы каркаса сгруппированы в `src/platform/navigation`: `contract.shared.ts`
-с типом крошки, `layout.ui.tsx` с оболочкой, `sidebar.ui.tsx` с областями панели
-и `styles.css` с оформлением каркаса.
+Файлы каркаса сгруппированы в `src/platform/navigation`: `layout.ui.tsx`
+с оболочкой, `sidebar.ui.tsx` с областями панели и `styles.css` с оформлением каркаса.
 `platform/public.ui.ts` экспортирует `AppLayout`, `Sidebar`, `Brand`
 и `Layout` с провайдером темы.
 Сборка навигации находится в `src/app/navigation.tsx`, дерево и аккаунт —
