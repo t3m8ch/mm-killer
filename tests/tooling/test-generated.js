@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import assert from "node:assert/strict";
 import { withFixture } from "./fixture-workspace.js";
 
 for (const options of [
@@ -20,6 +21,23 @@ for (const options of [
           throw new Error(`Не прошла генерация: ${args.join(" ")}`);
         }
       }
+
+      const listed = spawnSync(
+        resolve("node_modules/.bin/vitest"),
+        ["list", "--filesOnly", "--json"],
+        { encoding: "utf8" },
+      );
+
+      assert.equal(listed.status, 0, listed.stdout + listed.stderr);
+      assert.deepEqual(
+        JSON.parse(listed.stdout).filter(({ file }) => file.includes("/course-notes/")),
+        [
+          {
+            file: resolve("src/modules/course-notes/api.integration.test.ts"),
+            projectName: "integration",
+          },
+        ],
+      );
 
       // Клиент доступен внутри своего модуля, без обратного импорта app.
       writeFileSync(
@@ -65,7 +83,7 @@ void courseNotesRpc.missing.call();
         { command: "oxlint", args: ["--threads", "2", "src"] },
         { command: "easement", args: ["check"] },
         { command: "easement", args: ["check", "-c", "easement.environments.yml"] },
-        { command: "vitest", args: ["run"] },
+        { command: "vitest", args: ["run", "--project", "integration"] },
       ]) {
         const executable =
           command === "easement" ? command : resolve(`node_modules/.bin/${command}`);

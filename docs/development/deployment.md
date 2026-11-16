@@ -134,7 +134,10 @@ SameSite=Lax, Path=/ и Max-Age; Secure включён при HTTPS и всег�
 Даты `created_at` и `updated_at` пользователей и `created_at` сессий обязательны;
 seed задаёт одинаковые даты создания и обновления и не меняет существующих пользователей.
 
-`pnpm test:api` проверяет публичный API на отдельной временной БД. Для
+`pnpm test:unit` запускает проверки без Postgres и не выполняет DB global setup.
+`pnpm test:integration` проверяет публичный API, миграции и DB-помощники
+на временных БД с настоящим Postgres; `pnpm test:api` остаётся совместимым alias.
+Обычный `pnpm exec vitest run` запускает оба проекта корневого `vitest.config.ts`. Для
 `pnpm test:e2e` предварительно выполнить миграции и seed в локальной БД.
 
 ## Клиентский рендеринг страниц
