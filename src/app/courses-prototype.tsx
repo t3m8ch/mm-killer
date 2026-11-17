@@ -377,6 +377,19 @@ function CourseForm({
   const [emoji, setEmoji] = useState(course?.emoji ?? "📚");
   const [description, setDescription] = useState(course?.description ?? "");
   const [tab, setTab] = useState<string | null>("write");
+  const [submitted, setSubmitted] = useState(false);
+
+  const nameLength = Array.from(name).length;
+  const descriptionLength = Array.from(description).length;
+  const validateText = (value: string, limit: number, emptyMessage: string) => {
+    if (!value.trim()) {
+      return emptyMessage;
+    }
+
+    return Array.from(value).length > limit ? `Не больше ${limit} символов` : null;
+  };
+  const nameError = validateText(name, 120, "Введите название курса");
+  const descriptionError = validateText(description, 4000, "Введите описание курса");
 
   const editor = useRef<HTMLTextAreaElement>(null);
   const selection = useRef({ start: 0, end: 0 });
@@ -438,11 +451,20 @@ function CourseForm({
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        save({ name, emoji, description });
+        setSubmitted(true);
+        if (nameError || descriptionError) {
+          if (descriptionError) {
+            setTab("write");
+          }
+
+          return;
+        }
+
+        save({ name: name.trim(), emoji, description });
       }}
     >
       <Stack gap="lg" maw={760}>
-        <Group align="end">
+        <Group align="start">
           <Input.Wrapper label="Эмодзи" classNames={{ label: "cp-emoji-label" }}>
             <Box mt={3}>
               <EmojiPicker frequent={frequent} remember={remember} onPick={setEmoji}>
@@ -455,6 +477,10 @@ function CourseForm({
             label="Название курса"
             placeholder="Например, основы программирования"
             value={name}
+            withAsterisk
+            description={`${nameLength} / 120`}
+            inputWrapperOrder={["label", "input", "error", "description"]}
+            error={submitted || nameLength > 120 ? nameError : null}
             onChange={(e) => setName(e.currentTarget.value)}
           />
         </Group>
@@ -546,6 +572,14 @@ function CourseForm({
               </Box>
             </Tabs.Panel>
           </Tabs>
+          <Group justify="space-between">
+            <Text size="xs" c="red" role={descriptionError && submitted ? "alert" : undefined}>
+              {submitted || descriptionLength > 4000 ? descriptionError : null}
+            </Text>
+            <Text size="xs" c={descriptionLength > 4000 ? "red" : "dimmed"}>
+              {descriptionLength} / 4000
+            </Text>
+          </Group>
         </Stack>
         <Group>
           <Button type="submit">{course ? "Сохранить изменения" : "Создать курс"}</Button>
