@@ -159,7 +159,7 @@
 }
 .cp-toast {
   position: fixed;
-  bottom: 100px;
+  bottom: 24px;
   right: 24px;
   width: min(360px, calc(100vw - 32px));
   z-index: 200;
@@ -168,4 +168,8 @@
 
 .cp-emoji-label {
   transform: translateY(3px);
+}
+
+.cp-page:has(.cp-bulk) .cp-toast {
+  bottom: 100px;
 }
