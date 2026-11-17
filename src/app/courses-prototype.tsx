@@ -1289,11 +1289,11 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
         )}
         {search.view === "list" && (
           <Stack gap="lg">
-            <Group justify="space-between">
-              <div>
-                <Title order={2}>Мои курсы</Title>
-              </div>
+            <Group justify="space-between" align="baseline">
+              <Title order={2}>Мои курсы</Title>
               <Button
+                variant="default"
+                size="sm"
                 leftSection={<PlusIcon size={16} />}
                 onClick={() => navigate({ view: "create", course: 0 })}
               >
