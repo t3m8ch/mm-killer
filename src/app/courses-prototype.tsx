@@ -607,6 +607,7 @@ function Members({
         <Stack>
           <TextInput
             label="Название подгруппы"
+            autoFocus
             value={value}
             onChange={(e) => setValue(e.currentTarget.value)}
             error={error}
