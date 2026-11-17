@@ -1440,7 +1440,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                       cancel={() => navigate({ view: "home" })}
                       save={(data) => {
                         update({ ...course, ...data });
-                        setMessage("Изменения сохранены. Адрес курса не изменился.");
+                        setMessage("Изменения сохранены");
                       }}
                     />
                     <Divider />
