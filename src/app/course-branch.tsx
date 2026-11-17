@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ActionIcon, Loader, Tooltip } from "@mantine/core";
+import { ActionIcon, Loader, Tooltip, Text } from "@mantine/core";
 import {
   ArrowClockwiseIcon,
   ClockCounterClockwiseIcon,
@@ -90,6 +90,11 @@ export function CourseBranch({
         {state.status === "ready" && (
           <>
             <div className="mm-task-links" aria-label="Задания курса">
+              {state.tasks.length === 0 && (
+                <Text size="xs" c="dimmed" py="xs" px={5}>
+                  Заданий пока нет
+                </Text>
+              )}
               {state.tasks.map((link) => (
                 <NavigationItem key={link.href} path={path} link={link} />
               ))}
