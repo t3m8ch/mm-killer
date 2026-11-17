@@ -133,3 +133,39 @@
 .cp-sidebar-events {
   display: contents;
 }
+
+.cp-group-all {
+  border: 1px solid var(--mm-line);
+  border-radius: var(--mantine-radius-sm);
+  height: 38px;
+}
+.cp-group-all.active {
+  border-color: var(--mantine-color-blue-5);
+  background: var(--mantine-color-blue-light);
+}
+.cp-delete-target {
+  display: inline-flex;
+}
+.cp-course-status {
+  color: var(--mm-secondary);
+  white-space: nowrap;
+}
+.cp-course-status.open {
+  color: light-dark(var(--mantine-color-teal-8), var(--mantine-color-teal-3));
+}
+.cp-teacher-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--mm-line);
+}
+.cp-toast {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  width: min(360px, calc(100vw - 32px));
+  z-index: 200;
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.cp-emoji-label {
+  transform: translateY(3px);
+}

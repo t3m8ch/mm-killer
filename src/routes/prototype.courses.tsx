@@ -8,7 +8,7 @@ export const Route = createFileRoute("/prototype/courses")({
     course: Number(search.course) || 0,
     view:
       typeof search.view === "string" &&
-      ["list", "create", "home", "members", "settings"].includes(search.view)
+      ["list", "create", "home", "members", "teachers", "settings"].includes(search.view)
         ? search.view
         : "list",
   }),

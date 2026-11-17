@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ActionIcon,
   Alert,
-  Badge,
   Box,
   Button,
   Checkbox,
@@ -24,9 +23,18 @@ import {
   Title,
   UnstyledButton,
   Tooltip,
+  Input,
+  Notification,
 } from "@mantine/core";
 import {
   ArrowLeftIcon,
+  BookOpenIcon,
+  UsersIcon,
+  ChalkboardTeacherIcon,
+  GearSixIcon,
+  CheckCircleIcon,
+  CircleDashedIcon,
+  WarningIcon,
   ArrowRightIcon,
   MagnifyingGlassIcon,
   PlusIcon,
@@ -129,6 +137,65 @@ const emojis = [
   ["🔬", "микроскоп microscope"],
   ["🎨", "искусство art"],
 ];
+
+function CourseStatus({ status }: { status: Course["status"] }) {
+  const Icon = status === "open" ? CheckCircleIcon : CircleDashedIcon;
+
+  return (
+    <Group gap={6} wrap="nowrap" className={`cp-course-status ${status}`}>
+      <Icon size={17} />
+      <Text size="sm" inherit>
+        {status === "open" ? "Открыт" : "В подготовке"}
+      </Text>
+    </Group>
+  );
+}
+
+function Teachers({
+  course,
+  update,
+  owner,
+  notify,
+}: {
+  course: Course;
+  update: (next: Course) => void;
+  owner: boolean;
+  notify: (text: string) => void;
+}) {
+  return (
+    <Stack gap="lg">
+      <Title order={3}>Преподаватели</Title>
+      <Stack gap={0} maw={680}>
+        {course.teachers.map((name, index) => (
+          <Group key={name} gap="md" className="cp-teacher-row">
+            <Text size="sm">{name}</Text>
+            <Text size="xs" c="dimmed">
+              {index === 0 ? "Владелец" : "Преподаватель"}
+            </Text>
+            {index > 0 && owner && (
+              <Tooltip label={`Удалить из преподавателей: ${name}`}>
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  aria-label={`Удалить преподавателя: ${name}`}
+                  onClick={() => {
+                    update({
+                      ...course,
+                      teachers: course.teachers.filter((teacher) => teacher !== name),
+                    });
+                    notify("Преподаватель удалён");
+                  }}
+                >
+                  <TrashIcon size={17} />
+                </ActionIcon>
+              </Tooltip>
+            )}
+          </Group>
+        ))}
+      </Stack>
+    </Stack>
+  );
+}
 
 function EmojiPicker({
   children,
@@ -289,12 +356,45 @@ function CourseForm({
 
   const editor = useRef<HTMLTextAreaElement>(null);
   const selection = useRef({ start: 0, end: 0 });
+  const history = useRef([{ text: course?.description ?? "", start: 0, end: 0 }]);
+  const historyIndex = useRef(0);
+  const changeDescription = (text: string, start: number, end: number) => {
+    history.current[historyIndex.current] = { text: description, ...selection.current };
+    history.current = history.current.slice(0, historyIndex.current + 1);
+    history.current.push({ text, start, end });
+    historyIndex.current++;
+    setDescription(text);
+    selection.current = { start, end };
+  };
+  const restoreHistory = (direction: number) => {
+    const next = historyIndex.current + direction;
+
+    if (next < 0 || next >= history.current.length) {
+      return;
+    }
+
+    historyIndex.current = next;
+    const entry = history.current[next];
+
+    setDescription(entry.text);
+    selection.current = { start: entry.start, end: entry.end };
+    requestAnimationFrame(() => {
+      editor.current?.focus();
+      editor.current?.setSelectionRange(entry.start, entry.end);
+    });
+  };
+
   const insert = (before: string, after = "") => {
-    const { start, end } = selection.current;
+    const start = editor.current?.selectionStart ?? selection.current.start;
+    const end = editor.current?.selectionEnd ?? selection.current.end;
     const selected = description.slice(start, end);
 
-    setDescription(
+    selection.current = { start, end };
+
+    changeDescription(
       description.slice(0, start) + before + selected + after + description.slice(end),
+      start + before.length,
+      start + before.length + selected.length,
     );
     setTab("write");
     selection.current = {
@@ -319,14 +419,13 @@ function CourseForm({
     >
       <Stack gap="lg" maw={760}>
         <Group align="end">
-          <Stack gap={6}>
-            <Text size="sm" fw={500}>
-              Эмодзи
-            </Text>
-            <EmojiPicker frequent={frequent} remember={remember} onPick={setEmoji}>
-              {emoji}
-            </EmojiPicker>
-          </Stack>
+          <Input.Wrapper label="Эмодзи" classNames={{ label: "cp-emoji-label" }}>
+            <Box mt={3}>
+              <EmojiPicker frequent={frequent} remember={remember} onPick={setEmoji}>
+                {emoji}
+              </EmojiPicker>
+            </Box>
+          </Input.Wrapper>
           <TextInput
             flex={1}
             label="Название курса"
@@ -360,7 +459,19 @@ function CourseForm({
                       end: e.currentTarget.selectionEnd,
                     };
                   }}
-                  onChange={(e) => setDescription(e.currentTarget.value)}
+                  onChange={(e) =>
+                    changeDescription(
+                      e.currentTarget.value,
+                      e.currentTarget.selectionStart,
+                      e.currentTarget.selectionEnd,
+                    )
+                  }
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && ["z", "y"].includes(e.key.toLowerCase())) {
+                      e.preventDefault();
+                      restoreHistory(e.shiftKey || e.key.toLowerCase() === "y" ? 1 : -1);
+                    }
+                  }}
                 />
                 <Group justify="space-between" p="xs" className="cp-editor-toolbar">
                   <Group gap={2}>
@@ -427,13 +538,11 @@ function Members({
   course,
   update,
   variant,
-  role,
   notify,
 }: {
   course: Course;
   update: (next: Course) => void;
   variant: string;
-  role: string;
   notify: (message: string) => void;
 }) {
   const [group, setGroup] = useState("all");
@@ -488,14 +597,14 @@ function Members({
             leftSection={<PlusIcon size={14} />}
             onClick={() => openDialog(kind)}
           >
-            {kind === "teacher" ? "Добавить преподавателя" : "Подгруппа"}
+            Подгруппа
           </Button>
         )}
       </Popover.Target>
       <Popover.Dropdown>
         <Stack>
           <TextInput
-            label={dialog === "teacher" ? "ФИО" : "Название подгруппы"}
+            label="Название подгруппы"
             value={value}
             onChange={(e) => setValue(e.currentTarget.value)}
             error={error}
@@ -511,7 +620,6 @@ function Members({
               }
 
               if (
-                dialog !== "teacher" &&
                 course.groups.some(
                   (g) =>
                     g.toLocaleLowerCase() === name.toLocaleLowerCase() &&
@@ -521,10 +629,6 @@ function Members({
                 setError("Подгруппа с таким названием уже есть");
 
                 return;
-              }
-
-              if (dialog === "teacher") {
-                update({ ...course, teachers: [...new Set([...course.teachers, name])] });
               }
 
               if (dialog === "create") {
@@ -552,11 +656,15 @@ function Members({
       </Popover.Dropdown>
     </Popover>
   );
+  const lastGroupReason = (name: string) =>
+    course.groups.length === 1 ? "Нельзя удалить последнюю подгруппу" : `Удалить ${name}`;
   const groupControls = dialogForm("create");
   const groupTabs = (
     <Group gap="xs" mb="md" className="cp-group-tabs">
       <Button
-        variant={group === "all" ? "light" : "default"}
+        variant="transparent"
+        className={`cp-group-all${group === "all" ? " active" : ""}`}
+        color={group === "all" ? "blue" : "gray"}
         size="sm"
         onClick={() => chooseGroup("all")}
       >
@@ -573,26 +681,39 @@ function Members({
             {g}
           </Button>
           {dialogForm(`rename:${g}`, g)}
-          {!course.students.some((student) => student.group === g) && course.groups.length > 1 && (
-            <Tooltip label={`Удалить ${g}`}>
-              <ActionIcon
-                variant="subtle"
-                color="red"
-                size="sm"
-                aria-label={`Удалить ${g}`}
-                onClick={() => {
-                  update({ ...course, groups: course.groups.filter((name) => name !== g) });
-                  if (group === g) {
-                    chooseGroup("all");
+          {
+            <Tooltip
+              label={
+                course.students.some((student) => student.group === g)
+                  ? "Нельзя удалить подгруппу со студентами"
+                  : lastGroupReason(g)
+              }
+            >
+              <span className="cp-delete-target">
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
+                  size="sm"
+                  aria-label={`Удалить ${g}`}
+                  disabled={
+                    course.students.some((student) => student.group === g) ||
+                    course.groups.length === 1
                   }
-                }}
-              >
-                <TrashIcon size={14} />
-              </ActionIcon>
+                  onClick={() => {
+                    update({ ...course, groups: course.groups.filter((name) => name !== g) });
+                    if (group === g) {
+                      chooseGroup("all");
+                    }
+                  }}
+                >
+                  <TrashIcon size={14} />
+                </ActionIcon>
+              </span>
             </Tooltip>
-          )}
+          }
         </Group>
       ))}
+      {groupControls}
     </Group>
   );
   const table = (rows: Student[]) => (
@@ -692,45 +813,12 @@ function Members({
   return (
     <Stack gap="lg">
       <Group justify="space-between">
-        <div>
-          <Title order={3}>Преподаватели</Title>
-        </div>
-        {role === "owner" && dialogForm("teacher")}
-      </Group>
-      <Stack gap={8}>
-        {course.teachers.map((name, index) => (
-          <Group key={name} justify="space-between">
-            <Group gap="sm">
-              <Text size="sm">{name}</Text>
-              <Badge variant="light" color="gray" size="sm">
-                {index === 0 ? "Владелец" : "Преподаватель"}
-              </Badge>
-            </Group>
-            {index > 0 && role === "owner" && (
-              <Button
-                variant="subtle"
-                color="red"
-                size="compact-xs"
-                onClick={() => {
-                  update({ ...course, teachers: course.teachers.filter((n) => n !== name) });
-                  notify("Преподаватель удалён из состава курса");
-                }}
-              >
-                Удалить
-              </Button>
-            )}
-          </Group>
-        ))}
-      </Stack>
-      <Divider />
-      <Group justify="space-between">
         <Group gap="sm">
           <Title order={3}>Студенты</Title>
           <Text c="dimmed" size="sm">
             {course.students.length}
           </Text>
         </Group>
-        {groupControls}
       </Group>
       <Box className={variant === "B" ? "cp-members-split" : undefined}>
         {variant === "B" ? (
@@ -751,6 +839,7 @@ function Members({
                 {g === "all" ? "Все подгруппы" : g}
               </Button>
             ))}
+            {groupControls}
           </Stack>
         ) : (
           groupTabs
@@ -911,6 +1000,16 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
   const path = course ? `/prototype/courses/${course.id}/${search.view}` : "/prototype/courses";
 
   useEffect(() => {
+    if (!message) {
+      return;
+    }
+
+    const timer = setTimeout(() => setMessage(""), 4000);
+
+    return () => clearTimeout(timer);
+  }, [message]);
+
+  useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if (
         event.target instanceof Element &&
@@ -1014,8 +1113,13 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                   tasks: [],
                   sections: [
                     {
-                      label: "Участники",
+                      label: "Студенты",
                       href: `/prototype/courses?course=${c.id}&view=members`,
+                      icon: "members",
+                    },
+                    {
+                      label: "Преподаватели",
+                      href: `/prototype/courses?course=${c.id}&view=teachers`,
                       icon: "members",
                     },
                     {
@@ -1033,9 +1137,14 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
     >
       <Stack gap="xl" className="cp-page">
         {message && (
-          <Alert withCloseButton onClose={() => setMessage("")} color="blue" role="status">
+          <Notification
+            className="cp-toast"
+            onClose={() => setMessage("")}
+            icon={<CheckCircleIcon size={20} />}
+            role="status"
+          >
             {message}
-          </Alert>
+          </Notification>
         )}
         {search.view === "list" && (
           <Stack gap="lg">
@@ -1077,13 +1186,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                           Владелец
                         </Text>
                       </Box>
-                      <Badge
-                        color={c.status === "open" ? "teal" : "gray"}
-                        variant="light"
-                        size="sm"
-                      >
-                        {c.status === "open" ? "Открыт" : "В подготовке"}
-                      </Badge>
+                      <CourseStatus status={c.status} />
                       <ArrowRightIcon size={16} />
                     </Group>
                   </UnstyledButton>
@@ -1131,15 +1234,28 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                 <Text size="30px">{course.emoji}</Text>
                 <Title order={2}>{course.name || "Без названия"}</Title>
               </Group>
-              <Badge variant="light" color={course.status === "open" ? "teal" : "gray"}>
-                {course.status === "open" ? "Открыт" : "В подготовке"}
-              </Badge>
+              <CourseStatus status={course.status} />
             </Group>
             <Tabs value={search.view} onChange={(view) => navigate({ view: view ?? "home" })}>
               <Tabs.List>
-                <Tabs.Tab value="home">О курсе</Tabs.Tab>
-                {role !== "student" && <Tabs.Tab value="members">Участники</Tabs.Tab>}
-                {role === "owner" && <Tabs.Tab value="settings">Настройки</Tabs.Tab>}
+                <Tabs.Tab value="home" leftSection={<BookOpenIcon size={17} />}>
+                  О курсе
+                </Tabs.Tab>
+                {role !== "student" && (
+                  <Tabs.Tab value="members" leftSection={<UsersIcon size={17} />}>
+                    Студенты
+                  </Tabs.Tab>
+                )}
+                {role !== "student" && (
+                  <Tabs.Tab value="teachers" leftSection={<ChalkboardTeacherIcon size={17} />}>
+                    Преподаватели
+                  </Tabs.Tab>
+                )}
+                {role === "owner" && (
+                  <Tabs.Tab value="settings" leftSection={<GearSixIcon size={17} />}>
+                    Настройки
+                  </Tabs.Tab>
+                )}
               </Tabs.List>
             </Tabs>
             {role === "student" && course.status === "draft" ? (
@@ -1159,7 +1275,14 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                     course={course}
                     update={update}
                     variant={search.variant}
-                    role={role}
+                    notify={setMessage}
+                  />
+                )}
+                {search.view === "teachers" && role !== "student" && (
+                  <Teachers
+                    course={course}
+                    update={update}
+                    owner={role === "owner"}
                     notify={setMessage}
                   />
                 )}
@@ -1212,7 +1335,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                   </Stack>
                 )}
                 {((role !== "owner" && search.view === "settings") ||
-                  (role === "student" && search.view === "members")) && (
+                  (role === "student" && ["members", "teachers"].includes(search.view))) && (
                   <Alert color="gray">
                     Этот раздел недоступен выбранной роли. Откройте «О курсе».
                   </Alert>
@@ -1310,9 +1433,9 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
       <Modal opened={confirmOpen} onClose={() => setConfirmOpen(false)} title="Открыть курс?">
         <Stack>
           <Text>Студенты получат доступ к содержимому курса.</Text>
-          <Text size="sm" c="dimmed">
-            Вернуть курс в подготовку можно, только если в нём нет студентов.
-          </Text>
+          <Alert color="yellow" icon={<WarningIcon size={22} />}>
+            <Text fw={600}>Вернуть курс в подготовку можно, только если в нём нет студентов.</Text>
+          </Alert>
           <Group justify="end">
             <Button variant="default" onClick={() => setConfirmOpen(false)}>
               Отмена
