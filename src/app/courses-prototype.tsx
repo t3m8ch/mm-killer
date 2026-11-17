@@ -138,6 +138,28 @@ const emojis = [
   ["🎨", "искусство art"],
 ];
 
+function useConfirmationDelay(opened: boolean) {
+  const [ready, setReady] = useState(false);
+  const [previousOpened, setPreviousOpened] = useState(opened);
+
+  if (previousOpened !== opened) {
+    setPreviousOpened(opened);
+    setReady(false);
+  }
+
+  useEffect(() => {
+    if (!opened) {
+      return;
+    }
+
+    const timer = setTimeout(() => setReady(true), 2000);
+
+    return () => clearTimeout(timer);
+  }, [opened]);
+
+  return opened && ready;
+}
+
 function CourseStatus({ status }: { status: Course["status"] }) {
   if (status === "open") {
     return null;
@@ -555,6 +577,9 @@ function Members({
 
   const [error, setError] = useState("");
   const [remove, setRemove] = useState<Student | null>(null);
+
+  const [removeMany, setRemoveMany] = useState<Student[]>([]);
+  const canRemoveMany = useConfirmationDelay(removeMany.length > 0);
   const visible = course.students.filter((student) => group === "all" || student.group === group);
   const chooseGroup = (next: string) => {
     setGroup(next);
@@ -930,6 +955,17 @@ function Members({
           >
             Перевести
           </Button>
+          <Button
+            color="red"
+            variant="light"
+            size="sm"
+            leftSection={<TrashIcon size={16} />}
+            onClick={() =>
+              setRemoveMany(course.students.filter((student) => selected.includes(student.id)))
+            }
+          >
+            Исключить из курса
+          </Button>
           <Button variant="subtle" size="sm" onClick={() => setSelected([])}>
             Сбросить
           </Button>
@@ -958,6 +994,55 @@ function Members({
           </Button>
         </Alert>
       )}
+
+      <Modal
+        opened={removeMany.length > 0}
+        onClose={() => setRemoveMany([])}
+        title={`Исключить студентов: ${removeMany.length}?`}
+      >
+        <Stack>
+          <Text>
+            Эти студенты потеряют доступ к курсу. Учебные данные сохранятся для повторного
+            вступления.
+          </Text>
+          <ScrollArea.Autosize mah={280}>
+            <Stack gap={8}>
+              {removeMany.map((student) => (
+                <Text size="sm" key={student.id}>
+                  {student.name}
+                </Text>
+              ))}
+            </Stack>
+          </ScrollArea.Autosize>
+          <Group justify="end">
+            <Button variant="default" data-autofocus onClick={() => setRemoveMany([])}>
+              Отмена
+            </Button>
+            <Button
+              color="red"
+              disabled={!canRemoveMany}
+              onClick={() => {
+                if (!canRemoveMany) {
+                  return;
+                }
+
+                const ids = new Set(removeMany.map((student) => student.id));
+
+                update({
+                  ...course,
+                  students: course.students.filter((student) => !ids.has(student.id)),
+                  removed: [...course.removed, ...removeMany],
+                });
+                notify(`Исключено студентов: ${removeMany.length}`);
+                setSelected([]);
+                setRemoveMany([]);
+              }}
+            >
+              {canRemoveMany ? "Исключить" : "Исключить (через 2 с)"}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
 
       <Modal opened={remove !== null} onClose={() => setRemove(null)} title="Исключить студента?">
         <Stack>
@@ -1000,6 +1085,8 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
   const [role, setRole] = useState("owner");
   const [message, setMessage] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const canOpenCourse = useConfirmationDelay(confirmOpen);
+
   const [frequent, setFrequent] = useState<Record<string, number>>({});
 
   const visibleCourses = courses;
@@ -1484,11 +1571,16 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
             <Text fw={600}>Вернуть курс в подготовку можно, только если в нём нет студентов.</Text>
           </Alert>
           <Group justify="end">
-            <Button variant="default" onClick={() => setConfirmOpen(false)}>
+            <Button variant="default" data-autofocus onClick={() => setConfirmOpen(false)}>
               Отмена
             </Button>
             <Button
+              disabled={!canOpenCourse}
               onClick={() => {
+                if (!canOpenCourse) {
+                  return;
+                }
+
                 if (course) {
                   update({ ...course, status: "open" });
                 }
@@ -1497,7 +1589,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                 setMessage("Курс открыт");
               }}
             >
-              Открыть курс
+              {canOpenCourse ? "Открыть курс" : "Открыть курс (через 2 с)"}
             </Button>
           </Group>
         </Stack>
