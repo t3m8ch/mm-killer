@@ -955,20 +955,22 @@ function Members({
           >
             Перевести
           </Button>
-          <Button
-            color="red"
-            variant="light"
-            size="sm"
-            leftSection={<TrashIcon size={16} />}
-            onClick={() =>
-              setRemoveMany(course.students.filter((student) => selected.includes(student.id)))
-            }
-          >
-            Исключить из курса
-          </Button>
-          <Button variant="subtle" size="sm" onClick={() => setSelected([])}>
-            Сбросить
-          </Button>
+          <Group ml="auto" gap="sm">
+            <Button
+              color="red"
+              variant="light"
+              size="sm"
+              leftSection={<TrashIcon size={16} />}
+              onClick={() =>
+                setRemoveMany(course.students.filter((student) => selected.includes(student.id)))
+              }
+            >
+              Исключить из курса
+            </Button>
+            <Button variant="subtle" size="sm" onClick={() => setSelected([])}>
+              Сбросить
+            </Button>
+          </Group>
         </Group>
       )}
       {course.removed.length > 0 && (
