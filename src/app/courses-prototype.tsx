@@ -23,11 +23,11 @@ import {
   Title,
   UnstyledButton,
   Tooltip,
-  Input,
   Notification,
 } from "@mantine/core";
 import {
   ArrowLeftIcon,
+  CaretDownIcon,
   BookOpenIcon,
   UsersIcon,
   ChalkboardTeacherIcon,
@@ -247,16 +247,30 @@ function EmojiPicker({
   return (
     <Popover opened={opened} onChange={setOpened} width={290} position="bottom-start" shadow="md">
       <Popover.Target>
-        <ActionIcon
-          variant={compact ? "subtle" : "default"}
-          color="gray"
-          size={compact ? 30 : 36}
-          aria-label={compact ? "Вставить эмодзи" : "Выбрать эмодзи"}
-          title={compact ? "Вставить эмодзи" : "Выбрать эмодзи"}
-          onClick={() => setOpened(!opened)}
-        >
-          {children}
-        </ActionIcon>
+        {compact ? (
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size={30}
+            aria-label="Вставить эмодзи"
+            title="Вставить эмодзи"
+            onClick={() => setOpened(!opened)}
+          >
+            {children}
+          </ActionIcon>
+        ) : (
+          <Button
+            variant="default"
+            px="xs"
+            aria-label="Выбрать эмодзи"
+            rightSection={<CaretDownIcon size={13} />}
+            onClick={() => setOpened(!opened)}
+          >
+            <Text size="xl" component="span">
+              {children}
+            </Text>
+          </Button>
+        )}
       </Popover.Target>
       <Popover.Dropdown>
         <Stack gap="sm">
@@ -464,14 +478,12 @@ function CourseForm({
       }}
     >
       <Stack gap="lg" maw={760}>
-        <Group align="start">
-          <Input.Wrapper label="Эмодзи" classNames={{ label: "cp-emoji-label" }}>
-            <Box mt={3}>
-              <EmojiPicker frequent={frequent} remember={remember} onPick={setEmoji}>
-                {emoji}
-              </EmojiPicker>
-            </Box>
-          </Input.Wrapper>
+        <Group align="start" wrap="nowrap">
+          <Box pt={25}>
+            <EmojiPicker frequent={frequent} remember={remember} onPick={setEmoji}>
+              {emoji}
+            </EmojiPicker>
+          </Box>
           <TextInput
             flex={1}
             label="Название курса"

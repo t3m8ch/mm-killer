@@ -166,10 +166,6 @@
   box-shadow: var(--mantine-shadow-md);
 }
 
-.cp-emoji-label {
-  transform: translateY(3px);
-}
-
 .cp-page:has(.cp-bulk) .cp-toast {
   bottom: 100px;
 }
