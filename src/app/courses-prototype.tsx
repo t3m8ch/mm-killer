@@ -139,13 +139,15 @@ const emojis = [
 ];
 
 function CourseStatus({ status }: { status: Course["status"] }) {
-  const Icon = status === "open" ? CheckCircleIcon : CircleDashedIcon;
+  if (status === "open") {
+    return null;
+  }
 
   return (
     <Group gap={6} wrap="nowrap" className={`cp-course-status ${status}`}>
-      <Icon size={17} />
+      <CircleDashedIcon size={17} />
       <Text size="sm" inherit>
-        {status === "open" ? "Открыт" : "В подготовке"}
+        В подготовке
       </Text>
     </Group>
   );
@@ -658,7 +660,24 @@ function Members({
   );
   const lastGroupReason = (name: string) =>
     course.groups.length === 1 ? "Нельзя удалить последнюю подгруппу" : `Удалить ${name}`;
-  const groupControls = dialogForm("create");
+  const groupControls = (
+    <Button
+      variant="default"
+      size="sm"
+      leftSection={<PlusIcon size={14} />}
+      onClick={() => {
+        let number = course.groups.length + 1;
+
+        while (course.groups.includes(`Подгруппа ${number}`)) {
+          number++;
+        }
+
+        update({ ...course, groups: [...course.groups, `Подгруппа ${number}`] });
+      }}
+    >
+      Подгруппа
+    </Button>
+  );
   const groupTabs = (
     <Group gap="xs" mb="md" className="cp-group-tabs">
       <Button
@@ -982,7 +1001,24 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [frequent, setFrequent] = useState<Record<string, number>>({});
 
-  const course = courses.find((c) => c.id === search.course);
+  const visibleCourses = courses;
+  const course = visibleCourses.find((c) => c.id === search.course);
+
+  useEffect(() => {
+    if (role !== "student") {
+      return;
+    }
+
+    if (["members", "teachers", "settings"].includes(search.view)) {
+      navigate({ view: "home" });
+    }
+  }, [role, search.view, navigate]);
+
+  const roleLabels: Record<string, string> = {
+    student: "Студент",
+    teacher: "Преподаватель",
+    owner: "Владелец",
+  };
   const variantNames: Record<string, string> = {
     A: "Таблица и кнопки подгрупп",
     B: "Подгруппы сбоку",
@@ -1091,7 +1127,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
             path={path}
             drawer={drawer}
             currentCourseId={course ? String(course.id) : undefined}
-            courses={courses.map((c) => ({
+            courses={visibleCourses.map((c) => ({
               id: String(c.id),
               label: c.name,
               emoji: c.emoji,
@@ -1111,23 +1147,30 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                   status: "ready",
                   refreshing: false,
                   tasks: [],
-                  sections: [
-                    {
-                      label: "Студенты",
-                      href: `/prototype/courses?course=${c.id}&view=members`,
-                      icon: "members",
-                    },
-                    {
-                      label: "Преподаватели",
-                      href: `/prototype/courses?course=${c.id}&view=teachers`,
-                      icon: "members",
-                    },
-                    {
-                      label: "Настройки",
-                      href: `/prototype/courses?course=${c.id}&view=settings`,
-                      icon: "settings",
-                    },
-                  ],
+                  sections:
+                    role === "student"
+                      ? []
+                      : [
+                          {
+                            label: "Студенты",
+                            href: `/prototype/courses?course=${c.id}&view=members`,
+                            icon: "members",
+                          },
+                          {
+                            label: "Преподаватели",
+                            href: `/prototype/courses?course=${c.id}&view=teachers`,
+                            icon: "members",
+                          },
+                          ...(role === "owner"
+                            ? [
+                                {
+                                  label: "Настройки",
+                                  href: `/prototype/courses?course=${c.id}&view=settings`,
+                                  icon: "settings" as const,
+                                },
+                              ]
+                            : []),
+                        ],
                 }}
               />
             )}
@@ -1168,7 +1211,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
               onChange={(e) => setQuery(e.currentTarget.value)}
             />
             <Stack gap={0}>
-              {courses
+              {visibleCourses
                 .filter((c) => c.name.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
                 .map((c) => (
                   <UnstyledButton
@@ -1183,7 +1226,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                           {c.name || "Без названия"}
                         </Text>
                         <Text size="xs" c="dimmed">
-                          Владелец
+                          {roleLabels[role]}
                         </Text>
                       </Box>
                       <CourseStatus status={c.status} />
@@ -1192,8 +1235,9 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                   </UnstyledButton>
                 ))}
             </Stack>
-            {!courses.filter((c) => c.name.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
-              .length && (
+            {!visibleCourses.filter((c) =>
+              c.name.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
+            ).length && (
               <Text c="dimmed" py="xl">
                 {courses.length
                   ? "Курсы не найдены. Попробуйте другое название."
@@ -1258,16 +1302,18 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                 )}
               </Tabs.List>
             </Tabs>
-            {role === "student" && course.status === "draft" ? (
-              <Alert color="gray" title="Курс готовится">
-                Содержимое появится, когда преподаватель откроет курс.
-              </Alert>
-            ) : (
+            {
               <>
-                {search.view === "home" && (
-                  <Box maw={760}>
-                    <Markdown source={course.description} />
-                  </Box>
+                {role === "student" && course.status === "draft" ? (
+                  <Alert color="gray" title="Курс готовится">
+                    Содержимое появится, когда преподаватель откроет курс.
+                  </Alert>
+                ) : (
+                  search.view === "home" && (
+                    <Box maw={760}>
+                      <Markdown source={course.description} />
+                    </Box>
+                  )
                 )}
                 {search.view === "members" && role !== "student" && (
                   <Members
@@ -1341,7 +1387,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                   </Alert>
                 )}
               </>
-            )}
+            }
           </Stack>
         )}
       </Stack>
