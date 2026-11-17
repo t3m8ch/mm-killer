@@ -555,14 +555,19 @@ function CourseForm({
                       </Tooltip>
                     ))}
                   </Group>
-                  <EmojiPicker
-                    compact
-                    frequent={frequent}
-                    remember={remember}
-                    onPick={(value) => insert(value)}
-                  >
-                    <SmileyIcon size={20} />
-                  </EmojiPicker>
+                  <Group gap="xs">
+                    <Text size="xs" c={descriptionLength > 4000 ? "red" : "dimmed"}>
+                      {descriptionLength} / 4000
+                    </Text>
+                    <EmojiPicker
+                      compact
+                      frequent={frequent}
+                      remember={remember}
+                      onPick={(value) => insert(value)}
+                    >
+                      <SmileyIcon size={20} />
+                    </EmojiPicker>
+                  </Group>
                 </Group>
               </Box>
             </Tabs.Panel>
@@ -575,9 +580,6 @@ function CourseForm({
           <Group justify="space-between">
             <Text size="xs" c="red" role={descriptionError && submitted ? "alert" : undefined}>
               {submitted || descriptionLength > 4000 ? descriptionError : null}
-            </Text>
-            <Text size="xs" c={descriptionLength > 4000 ? "red" : "dimmed"}>
-              {descriptionLength} / 4000
             </Text>
           </Group>
         </Stack>
