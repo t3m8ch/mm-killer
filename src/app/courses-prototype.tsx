@@ -1093,7 +1093,9 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
   const [deleteName, setDeleteName] = useState("");
   const deleteDelayReady = useConfirmationDelay(deletingCourse !== null);
   const canDeleteCourse =
-    deleteDelayReady && deletingCourse !== null && deleteName === deletingCourse.name;
+    deleteDelayReady &&
+    deletingCourse !== null &&
+    deleteName.toLocaleLowerCase("ru-RU") === deletingCourse.name.toLocaleLowerCase("ru-RU");
 
   const [frequent, setFrequent] = useState<Record<string, number>>({});
 
