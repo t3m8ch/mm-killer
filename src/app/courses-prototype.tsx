@@ -1087,6 +1087,12 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
   const [confirmOpen, setConfirmOpen] = useState(false);
   const canOpenCourse = useConfirmationDelay(confirmOpen);
 
+  const [deletingCourse, setDeletingCourse] = useState<Course | null>(null);
+  const [deleteName, setDeleteName] = useState("");
+  const deleteDelayReady = useConfirmationDelay(deletingCourse !== null);
+  const canDeleteCourse =
+    deleteDelayReady && deletingCourse !== null && deleteName === deletingCourse.name;
+
   const [frequent, setFrequent] = useState<Record<string, number>>({});
 
   const visibleCourses = courses;
@@ -1466,6 +1472,21 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
                         </>
                       )}
                     </Stack>
+                    <Divider />
+                    <Stack gap="sm" maw={760}>
+                      <Title order={3}>Удаление курса</Title>
+                      <Button
+                        color="red"
+                        w="fit-content"
+                        leftSection={<TrashIcon size={17} />}
+                        onClick={() => {
+                          setDeleteName("");
+                          setDeletingCourse(course);
+                        }}
+                      >
+                        Удалить курс
+                      </Button>
+                    </Stack>
                   </Stack>
                 )}
                 {((role !== "owner" && search.view === "settings") ||
@@ -1564,6 +1585,53 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
           </Group>
         </Box>
       )}
+      <Modal
+        opened={deletingCourse !== null}
+        onClose={() => setDeletingCourse(null)}
+        title="Удалить курс?"
+      >
+        <Stack>
+          <Alert color="red" icon={<WarningIcon size={22} />}>
+            <Text fw={600}>
+              Курс будет удалён. Участники потеряют к нему доступ. Это действие нельзя отменить.
+            </Text>
+          </Alert>
+          <Text size="sm">
+            Для подтверждения введите название курса:{" "}
+            <Text component="strong" inherit>
+              {deletingCourse?.name}
+            </Text>
+          </Text>
+          <TextInput
+            label="Название курса для подтверждения"
+            value={deleteName}
+            onChange={(event) => setDeleteName(event.currentTarget.value)}
+            autoComplete="off"
+          />
+          <Group justify="end">
+            <Button variant="default" data-autofocus onClick={() => setDeletingCourse(null)}>
+              Отмена
+            </Button>
+            <Button
+              color="red"
+              disabled={!canDeleteCourse}
+              onClick={() => {
+                if (!canDeleteCourse || !deletingCourse) {
+                  return;
+                }
+
+                setCourses((old) => old.filter((item) => item.id !== deletingCourse.id));
+                setDeletingCourse(null);
+                setDeleteName("");
+                navigate({ course: 0, view: "list" });
+                setMessage("Курс удалён");
+              }}
+            >
+              {deleteDelayReady ? "Удалить курс" : "Удалить курс (через 2 с)"}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
       <Modal opened={confirmOpen} onClose={() => setConfirmOpen(false)} title="Открыть курс?">
         <Stack>
           <Text>Студенты получат доступ к содержимому курса.</Text>
