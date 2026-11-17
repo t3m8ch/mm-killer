@@ -1602,7 +1602,7 @@ export function CoursesPrototype({ search, navigate }: { search: Search; navigat
           </Alert>
           <Text size="sm">
             Для подтверждения введите название курса:{" "}
-            <Text component="strong" inherit>
+            <Text component="strong" inherit fw={700}>
               {deletingCourse?.name}
             </Text>
           </Text>
